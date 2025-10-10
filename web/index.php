@@ -12,6 +12,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0">
 	<meta name="keywords" content="дневник мигрени, мигренозник, дневник">
 	<meta name="description" content="Мигренозник &mdash; дневник мигрени">
+    <link rel="manifest" href="manifest.json" crossorigin="use-credentials"  />
     <title>Мигренозник &mdash; дневник мигрени</title>
 </head>
 <body>
