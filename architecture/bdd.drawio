@@ -1,0 +1,214 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/28.1.2 Chrome/138.0.7204.243 Electron/37.4.0 Safari/537.36" version="28.1.2">
+  <diagram name="Page-1" id="_HxpFkuHzDFq6XvuuUwD">
+    <mxGraphModel dx="849" dy="559" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="900" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="-YkX-gIMlecEPIrJARPo-1" value="&lt;b&gt;bdd&lt;/b&gt; [блок] ИС пациента [Дневник мигрени]" style="shape=umlFrame;whiteSpace=wrap;html=1;pointerEvents=0;width=270;height=20;" vertex="1" parent="1">
+          <mxGeometry x="100" y="110" width="740" height="380" as="geometry" />
+        </mxCell>
+        <mxCell id="-YkX-gIMlecEPIrJARPo-4" style="rounded=1;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;startArrow=diamondThin;startFill=1;endArrow=open;endFill=0;startSize=10;edgeStyle=orthogonalEdgeStyle;jumpStyle=none;curved=0;exitX=0.341;exitY=1.003;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="-YkX-gIMlecEPIrJARPo-2" target="-YkX-gIMlecEPIrJARPo-3">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="461" y="200" />
+              <mxPoint x="420" y="200" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-YkX-gIMlecEPIrJARPo-2" value="«system»&lt;br&gt;&lt;b&gt;ИС «Дневник мигрени»&lt;/b&gt;" style="html=1;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="420" y="120" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="-YkX-gIMlecEPIrJARPo-3" value="«block»&lt;br&gt;&lt;b&gt;Ядро ИС &lt;br&gt;(backend)&lt;/b&gt;" style="html=1;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="360" y="220" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="-YkX-gIMlecEPIrJARPo-5" value="«block»&lt;br&gt;&lt;b&gt;Пользовательский&lt;br&gt;интерфейс&lt;/b&gt;" style="html=1;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="230" y="220" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="-YkX-gIMlecEPIrJARPo-6" style="rounded=1;orthogonalLoop=1;jettySize=auto;html=1;startArrow=diamondThin;startFill=1;endArrow=open;endFill=0;startSize=10;edgeStyle=orthogonalEdgeStyle;jumpStyle=none;curved=0;exitX=0.111;exitY=0.992;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="-YkX-gIMlecEPIrJARPo-2" target="-YkX-gIMlecEPIrJARPo-5">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="430" y="190" as="sourcePoint" />
+            <mxPoint x="520" y="240" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-YkX-gIMlecEPIrJARPo-8" value="" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=halfCircle;endFill=0;endSize=6;strokeWidth=1;sketch=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="-YkX-gIMlecEPIrJARPo-5">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="230" y="245" as="sourcePoint" />
+            <mxPoint x="210" y="245" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-YkX-gIMlecEPIrJARPo-11" value="RestAPI" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="-YkX-gIMlecEPIrJARPo-8">
+          <mxGeometry x="0.3157" y="-4" relative="1" as="geometry">
+            <mxPoint x="-32" y="13" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-YkX-gIMlecEPIrJARPo-12" value="«block»&lt;br&gt;&lt;b&gt;База данных&lt;/b&gt;" style="html=1;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="490" y="220" width="100" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="-YkX-gIMlecEPIrJARPo-13" style="rounded=1;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;startArrow=diamondThin;startFill=1;endArrow=open;endFill=0;startSize=10;edgeStyle=orthogonalEdgeStyle;jumpStyle=none;curved=0;exitX=0.661;exitY=0.992;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="-YkX-gIMlecEPIrJARPo-2" target="-YkX-gIMlecEPIrJARPo-12">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="480" y="190" as="sourcePoint" />
+            <mxPoint x="540" y="240" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="499" y="200" />
+              <mxPoint x="540" y="200" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-YkX-gIMlecEPIrJARPo-14" value="«block»&lt;br&gt;&lt;b&gt;ORM для БД&lt;/b&gt;" style="html=1;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="430" y="350" width="100" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="-YkX-gIMlecEPIrJARPo-15" style="rounded=1;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;startArrow=diamondThin;startFill=0;endArrow=open;endFill=0;startSize=10;edgeStyle=orthogonalEdgeStyle;jumpStyle=none;curved=0;exitX=0.81;exitY=1.005;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="-YkX-gIMlecEPIrJARPo-3" target="-YkX-gIMlecEPIrJARPo-14">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="470" y="190" as="sourcePoint" />
+            <mxPoint x="560" y="240" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-YkX-gIMlecEPIrJARPo-16" value="«block»&lt;br&gt;&lt;b&gt;Пользовательские действия&lt;/b&gt;" style="html=1;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="190" y="410" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="-YkX-gIMlecEPIrJARPo-17" style="rounded=1;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;startArrow=diamondThin;startFill=0;endArrow=open;endFill=0;startSize=10;edgeStyle=orthogonalEdgeStyle;jumpStyle=none;curved=0;exitX=0.122;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="-YkX-gIMlecEPIrJARPo-3" target="-YkX-gIMlecEPIrJARPo-16">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="450" y="290" as="sourcePoint" />
+            <mxPoint x="540" y="340" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="375" y="320" />
+              <mxPoint x="250" y="320" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-YkX-gIMlecEPIrJARPo-20" value="" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=halfCircle;endFill=0;endSize=6;strokeWidth=1;sketch=0;exitX=0.75;exitY=0;exitDx=0;exitDy=0;" edge="1" parent="1" source="-YkX-gIMlecEPIrJARPo-14">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="620" y="295" as="sourcePoint" />
+            <mxPoint x="505" y="300" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-YkX-gIMlecEPIrJARPo-21" value="" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=oval;endFill=0;sketch=0;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;endSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="505" y="270" as="sourcePoint" />
+            <mxPoint x="505" y="298" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-YkX-gIMlecEPIrJARPo-23" value="SSH" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="-YkX-gIMlecEPIrJARPo-21">
+          <mxGeometry x="1" y="6" relative="1" as="geometry">
+            <mxPoint x="-25" y="-7" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-YkX-gIMlecEPIrJARPo-22" value="" style="ellipse;whiteSpace=wrap;html=1;align=center;aspect=fixed;fillColor=none;strokeColor=none;resizable=0;perimeter=centerPerimeter;rotatable=0;allowArrows=0;points=[];outlineConnect=1;" vertex="1" parent="1">
+          <mxGeometry x="560" y="290" width="10" height="10" as="geometry" />
+        </mxCell>
+        <mxCell id="-YkX-gIMlecEPIrJARPo-25" value="" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=oval;endFill=0;sketch=0;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;endSize=10;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" edge="1" target="-YkX-gIMlecEPIrJARPo-26" parent="1" source="-YkX-gIMlecEPIrJARPo-16">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="140" y="425" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-YkX-gIMlecEPIrJARPo-27" value="RestAPI" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="-YkX-gIMlecEPIrJARPo-25">
+          <mxGeometry x="-0.2674" y="1" relative="1" as="geometry">
+            <mxPoint x="-39" y="-9" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-YkX-gIMlecEPIrJARPo-26" value="" style="ellipse;whiteSpace=wrap;html=1;align=center;aspect=fixed;fillColor=none;strokeColor=none;resizable=0;perimeter=centerPerimeter;rotatable=0;allowArrows=0;points=[];outlineConnect=1;" vertex="1" parent="1">
+          <mxGeometry x="170" y="430" width="10" height="10" as="geometry" />
+        </mxCell>
+        <mxCell id="-YkX-gIMlecEPIrJARPo-28" value="«block»&lt;br&gt;&lt;b&gt;API для работы с записями&lt;/b&gt;" style="html=1;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="350" y="410" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="-YkX-gIMlecEPIrJARPo-29" style="rounded=1;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;startArrow=diamondThin;startFill=1;endArrow=open;endFill=0;startSize=10;edgeStyle=orthogonalEdgeStyle;jumpStyle=none;curved=0;exitX=0.587;exitY=0.999;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="-YkX-gIMlecEPIrJARPo-3" target="-YkX-gIMlecEPIrJARPo-28">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="421" y="270" as="sourcePoint" />
+            <mxPoint x="420" y="240" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="430" y="330" />
+              <mxPoint x="410" y="330" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-YkX-gIMlecEPIrJARPo-30" value="«block»&lt;br&gt;&lt;b&gt;Локальное хранилище&lt;/b&gt;" style="html=1;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="110" y="320" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="-YkX-gIMlecEPIrJARPo-31" style="rounded=1;orthogonalLoop=1;jettySize=auto;html=1;startArrow=diamondThin;startFill=1;endArrow=open;endFill=0;startSize=10;edgeStyle=orthogonalEdgeStyle;jumpStyle=none;curved=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="-YkX-gIMlecEPIrJARPo-5" target="-YkX-gIMlecEPIrJARPo-30">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="450" y="190" as="sourcePoint" />
+            <mxPoint x="350" y="240" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="290" y="300" />
+              <mxPoint x="170" y="300" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-YkX-gIMlecEPIrJARPo-32" value="" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=oval;endFill=0;sketch=0;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;endSize=10;exitX=0.25;exitY=0;exitDx=0;exitDy=0;" edge="1" parent="1" source="-YkX-gIMlecEPIrJARPo-5">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="255" y="340" as="sourcePoint" />
+            <mxPoint x="260" y="199" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-YkX-gIMlecEPIrJARPo-33" value="Кнопки" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="-YkX-gIMlecEPIrJARPo-32">
+          <mxGeometry x="-0.2674" y="1" relative="1" as="geometry">
+            <mxPoint x="-24" y="-24" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-YkX-gIMlecEPIrJARPo-34" value="«block»&lt;br&gt;&lt;b&gt;Схема пользовательских данных&lt;/b&gt;" style="html=1;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="540" y="340" width="130" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="-YkX-gIMlecEPIrJARPo-35" value="«block»&lt;br&gt;&lt;b&gt;Схема аутентифика- ционных данных&lt;/b&gt;" style="html=1;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="620" y="420" width="130" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="-YkX-gIMlecEPIrJARPo-36" value="«block»&lt;br&gt;&lt;b&gt;Схема справочных данных&lt;/b&gt;" style="html=1;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="700" y="340" width="130" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="-YkX-gIMlecEPIrJARPo-37" style="rounded=1;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;startArrow=diamondThin;startFill=0;endArrow=open;endFill=0;startSize=10;edgeStyle=orthogonalEdgeStyle;jumpStyle=none;curved=0;" edge="1" parent="1" target="-YkX-gIMlecEPIrJARPo-34">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="530" y="270" as="sourcePoint" />
+            <mxPoint x="560" y="340" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="530" y="270" />
+              <mxPoint x="530" y="320" />
+              <mxPoint x="605" y="320" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-YkX-gIMlecEPIrJARPo-38" style="rounded=1;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;startArrow=diamondThin;startFill=0;endArrow=open;endFill=0;startSize=10;edgeStyle=orthogonalEdgeStyle;jumpStyle=none;curved=0;exitX=0.645;exitY=1.002;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="-YkX-gIMlecEPIrJARPo-12" target="-YkX-gIMlecEPIrJARPo-35">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="670" y="320" as="sourcePoint" />
+            <mxPoint x="830" y="370" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="555" y="300" />
+              <mxPoint x="685" y="300" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-YkX-gIMlecEPIrJARPo-39" style="rounded=1;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;startArrow=diamondThin;startFill=0;endArrow=open;endFill=0;startSize=10;edgeStyle=orthogonalEdgeStyle;jumpStyle=none;curved=0;exitX=0.897;exitY=1.002;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="-YkX-gIMlecEPIrJARPo-12" target="-YkX-gIMlecEPIrJARPo-36">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="820" y="310" as="sourcePoint" />
+            <mxPoint x="1105" y="360" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="580" y="290" />
+              <mxPoint x="765" y="290" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-YkX-gIMlecEPIrJARPo-40" value="«block»&lt;br&gt;&lt;b&gt;Сервер уведомлений&lt;/b&gt;" style="html=1;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="600" y="220" width="100" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="-YkX-gIMlecEPIrJARPo-41" style="rounded=1;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;startArrow=diamondThin;startFill=1;endArrow=open;endFill=0;startSize=10;edgeStyle=orthogonalEdgeStyle;jumpStyle=none;curved=0;exitX=0.873;exitY=0.984;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="-YkX-gIMlecEPIrJARPo-2" target="-YkX-gIMlecEPIrJARPo-40">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="470" y="190" as="sourcePoint" />
+            <mxPoint x="560" y="240" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-YkX-gIMlecEPIrJARPo-42" value="«block»&lt;br&gt;&lt;b&gt;API формирования отчетов&lt;/b&gt;" style="html=1;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="270" y="350" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="-YkX-gIMlecEPIrJARPo-43" style="rounded=1;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;startArrow=diamondThin;startFill=1;endArrow=open;endFill=0;startSize=10;edgeStyle=orthogonalEdgeStyle;jumpStyle=none;curved=0;exitX=0.354;exitY=1.004;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="-YkX-gIMlecEPIrJARPo-3" target="-YkX-gIMlecEPIrJARPo-42">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="430" y="320" as="sourcePoint" />
+            <mxPoint x="400" y="440" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="403" y="330" />
+              <mxPoint x="330" y="330" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
