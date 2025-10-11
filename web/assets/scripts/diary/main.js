@@ -4,6 +4,13 @@ class MigraineAttack {
         this.DT_Start = dt_start;
         this.DT_End = dt_end;
     }
+
+    static from_json(obj) {
+        return new MigraineAttack(
+            obj["DT_Start"] == null ? null : new Date(obj["DT_Start"]),
+            obj["DT_End"] == null ? null : new Date(obj["DT_End"]),
+        );
+    }
 }
 
 class MigrenoznikCore {
@@ -43,7 +50,7 @@ class MigrenoznikCore {
         migraine_attacks = JSON.parse(migraine_attacks);
         let migraine_attacks_obj = [];
         for (const migraine_attack of migraine_attacks) {
-            migraine_attacks_obj.push(new MigraineAttack(new Date(migraine_attack["DT_Start"]), migraine_attack["DT_End"] == null ? null : new Date(migraine_attack["DT_End"])));
+            migraine_attacks_obj.push(MigraineAttack.from_json(migraine_attack));
         }
         return migraine_attacks_obj;
     }
