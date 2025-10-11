@@ -1,7 +1,11 @@
 <?php
     $CACHES = array(
         // CSS
-        "assets/style/main.css" => "10.10.25.1"
+        "assets/style/main.css" => "11.10.25.1",
+
+        // JS
+        "assets/scripts/lib/browser.js" => "11.10.25.1",
+        "assets/scripts/diary/pageload.js" => "11.10.25.1",
     );
 
     function include_file($filename) {

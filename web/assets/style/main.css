@@ -19,6 +19,7 @@ body {
 
 .migre-v1-content {
     height: 100%;
+    margin-bottom: var(--screen-footer-margin);
 }
 
 .migre-v1-container {
