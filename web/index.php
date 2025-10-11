@@ -1,11 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Дневник мигрени</title>
-</head>
+<html lang="RU">
+<?php
+    include __DIR__ . "/assets/embed/head.php";
+?>
 <body>
-    
+    <div class="migre-v1-content">
+        <div class="migre-v1-container">
+            <div class="migre-v1-main">
+                <div class="migre-v1-main-diary">
+                    <div class="migre-v1-main-diary-wrapper">
+                        <div class="migre-v1-main-diary-item"></div>
+                    </div>
+                </div>  
+                <div class="migre-v1-main-bottom">
+                    <div class="migre-v1-main-bottom-row">
+                        <div class="migre-v1-main-bottom-button-wrapper">
+                            <button class="migre-v1-main-bottom-button">Отметить мигрень сейчас</button>
+                        </div>
+                    </div>
+                </div>    
+            </div>
+        </div>
+    </div>
 </body>
 </html>
