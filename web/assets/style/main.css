@@ -31,6 +31,9 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+
+    max-width: 500px;
+    margin: 0 auto;
 }
 
 .migre-v1-main-diary {
