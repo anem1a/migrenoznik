@@ -28,7 +28,9 @@
     ?>
 
     <script src="/<?php echo include_file("assets/scripts/lib/browser.js"); ?>"></script>
+    <script src="/<?php echo include_file("assets/scripts/lib/datetime.js"); ?>"></script>
     <script src="/<?php echo include_file("assets/scripts/diary/pageload.js"); ?>"></script>
+    <script src="/<?php echo include_file("assets/scripts/diary/main.js"); ?>"></script>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0">
 	<meta name="keywords" content="дневник мигрени, мигренозник, дневник">

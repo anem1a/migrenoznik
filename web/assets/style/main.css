@@ -31,10 +31,21 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.migre-v1-main-diary {
+    overflow-y: auto;
+}
+
+.migre-v1-main-diary-wrapper {
+    margin: 20px;
 }
 
 .migre-v1-main-bottom-button-wrapper {
-    padding: 5px;
+    padding: 15px;
 }
 
 .migre-v1-main-bottom-button {
@@ -50,11 +61,11 @@ body {
 }
 @media (hover: hover) {
     .migre-v1-main-bottom-button:hover {
-        background-color: #333;
+        background-color: #444;
     }
 }
 @media (hover: none) {
-    .migre-v1-main-bottom-button:hover {
-        background-color: #333;
+    .migre-v1-main-bottom-button:active {
+        background-color: #444;
     }
 }

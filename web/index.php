@@ -8,14 +8,13 @@
         <div class="migre-v1-container">
             <div class="migre-v1-main">
                 <div class="migre-v1-main-diary">
-                    <div class="migre-v1-main-diary-wrapper">
-                        <div class="migre-v1-main-diary-item"></div>
+                    <div class="migre-v1-main-diary-wrapper" id="migre-diary-wrapper">
                     </div>
                 </div>  
                 <div class="migre-v1-main-bottom">
                     <div class="migre-v1-main-bottom-row">
                         <div class="migre-v1-main-bottom-button-wrapper">
-                            <button class="migre-v1-main-bottom-button">Отметить мигрень сейчас</button>
+                            <button class="migre-v1-main-bottom-button" id="migre-diary-main-bottom-button" onclick="migraine_now_button_Clicked()">Отметить мигрень сейчас</button>
                         </div>
                     </div>
                 </div>    
