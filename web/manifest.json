@@ -1,0 +1,14 @@
+{
+    "name": "Мигренозник",
+    "short_name": "Мигренозник",
+    "start_url": "/",
+    "background_color": "white",
+    "display": "standalone",
+    "version": "1.0.0.0",
+    "icons": [
+        {
+            "sizes": "512x512",
+            "src": "https://migrenoznik.ru/assets/images/favicons/apple-512x512.png?1209"
+        }
+    ]
+}
