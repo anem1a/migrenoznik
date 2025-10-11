@@ -33,6 +33,10 @@ body {
     justify-content: space-between;
 }
 
+.migre-v1-main-diary {
+    overflow-y: auto;
+}
+
 .migre-v1-main-diary-wrapper {
     margin: 20px;
 }
