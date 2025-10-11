@@ -5,5 +5,6 @@ document.addEventListener('DOMContentLoaded',
         } else {
             document.documentElement.style.setProperty('--screen-footer-margin', '0px');
         }
+        compose_migraine_diary();
     }
 );

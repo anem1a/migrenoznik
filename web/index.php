@@ -8,8 +8,7 @@
         <div class="migre-v1-container">
             <div class="migre-v1-main">
                 <div class="migre-v1-main-diary">
-                    <div class="migre-v1-main-diary-wrapper">
-                        <div class="migre-v1-main-diary-item"></div>
+                    <div class="migre-v1-main-diary-wrapper" id="migre-diary-wrapper">
                     </div>
                 </div>  
                 <div class="migre-v1-main-bottom">

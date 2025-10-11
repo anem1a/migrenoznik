@@ -28,6 +28,7 @@
     ?>
 
     <script src="/<?php echo include_file("assets/scripts/lib/browser.js"); ?>"></script>
+    <script src="/<?php echo include_file("assets/scripts/lib/datetime.js"); ?>"></script>
     <script src="/<?php echo include_file("assets/scripts/diary/pageload.js"); ?>"></script>
     <script src="/<?php echo include_file("assets/scripts/diary/main.js"); ?>"></script>
 
