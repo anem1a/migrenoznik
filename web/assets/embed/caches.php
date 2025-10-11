@@ -5,6 +5,7 @@
 
         // JS
         "assets/scripts/lib/browser.js" => "11.10.25.1",
+        "assets/scripts/diary/main.js" => "11.10.25.1",
         "assets/scripts/diary/pageload.js" => "11.10.25.1",
     );
 
