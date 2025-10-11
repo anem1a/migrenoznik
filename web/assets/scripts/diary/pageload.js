@@ -6,5 +6,8 @@ document.addEventListener('DOMContentLoaded',
             document.documentElement.style.setProperty('--screen-footer-margin', '0px');
         }
         compose_migraine_diary();
+        if (Core.is_migraine_now()) {
+            document.getElementById("migre-diary-main-bottom-button").innerText = "Отметить конец мигрени";
+        }
     }
 );
