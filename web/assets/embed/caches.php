@@ -1,12 +1,13 @@
 <?php
     $CACHES = array(
         // CSS
-        "assets/style/main.css" => "11.10.25.1",
+        "assets/style/main.css" => "11.10.25.2",
 
         // JS
-        "assets/scripts/lib/browser.js" => "11.10.25.1",
-        "assets/scripts/diary/main.js" => "11.10.25.1",
-        "assets/scripts/diary/pageload.js" => "11.10.25.1",
+        "assets/scripts/lib/browser.js" => "11.10.25.2",
+        "assets/scripts/lib/datetime.js" => "11.10.25.2",
+        "assets/scripts/diary/main.js" => "11.10.25.2",
+        "assets/scripts/diary/pageload.js" => "11.10.25.2",
     );
 
     /**

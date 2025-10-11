@@ -33,8 +33,12 @@ body {
     justify-content: space-between;
 }
 
+.migre-v1-main-diary-wrapper {
+    margin: 20px;
+}
+
 .migre-v1-main-bottom-button-wrapper {
-    padding: 5px;
+    padding: 15px;
 }
 
 .migre-v1-main-bottom-button {
