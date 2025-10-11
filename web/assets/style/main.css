@@ -61,11 +61,11 @@ body {
 }
 @media (hover: hover) {
     .migre-v1-main-bottom-button:hover {
-        background-color: #333;
+        background-color: #444;
     }
 }
 @media (hover: none) {
-    .migre-v1-main-bottom-button:hover {
-        background-color: #333;
+    .migre-v1-main-bottom-button:active {
+        background-color: #444;
     }
 }
