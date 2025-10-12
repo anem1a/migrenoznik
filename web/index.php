@@ -9,7 +9,7 @@
             <header class="migre-v1-main-header">
                 <div class="migre-v1-main-header-container">
                     <div class="migre-v1-main-header-inner">
-                        <button class="migre-v1-main-header-login-button">Войти</button>
+                        <button class="migre-v1-main-header-login-button" onclick="login_Clicked()">Войти</button>
                     </div>
                 </div>
             </header>

@@ -114,6 +114,10 @@ function migraine_now_button_Clicked() {
     compose_migraine_diary();
 }
 
+function login_Clicked() {
+    window.history.pushState(null, null, "/login/");
+}
+
 function compose_migraine_diary() {
     document.getElementById("migre-diary-wrapper").innerHTML = "";
     let migraine_attacks = Core.get_migraine_attacks();
