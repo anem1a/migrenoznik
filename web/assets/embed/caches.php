@@ -1,7 +1,7 @@
 <?php
     $CACHES = array(
         // CSS
-        "assets/style/main.css" => "12.10.25.2",
+        "assets/style/main.css" => "12.10.25.3",
 
         // JS
         "assets/scripts/lib/browser.js" => "12.10.25.2",
