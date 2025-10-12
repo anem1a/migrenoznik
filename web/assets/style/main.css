@@ -1,6 +1,14 @@
+:root {
+	--screen-footer-margin: 15px;
+
+    --migre-sans-font-family: "Play", sans-serif;
+    --migre-color-bright: #34ebbd;
+}
+
+
 body {
 	margin: 0;
-	font-family: "Play", sans-serif;
+	font-family: var(--migre-sans-font-family);
 
 	font-size: 16px;
 	line-height: 1.2;
@@ -51,7 +59,7 @@ body {
 .migre-v1-main-bottom-button {
     width: 100%;
     background-color: black;
-    font-family: "Play", sans-serif;
+    font-family: var(--migre-sans-font-family);
     color: white;
     padding: 12px 0px;
     font-size: 18px;
@@ -71,7 +79,7 @@ body {
 }
 
 .migre-v1-main-header {
-    background-color: #34ebbd;
+    background-color: var(--migre-color-bright);
 }
 
 .migre-v1-main-header-inner {
@@ -82,7 +90,18 @@ body {
     border: none;
     background-color: white;
     font-size: 14px;
-    font-family: 'Play', sans-serif;
+    font-family: var(--migre-sans-font-family);
     border-radius: 4px;
     padding: 4px 10px;
+    cursor: pointer;
+}
+@media (hover: hover) {
+    .migre-v1-main-header-login-button:hover {
+        background-color: #eee;
+    }
+}
+@media (hover: none) {
+    .migre-v1-main-header-login-button:active {
+        background-color: #eee;
+    }
 }
