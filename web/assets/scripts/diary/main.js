@@ -47,12 +47,16 @@ class MigrenoznikCore {
         if (migraine_attacks == undefined) {
             return [];
         }
-        migraine_attacks = JSON.parse(migraine_attacks);
-        let migraine_attacks_obj = [];
-        for (const migraine_attack of migraine_attacks) {
-            migraine_attacks_obj.push(MigraineAttack.from_json(migraine_attack));
+        try {
+            migraine_attacks = JSON.parse(migraine_attacks);
+            let migraine_attacks_obj = [];
+            for (const migraine_attack of migraine_attacks) {
+                migraine_attacks_obj.push(MigraineAttack.from_json(migraine_attack));
+            }
+            return migraine_attacks_obj;
+        } catch (error) {
+            return [];
         }
-        return migraine_attacks_obj;
     }
 
     /**
