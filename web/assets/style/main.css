@@ -69,3 +69,20 @@ body {
         background-color: #444;
     }
 }
+
+.migre-v1-main-header {
+    background-color: #34ebbd;
+}
+
+.migre-v1-main-header-inner {
+    padding: 6px 10px;
+}
+
+.migre-v1-main-header-login-button {
+    border: none;
+    background-color: white;
+    font-size: 14px;
+    font-family: 'Play', sans-serif;
+    border-radius: 4px;
+    padding: 4px 10px;
+}

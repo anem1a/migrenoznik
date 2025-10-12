@@ -7,6 +7,13 @@
     <div class="migre-v1-content">
         <div class="migre-v1-container">
             <div class="migre-v1-main">
+                <header class="migre-v1-main-header">
+                    <div class="migre-v1-main-header-container">
+                        <div class="migre-v1-main-header-inner">
+                            <button class="migre-v1-main-header-login-button">Войти</button>
+                        </div>
+                    </div>
+                </header>
                 <div class="migre-v1-main-diary">
                     <div class="migre-v1-main-diary-wrapper" id="migre-diary-wrapper">
                     </div>
