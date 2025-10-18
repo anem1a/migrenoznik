@@ -115,7 +115,8 @@ function migraine_now_button_Clicked() {
 }
 
 function login_Clicked() {
-    window.history.pushState(null, null, "/login/");
+    window.location.href = "/login/";
+    //window.history.pushState(null, null, "/login/");
 }
 
 function compose_migraine_diary() {
