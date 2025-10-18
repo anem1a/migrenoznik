@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="RU">
 <?php
+    $_head = array(
+        "dir" => __DIR__
+    );
     include __DIR__ . "/assets/embed/head.php";
 ?>
 <body>
