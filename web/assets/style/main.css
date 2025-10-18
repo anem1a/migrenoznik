@@ -124,6 +124,28 @@ body {
     font-family: var(--migre-sans-font-family);
 }
 
+.migre-v1-main-login-field-container button {
+    width: 100%;
+    background-color: black;
+    font-family: var(--migre-sans-font-family);
+    color: white;
+    padding: 12px 0px;
+    font-size: 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    border: none;
+}
+@media (hover: hover) {
+    .migre-v1-main-login-field-container button:hover {
+        background-color: #444;
+    }
+}
+@media (hover: none) {
+    .migre-v1-main-login-field-container button:active {
+        background-color: #444;
+    }
+}
+
 .migre-v1-main-login {
     margin: 0 auto;
     width: 100%;

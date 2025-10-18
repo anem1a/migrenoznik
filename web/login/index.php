@@ -34,6 +34,11 @@
                                 <input type="text">
                             </div>
                         </div>
+                        <div class="migre-v1-main-login-field-wrapper">
+                            <div class="migre-v1-main-login-field-container">
+                                <button>Войти</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
