@@ -25,18 +25,18 @@
                         <div class="migre-v1-main-login-field-wrapper">
                             <div>Эл. почта</div>
                             <div class="migre-v1-main-login-field-container">
-                                <input type="text">
+                                <input name="login" type="text">
                             </div>
                         </div>
                         <div class="migre-v1-main-login-field-wrapper">
                             <div>Пароль</div>
                             <div class="migre-v1-main-login-field-container">
-                                <input type="text">
+                                <input name="password" type="text">
                             </div>
                         </div>
                         <div class="migre-v1-main-login-field-wrapper">
                             <div class="migre-v1-main-login-field-container">
-                                <button>Войти</button>
+                                <button onclick="login_button_Clicked()">Войти</button>
                             </div>
                         </div>
                     </div>

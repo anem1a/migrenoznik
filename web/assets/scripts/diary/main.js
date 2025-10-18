@@ -135,4 +135,33 @@ function compose_migraine_diary() {
     }
 }
 
+async function login_button_Clicked() {
+    const login = document.getElementsByName('login')[0].value;
+    const password = document.getElementsByName('password')[0].value;
+
+    try {
+        let data = new FormData();
+        data.append("login", login);
+        data.append("password", password);
+        
+        const response = await fetch('/assets/actions/login.php', {
+            method: 'POST',
+            body: data,
+        });
+        
+        if (!response.ok) throw new Error(`Ошибка HTTP ${response.status}`);
+        
+        const result = await response.json();
+        if (result["success"]) {
+            alert("Логин и пароль правильные");
+        } else {
+            alert("Неверный логин или пароль");
+        }
+
+    } catch(error) {
+        console.error('Ошибка:', error.message);
+    }
+    
+}
+
 const Core = new MigrenoznikCore();
