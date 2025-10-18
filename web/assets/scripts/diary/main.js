@@ -114,6 +114,11 @@ function migraine_now_button_Clicked() {
     compose_migraine_diary();
 }
 
+function login_Clicked() {
+    window.location.href = "/login/";
+    //window.history.pushState(null, null, "/login/");
+}
+
 function compose_migraine_diary() {
     document.getElementById("migre-diary-wrapper").innerHTML = "";
     let migraine_attacks = Core.get_migraine_attacks();
@@ -128,6 +133,35 @@ function compose_migraine_diary() {
         }
         document.getElementById("migre-diary-wrapper").appendChild(diary_item);
     }
+}
+
+async function login_button_Clicked() {
+    const login = document.getElementsByName('login')[0].value;
+    const password = document.getElementsByName('password')[0].value;
+
+    try {
+        let data = new FormData();
+        data.append("login", login);
+        data.append("password", password);
+        
+        const response = await fetch('/assets/actions/login.php', {
+            method: 'POST',
+            body: data,
+        });
+        
+        if (!response.ok) throw new Error(`Ошибка HTTP ${response.status}`);
+        
+        const result = await response.json();
+        if (result["success"]) {
+            alert("Логин и пароль правильные");
+        } else {
+            alert("Неверный логин или пароль");
+        }
+
+    } catch(error) {
+        console.error('Ошибка:', error.message);
+    }
+    
 }
 
 const Core = new MigrenoznikCore();

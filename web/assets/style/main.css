@@ -1,6 +1,19 @@
+:root {
+	--screen-footer-margin: 15px;
+
+    --migre-sans-font-family: "Play", sans-serif;
+    --migre-color-bright: #34ebbd;
+
+    --migre-font-size-s: 14px;
+    --migre-font-size-m: 16px;
+    --migre-font-size-l: 18px;
+    --migre-font-size-xl: 24px;
+}
+
+
 body {
 	margin: 0;
-	font-family: "Play", sans-serif;
+	font-family: var(--migre-sans-font-family);
 
 	font-size: 16px;
 	line-height: 1.2;
@@ -24,16 +37,19 @@ body {
 
 .migre-v1-container {
     height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .migre-v1-main {
-    height: 100%;
     display: flex;
     flex-direction: column;
+    flex-grow: 1;
     justify-content: space-between;
-
-    max-width: 500px;
+    overflow-y: hidden;
+    max-width: 420px;
     margin: 0 auto;
+    width: 100%;
 }
 
 .migre-v1-main-diary {
@@ -51,7 +67,7 @@ body {
 .migre-v1-main-bottom-button {
     width: 100%;
     background-color: black;
-    font-family: "Play", sans-serif;
+    font-family: var(--migre-sans-font-family);
     color: white;
     padding: 12px 0px;
     font-size: 18px;
@@ -68,4 +84,74 @@ body {
     .migre-v1-main-bottom-button:active {
         background-color: #444;
     }
+}
+
+.migre-v1-main-header {
+    background-color: var(--migre-color-bright);
+}
+
+.migre-v1-main-header-inner {
+    padding: 6px 10px;
+}
+
+.migre-v1-main-header-login-button {
+    border: none;
+    background-color: white;
+    font-size: 14px;
+    font-family: var(--migre-sans-font-family);
+    border-radius: 4px;
+    padding: 4px 10px;
+    cursor: pointer;
+}
+@media (hover: hover) {
+    .migre-v1-main-header-login-button:hover {
+        background-color: #eee;
+    }
+}
+@media (hover: none) {
+    .migre-v1-main-header-login-button:active {
+        background-color: #eee;
+    }
+}
+
+.migre-v1-main-login-field-container input {
+    border: none;
+    border-bottom: 1px solid black;
+    border-radius: 0;
+    outline: none;
+    width: 100%;
+    font-size: 24px;
+    font-family: var(--migre-sans-font-family);
+}
+
+.migre-v1-main-login-field-container button {
+    width: 100%;
+    background-color: black;
+    font-family: var(--migre-sans-font-family);
+    color: white;
+    padding: 12px 0px;
+    font-size: 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    border: none;
+}
+@media (hover: hover) {
+    .migre-v1-main-login-field-container button:hover {
+        background-color: #444;
+    }
+}
+@media (hover: none) {
+    .migre-v1-main-login-field-container button:active {
+        background-color: #444;
+    }
+}
+
+.migre-v1-main-login {
+    margin: 0 auto;
+    width: 100%;
+    max-width: 300px;
+}
+
+.migre-v1-main-login-field-wrapper {
+    margin-bottom: 15px;
 }
