@@ -155,3 +155,22 @@ body {
 .migre-v1-main-login-field-wrapper {
     margin-bottom: 15px;
 }
+
+.migre-v1-main-diary-item a {
+    color: rgb(18, 126, 255);
+    border-bottom: 1px solid rgb(18, 126, 255);
+    margin-left: .75em;
+    cursor: pointer;
+}
+@media (hover: hover) {
+    .migre-v1-main-diary-item a:hover {
+        color: rgb(255, 126, 18);
+        border-bottom: 1px solid rgb(255, 126, 18);
+    }
+}
+@media (hover: none) {
+    .migre-v1-main-diary-item a:active {
+        color: rgb(255, 126, 18);
+        border-bottom: 1px solid rgb(255, 126, 18);
+    }
+}
