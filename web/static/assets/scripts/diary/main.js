@@ -174,7 +174,7 @@ async function login_button_Clicked() {
         data.append("login", login);
         data.append("password", password);
         
-        const response = await fetch('/assets/actions/login.php', {
+        const response = await fetch('/api/login', {
             method: 'POST',
             body: data,
         });
