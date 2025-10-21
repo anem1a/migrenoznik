@@ -25,8 +25,25 @@ func main() {
 	// API
 	mux.HandleFunc("/api/login", loginHandler)
 
-	log.Println("🚀 Сервер запущен")
-	log.Fatal(http.ListenAndServe(":80", mux))
+	// HTTPS сервер
+	go func() {
+		log.Println("🚀 HTTPS сервер запущен на https://migrenoznik.ru")
+		err := http.ListenAndServeTLS(
+			":443",
+			"/etc/letsencrypt/live/migrenoznik.ru/fullchain.pem",
+			"/etc/letsencrypt/live/migrenoznik.ru/privkey.pem",
+			mux,
+		)
+		if err != nil {
+			log.Fatal("Ошибка HTTPS сервера:", err)
+		}
+	}()
+
+	// HTTP → HTTPS редирект
+	log.Println("➡️ HTTP сервер запущен (редиректит на HTTPS)")
+	log.Fatal(http.ListenAndServe(":80", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "https://"+r.Host+r.RequestURI, http.StatusMovedPermanently)
+	})))
 }
 
 func renderTemplate(w http.ResponseWriter, name string) {
