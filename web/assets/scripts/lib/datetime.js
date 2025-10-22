@@ -1,7 +1,7 @@
 
 class Calendar {
-    static month_number_to_name(month_number) {
-        switch (month_number) {
+    static month_number_to_name(month_number) { /* Мария: имена методов должны быть в стиле camelCase: month_number_to_name → monthNumberToName */
+        switch (month_number) { /* Мария: имена переменных должны быть в стиле camelCase: month_number → monthNumber */
             case 0:
                 return "янв";
             case 1:
