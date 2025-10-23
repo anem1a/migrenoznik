@@ -1,106 +1,95 @@
 import MigraineAttackMapper from '../mappers/MigraineAttackMapper.js';
 import MigraineAttack from '../models/MigraineAttack.js';
+import { STORAGE_KEYS } from '../config/storageKeys.js';
 
-/**
- * Класс MigrenoznikCore управляет логикой хранения и обработки данных.
- */
-class MigrenoznikCore {
-  constructor(storage = localStorage) {
-    this.storage = storage;
-    // Исправлено: внедрение зависимости (Dependency Inversion)
-  }
-
-  /**
-   * Проверяет, активен ли сейчас приступ мигрени.
-   * @returns {boolean}
-   */
-  isMigraineNow() { // Исправлено: camelCase
-    let migraineNow = this.storage.getItem('migraine_now'); // camelCase
-    if (migraineNow === undefined || migraineNow === null) {
-      this.storage.setItem('migraine_now', 'false');
-      return false;
-    }
-    return migraineNow === 'true';
-  }
-
-  /**
-   * Переключает статус текущего приступа мигрени.
-   */
-  toggleMigraineStatus() { // camelCase
-    const current = this.isMigraineNow();
-    this.storage.setItem('migraine_now', current ? 'false' : 'true');
-  }
-
-  /**
-   * Возвращает список всех приступов мигрени из хранилища.
-   * @returns {MigraineAttack[]}
-   */
-  getMigraineAttacks() { // camelCase
-    let migraineAttacks = this.storage.getItem('migraine_attacks');
-    if (!migraineAttacks) return [];
-    try {
-      migraineAttacks = JSON.parse(migraineAttacks);
-      return migraineAttacks.map(a => MigraineAttackMapper.fromJson(a));
-    } catch (error) {
-      console.error('Ошибка чтения данных мигрени:', error);
-      return [];
-    }
-  }
-
-  /**
-   * Добавляет новую запись приступа мигрени.
-   * @param {MigraineAttack} migraineAttack
-   */
-  addNewMigraineAttack(migraineAttack) { // camelCase
-    try {
-      let migraineAttacks =
-        JSON.parse(this.storage.getItem('migraine_attacks') || '[]');
-      migraineAttacks.push(MigraineAttackMapper.toJson(migraineAttack));
-      this.storage.setItem('migraine_attacks', JSON.stringify(migraineAttacks));
-    } catch (error) {
-      console.error('Ошибка добавления приступа:', error);
-      this.storage.setItem(
-        'migraine_attacks',
-        JSON.stringify([MigraineAttackMapper.toJson(migraineAttack)])
-      );
-    }
-  }
-
-  /**
-   * Удаляет запись приступа по индексу.
-   * @param {number} index
-   */
-  removeMigraineAttack(index) { // camelCase
-    try {
-      let migraineAttacks =
-        JSON.parse(this.storage.getItem('migraine_attacks') || '[]');
-      if (index < 0 || index >= migraineAttacks.length) return;
-      migraineAttacks = migraineAttacks.filter((_, i) => i !== index); // Упрощено (KISS)
-      this.storage.setItem('migraine_attacks', JSON.stringify(migraineAttacks));
-    } catch (error) {
-      console.error('Ошибка удаления приступа:', error);
-      this.storage.setItem('migraine_attacks', JSON.stringify([]));
-    }
-  }
-
-  /**
-   * Закрывает последний приступ мигрени (устанавливает dtEnd = now).
-   */
-  closeLastMigraineAttack() { // camelCase
-    try {
-      let migraineAttacks =
-        JSON.parse(this.storage.getItem('migraine_attacks') || '[]');
-      if (migraineAttacks.length === 0) return;
-      const last = migraineAttacks.pop();
-      last.DT_End = new Date().toISOString();
-      migraineAttacks.push(last);
-      this.storage.setItem('migraine_attacks', JSON.stringify(migraineAttacks));
-    } catch (error) {
-      console.error('Ошибка закрытия приступа:', error);
-    }
+class StorageError extends Error {
+  constructor(message, originalError) {
+    super(message);
+    this.name = 'StorageError';
+    this.originalError = originalError;
   }
 }
 
-const CORE = new MigrenoznikCore(); // Константа верхнего уровня в верхнем регистре.
+class MigrenoznikCore {
+  constructor(storage = localStorage, mapper = MigraineAttackMapper) {
+    this.storage = storage;
+    this.mapper = mapper;
+  }
 
+  isMigraineNow() {
+    const migraineNow = this.storage.getItem(STORAGE_KEYS.MIGRAINE_NOW);
+    if (migraineNow === null) {
+      this.storage.setItem(STORAGE_KEYS.MIGRAINE_NOW, JSON.stringify(false));
+      return false;
+    }
+    return JSON.parse(migraineNow);
+  }
+
+  toggleMigraineStatus() {
+    const current = this.isMigraineNow();
+    this.storage.setItem(STORAGE_KEYS.MIGRAINE_NOW, JSON.stringify(!current));
+  }
+
+  getMigraineAttacks() {
+    const migraineAttacks = this.storage.getItem(STORAGE_KEYS.MIGRAINE_ATTACKS);
+    if (!migraineAttacks) return [];
+    
+    try {
+      const parsedAttacks = JSON.parse(migraineAttacks);
+      return parsedAttacks.map(attack => this.mapper.fromJson(attack));
+    } catch (error) {
+      console.error('Ошибка чтения данных мигрени:', error);
+      throw new StorageError('Failed to read migraine attacks', error);
+    }
+  }
+
+  addNewMigraineAttack(migraineAttack) {
+    try {
+      const migraineAttacks = this.getMigraineAttacksFromStorage();
+      migraineAttacks.push(this.mapper.toJson(migraineAttack));
+      this.saveMigraineAttacks(migraineAttacks);
+    } catch (error) {
+      console.error('Ошибка добавления приступа:', error);
+      this.saveMigraineAttacks([this.mapper.toJson(migraineAttack)]);
+    }
+  }
+
+  removeMigraineAttack(index) {
+    try {
+      const migraineAttacks = this.getMigraineAttacksFromStorage();
+      if (index < 0 || index >= migraineAttacks.length) return;
+      
+      const filteredAttacks = migraineAttacks.filter((_, i) => i !== index);
+      this.saveMigraineAttacks(filteredAttacks);
+    } catch (error) {
+      console.error('Ошибка удаления приступа:', error);
+      throw new StorageError('Failed to remove migraine attack', error);
+    }
+  }
+
+  closeLastMigraineAttack() {
+    try {
+      const migraineAttacks = this.getMigraineAttacksFromStorage();
+      if (migraineAttacks.length === 0) return;
+      
+      const lastAttack = migraineAttacks[migraineAttacks.length - 1];
+      lastAttack.DT_End = new Date().toISOString();
+      this.saveMigraineAttacks(migraineAttacks);
+    } catch (error) {
+      console.error('Ошибка закрытия приступа:', error);
+      throw new StorageError('Failed to close migraine attack', error);
+    }
+  }
+
+  getMigraineAttacksFromStorage() {
+    const migraineAttacks = this.storage.getItem(STORAGE_KEYS.MIGRAINE_ATTACKS);
+    return migraineAttacks ? JSON.parse(migraineAttacks) : [];
+  }
+
+  saveMigraineAttacks(attacks) {
+    this.storage.setItem(STORAGE_KEYS.MIGRAINE_ATTACKS, JSON.stringify(attacks));
+  }
+}
+
+const CORE = new MigrenoznikCore();
 export default CORE;
