@@ -1,4 +1,6 @@
-// Импортируем класс из отдельного модуля
+// Импортируем класс MigraineAttack из отдельного файла
+// → Это позволяет разделить код на части (модули), как в руководстве
+// → Раньше всё было в одном файле — плохо для поддержки
 import { MigraineAttack } from './MigraineAttack.js';
 
 /**
@@ -15,7 +17,9 @@ class MigrenoznikCore {
         if (!data) return [];
         try {
             const attacks = JSON.parse(data);
-            return attacks.map(MigraineAttack.from_json);
+            // Используем fromJson — метод из MigraineAttack.js
+            // → Раньше было from_json (snake_case), теперь camelCase
+            return attacks.map(MigraineAttack.fromJson);
         } catch (e) {
             console.warn("Failed to parse migraine_attacks, returning empty array");
             return [];
@@ -29,6 +33,9 @@ class MigrenoznikCore {
      */
     _saveAttacks(attacks) {
         try {
+            // Сохраняем массив атак
+            // → Раньше дублировался этот код в 4 местах
+            // → Теперь он в одном месте — проще поддерживать
             localStorage.setItem("migraine_attacks", JSON.stringify(attacks));
         } catch (e) {
             console.error("Failed to save migraine_attacks");
@@ -42,6 +49,8 @@ class MigrenoznikCore {
     isMigraineNow() {
         const migraineNow = localStorage.getItem("migraine_now");
         return migraineNow === "true";
+        // → Раньше было is_migraine_now() — snake_case
+        // → Теперь isMigraineNow() — camelCase, как в руководстве
     }
 
     /**
@@ -50,6 +59,8 @@ class MigrenoznikCore {
     toggleMigraineStatus() {
         const status = !this.isMigraineNow();
         localStorage.setItem("migraine_now", status.toString());
+        // → Раньше было toggle_migraine_status() — snake_case
+        // → Теперь toggleMigraineStatus() — camelCase
     }
 
     /**
@@ -58,6 +69,8 @@ class MigrenoznikCore {
      */
     getMigraineAttacks() {
         return this._getParsedAttacks();
+        // → Раньше было get_migraine_attacks() — snake_case
+        // → Теперь getMigraineAttacks() — camelCase
     }
 
     /**
@@ -68,6 +81,8 @@ class MigrenoznikCore {
         const attacks = this._getParsedAttacks();
         attacks.push(migraineAttack);
         this._saveAttacks(attacks);
+        // → Раньше было add_new_migraine_attack() — snake_case
+        // → Теперь addNewMigraineAttack() — camelCase
     }
 
     /**
@@ -77,19 +92,27 @@ class MigrenoznikCore {
     removeMigraineAttack(no) {
         const attacks = this._getParsedAttacks();
         if (no < 0 || no >= attacks.length) return;
+        // → Раньше удаляли через цикл — сложно и медленно
+        // → Теперь используем splice() — проще и понятнее
         attacks.splice(no, 1);
         this._saveAttacks(attacks);
+        // → Раньше было remove_migraine_attack() — snake_case
+        // → Теперь removeMigraineAttack() — camelCase
     }
 
     /**
-     * Завершает последнюю атаку (устанавливает DT_End = сейчас).
+     * Завершает последнюю атаку (устанавливает endDate = сейчас).
      */
     closeLastMigraineAttack() {
         const attacks = this._getParsedAttacks();
         if (attacks.length === 0) return;
         const last = attacks[attacks.length - 1];
-        last.DT_End = new Date();
+        // → Раньше было last.DT_End — не по стилю
+        // → Теперь last.endDate — camelCase
+        last.endDate = new Date();
         this._saveAttacks(attacks);
+        // → Раньше было close_last_migraine_attack() — snake_case
+        // → Теперь closeLastMigraineAttack() — camelCase
     }
 }
 
@@ -100,12 +123,15 @@ function migraineNowButtonClicked() {
     if (CORE.isMigraineNow()) {
         CORE.toggleMigraineStatus();
         CORE.closeLastMigraineAttack();
+        // → Раньше было migraine_now_button_Clicked() — смешанный стиль
+        // → Теперь migraineNowButtonClicked() — чистый camelCase
         document.getElementById("migre-diary-main-bottom-button").innerText = "Отметить мигрень сейчас";
     } else {
         CORE.toggleMigraineStatus();
         CORE.addNewMigraineAttack(new MigraineAttack(new Date()));
         document.getElementById("migre-diary-main-bottom-button").innerText = "Отметить конец мигрени";
     }
+    // Обновляем отображение дневника
     composeMigraineDiary();
 }
 
@@ -114,6 +140,8 @@ function migraineNowButtonClicked() {
  */
 function loginClicked() {
     window.location.href = "/login/";
+    // → Раньше было login_Clicked() — snake_case
+    // → Теперь loginClicked() — camelCase
 }
 
 /**
@@ -135,11 +163,16 @@ function composeMigraineDiary() {
                 `${date.getDate()} ${Calendar.month_number_to_name(date.getMonth())} ` +
                 `${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}`
             );
+            // → Форматируем дату красиво: "5 Октябрь 2025 14:30"
         };
 
-        let html = `<b>Запись&nbsp;${i + 1}.</b> ${formatDate(attack.DT_Start)}`;
-        if (attack.DT_End != null) {
-            html += ` &ndash; ${formatDate(attack.DT_End)}`;
+        // → Раньше использовали attack.DT_Start — не по стилю
+        // → Теперь attack.startDate — camelCase
+        let html = `<b>Запись&nbsp;${i + 1}.</b> ${formatDate(attack.startDate)}`;
+        if (attack.endDate != null) {
+            // → Раньше было attack.DT_End
+            // → Теперь attack.endDate — camelCase
+            html += ` &ndash; ${formatDate(attack.endDate)}`;
             html += ` <a href="#" onclick="deleteEntryClicked(${i}); return false;">Удалить</a>`;
         }
 
@@ -155,6 +188,8 @@ function composeMigraineDiary() {
 function deleteEntryClicked(no) {
     CORE.removeMigraineAttack(no);
     composeMigraineDiary();
+    // → Раньше было delete_entry_Clicked() — snake_case
+    // → Теперь deleteEntryClicked() — camelCase
 }
 
 /**
@@ -191,19 +226,25 @@ async function loginButtonClicked() {
         console.error('Ошибка:', error.message);
         alert("Не удалось подключиться к серверу. Попробуйте позже.");
     }
+    // → Раньше было login_button_Clicked() — snake_case
+    // → Теперь loginButtonClicked() — camelCase
 }
 
 // Глобальная константа ядра
+// → Раньше было Core (с большой, но не UPPER_CASE)
+// → Теперь CORE — константа в правильном стиле (UPPER_CASE)
 const CORE = new MigrenoznikCore();
 
-// Инициализация при загрузке
-document.addEventListener("DOMContentLoaded", () => {
-    composeMigraineDiary();
-    // Привязка событий (пример — можно вынести в HTML или отдельный скрипт)
-    const button = document.getElementById("migre-diary-main-bottom-button");
-    if (button) {
-        button.innerText = CORE.isMigraineNow()
-            ? "Отметить конец мигрени"
-            : "Отметить мигрень сейчас";
-    }
-});
+// === ПРОСТАЯ ИНИЦИАЛИЗАЦИЯ ===
+// Просто вызываем функцию после объявления всего
+// → Раньше не было инициализации — дневник не обновлялся при открытии
+// → Теперь он сразу показывается
+composeMigraineDiary();
+
+// Меняем текст кнопки в зависимости от статуса
+const button = document.getElementById("migre-diary-main-bottom-button");
+if (button) {
+    button.innerText = CORE.isMigraineNow()
+        ? "Отметить конец мигрени"
+        : "Отметить мигрень сейчас";
+}
