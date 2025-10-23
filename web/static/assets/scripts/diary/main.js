@@ -1,197 +1,209 @@
+// Импортируем класс из отдельного модуля
+import { MigraineAttack } from './MigraineAttack.js';
 
-class MigraineAttack {
-    constructor(dt_start, dt_end = null) {
-        this.DT_Start = dt_start;
-        this.DT_End = dt_end;
-    }
-
-    static from_json(obj) {
-        return new MigraineAttack(
-            obj["DT_Start"] == null ? null : new Date(obj["DT_Start"]),
-            obj["DT_End"] == null ? null : new Date(obj["DT_End"]),
-        );
-    }
-}
-
+/**
+ * Основной класс логики приложения "Дневник мигрени".
+ */
 class MigrenoznikCore {
-
     /**
-     * Does user have migraine now.
-     * @returns True if yes, False if no
+     * Получает и парсит массив атак из localStorage.
+     * @returns {MigraineAttack[]}
+     * @private
      */
-    is_migraine_now() {
-        let migraine_now = localStorage.getItem("migraine_now");
-        if (migraine_now == undefined) {
-            localStorage.setItem("migraine_now", "false");
-            return false;
-        }
-        return migraine_now == "true";
-    }
-
-    /**
-     * Toggles user's migraine status, i.e. if user has migraine, stops it, otherwise starts it.
-     */
-    toggle_migraine_status() {
-        if (this.is_migraine_now()) {
-            localStorage.setItem("migraine_now", "false");
-        } else {
-            localStorage.setItem("migraine_now", "true");
-        }
-    }
-
-    /**
-     * Returns the entire diary of migraine attacks.
-     */
-    get_migraine_attacks() {
-        let migraine_attacks = localStorage.getItem("migraine_attacks");
-        if (migraine_attacks == undefined) {
-            return [];
-        }
+    _getParsedAttacks() {
+        const data = localStorage.getItem("migraine_attacks");
+        if (!data) return [];
         try {
-            migraine_attacks = JSON.parse(migraine_attacks);
-            let migraine_attacks_obj = [];
-            for (const migraine_attack of migraine_attacks) {
-                migraine_attacks_obj.push(MigraineAttack.from_json(migraine_attack));
-            }
-            return migraine_attacks_obj;
-        } catch (error) {
+            const attacks = JSON.parse(data);
+            return attacks.map(MigraineAttack.from_json);
+        } catch (e) {
+            console.warn("Failed to parse migraine_attacks, returning empty array");
             return [];
         }
     }
 
     /**
-     * Adds new migraine attack to the end of the list.
+     * Сохраняет массив атак в localStorage.
+     * @param {MigraineAttack[]} attacks
+     * @private
      */
-    add_new_migraine_attack(migraine_attack) {
-        let migraine_attacks = localStorage.getItem("migraine_attacks");
-        if (migraine_attacks == undefined) {
-            localStorage.setItem("migraine_attacks", JSON.stringify([migraine_attack]));
-            return;
-        }
+    _saveAttacks(attacks) {
         try {
-            migraine_attacks = JSON.parse(migraine_attacks);
-            migraine_attacks.push(migraine_attack);
-            localStorage.setItem("migraine_attacks", JSON.stringify(migraine_attacks));
-        } catch (error) {
-            localStorage.setItem("migraine_attacks", JSON.stringify([migraine_attack]));
+            localStorage.setItem("migraine_attacks", JSON.stringify(attacks));
+        } catch (e) {
+            console.error("Failed to save migraine_attacks");
         }
     }
 
-    remove_migraine_attack(no) {
-        let migraine_attacks = localStorage.getItem("migraine_attacks");
-        if (migraine_attacks == undefined) {
-            localStorage.setItem("migraine_attacks", JSON.stringify([]));
-            return;
-        }
-        try {
-            migraine_attacks = JSON.parse(migraine_attacks);
-            if (migraine_attacks.length < no) {
-                return;
-            }
-            let new_migraine_attacks = [];
-            for (let i = 0; i < migraine_attacks.length; i++) {
-                const migraine_attack = migraine_attacks[i];
-                if (i != no) {
-                    new_migraine_attacks.push(migraine_attack);
-                }
-            }
-            localStorage.setItem("migraine_attacks", JSON.stringify(new_migraine_attacks));
-        } catch (error) {
-            localStorage.setItem("migraine_attacks", JSON.stringify([]));
-        }
+    /**
+     * Проверяет, есть ли мигрень сейчас.
+     * @returns {boolean}
+     */
+    isMigraineNow() {
+        const migraineNow = localStorage.getItem("migraine_now");
+        return migraineNow === "true";
     }
 
-    close_last_migraine_attack() {
-        let migraine_attacks = localStorage.getItem("migraine_attacks");
-        if (migraine_attacks == undefined) {
-            return;
-        }
-        try {
-            migraine_attacks = JSON.parse(migraine_attacks);
-            let last_element = migraine_attacks.pop();
-            last_element["DT_End"] = new Date();
-            migraine_attacks.push(last_element);
-            localStorage.setItem("migraine_attacks", JSON.stringify(migraine_attacks));
-        } catch (error) {
-            return;
-        }
+    /**
+     * Переключает статус мигрени (есть/нет).
+     */
+    toggleMigraineStatus() {
+        const status = !this.isMigraineNow();
+        localStorage.setItem("migraine_now", status.toString());
     }
 
-    constructor() {
-        
+    /**
+     * Возвращает весь дневник атак.
+     * @returns {MigraineAttack[]}
+     */
+    getMigraineAttacks() {
+        return this._getParsedAttacks();
+    }
+
+    /**
+     * Добавляет новую атаку в конец списка.
+     * @param {MigraineAttack} migraineAttack
+     */
+    addNewMigraineAttack(migraineAttack) {
+        const attacks = this._getParsedAttacks();
+        attacks.push(migraineAttack);
+        this._saveAttacks(attacks);
+    }
+
+    /**
+     * Удаляет атаку по номеру.
+     * @param {number} no - Индекс записи в массиве
+     */
+    removeMigraineAttack(no) {
+        const attacks = this._getParsedAttacks();
+        if (no < 0 || no >= attacks.length) return;
+        attacks.splice(no, 1);
+        this._saveAttacks(attacks);
+    }
+
+    /**
+     * Завершает последнюю атаку (устанавливает DT_End = сейчас).
+     */
+    closeLastMigraineAttack() {
+        const attacks = this._getParsedAttacks();
+        if (attacks.length === 0) return;
+        const last = attacks[attacks.length - 1];
+        last.DT_End = new Date();
+        this._saveAttacks(attacks);
     }
 }
 
 /**
- * Onclick event of pressing the "Migraine now" button
+ * Обработчик клика по кнопке "Мигрень сейчас".
  */
-function migraine_now_button_Clicked() {
-    if (Core.is_migraine_now()) {
-        Core.toggle_migraine_status();
-        Core.close_last_migraine_attack();
+function migraineNowButtonClicked() {
+    if (CORE.isMigraineNow()) {
+        CORE.toggleMigraineStatus();
+        CORE.closeLastMigraineAttack();
         document.getElementById("migre-diary-main-bottom-button").innerText = "Отметить мигрень сейчас";
     } else {
-        Core.toggle_migraine_status();
-        Core.add_new_migraine_attack(new MigraineAttack(new Date()));
+        CORE.toggleMigraineStatus();
+        CORE.addNewMigraineAttack(new MigraineAttack(new Date()));
         document.getElementById("migre-diary-main-bottom-button").innerText = "Отметить конец мигрени";
     }
-    compose_migraine_diary();
+    composeMigraineDiary();
 }
 
-function login_Clicked() {
+/**
+ * Обработчик клика по кнопке "Войти".
+ */
+function loginClicked() {
     window.location.href = "/login/";
-    //window.history.pushState(null, null, "/login/");
 }
 
-function compose_migraine_diary() {
-    document.getElementById("migre-diary-wrapper").innerHTML = "";
-    let migraine_attacks = Core.get_migraine_attacks();
-    for (let i = 0; i < migraine_attacks.length; i++) {
-        const migraine_attack = migraine_attacks[i];
-        let diary_item = document.createElement("div");
-        diary_item.className = "migre-v1-main-diary-item";
-        let a = new Date();
-        diary_item.innerHTML = `<b>Запись&nbsp;${i+1}.</b> ${migraine_attack.DT_Start.getDate()} ${Calendar.month_number_to_name(migraine_attack.DT_Start.getMonth())} ${migraine_attack.DT_Start.getFullYear()} ${migraine_attack.DT_Start.getHours() < 10 ? "0" : ""}${migraine_attack.DT_Start.getHours()}:${migraine_attack.DT_Start.getMinutes() < 10 ? "0" : ""}${migraine_attack.DT_Start.getMinutes()}`;
-        if (migraine_attack.DT_End != null) {
-            diary_item.innerHTML += ` &ndash; ${migraine_attack.DT_End.getDate()} ${Calendar.month_number_to_name(migraine_attack.DT_End.getMonth())} ${migraine_attack.DT_End.getFullYear()} ${migraine_attack.DT_End.getHours() < 10 ? "0" : ""}${migraine_attack.DT_End.getHours()}:${migraine_attack.DT_End.getMinutes() < 10 ? "0" : ""}${migraine_attack.DT_End.getMinutes()}`;
-            diary_item.innerHTML += ` <a onclick=\"delete_entry_Clicked(${i})\">Удалить</a>`;
+/**
+ * Формирует отображение дневника мигреней.
+ */
+function composeMigraineDiary() {
+    const container = document.getElementById("migre-diary-wrapper");
+    container.innerHTML = "";
+
+    const attacks = CORE.getMigraineAttacks();
+    for (let i = 0; i < attacks.length; i++) {
+        const attack = attacks[i];
+        const item = document.createElement("div");
+        item.className = "migre-v1-main-diary-item";
+
+        const formatDate = (date) => {
+            const pad = (n) => n < 10 ? "0" + n : n;
+            return (
+                `${date.getDate()} ${Calendar.month_number_to_name(date.getMonth())} ` +
+                `${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}`
+            );
+        };
+
+        let html = `<b>Запись&nbsp;${i + 1}.</b> ${formatDate(attack.DT_Start)}`;
+        if (attack.DT_End != null) {
+            html += ` &ndash; ${formatDate(attack.DT_End)}`;
+            html += ` <a href="#" onclick="deleteEntryClicked(${i}); return false;">Удалить</a>`;
         }
-        document.getElementById("migre-diary-wrapper").appendChild(diary_item);
+
+        item.innerHTML = html;
+        container.appendChild(item);
     }
 }
 
-function delete_entry_Clicked(no) {
-    Core.remove_migraine_attack(no);
-    compose_migraine_diary();
+/**
+ * Обработчик удаления записи.
+ * @param {number} no - Номер записи
+ */
+function deleteEntryClicked(no) {
+    CORE.removeMigraineAttack(no);
+    composeMigraineDiary();
 }
 
-async function login_button_Clicked() {
-    const login = document.getElementsByName('login')[0].value;
-    const password = document.getElementsByName('password')[0].value;
+/**
+ * Обработчик входа через форму.
+ */
+async function loginButtonClicked() {
+    const login = document.getElementsByName('login')[0]?.value || '';
+    const password = document.getElementsByName('password')[0]?.value || '';
+
+    if (!login || !password) {
+        alert("Заполните логин и пароль");
+        return;
+    }
 
     try {
-        let data = new FormData();
+        const data = new FormData();
         data.append("login", login);
         data.append("password", password);
-        
+
         const response = await fetch('/api/login', {
             method: 'POST',
             body: data,
         });
-        
+
         if (!response.ok) throw new Error(`Ошибка HTTP ${response.status}`);
-        
+
         const result = await response.json();
-        if (result["success"]) {
+        if (result.success) {
             alert("Логин и пароль правильные");
         } else {
             alert("Неверный логин или пароль");
         }
-
-    } catch(error) {
+    } catch (error) {
         console.error('Ошибка:', error.message);
+        alert("Не удалось подключиться к серверу. Попробуйте позже.");
     }
-    
 }
 
-const Core = new MigrenoznikCore();
+// Глобальная константа ядра
+const CORE = new MigrenoznikCore();
+
+// Инициализация при загрузке
+document.addEventListener("DOMContentLoaded", () => {
+    composeMigraineDiary();
+    // Привязка событий (пример — можно вынести в HTML или отдельный скрипт)
+    const button = document.getElementById("migre-diary-main-bottom-button");
+    if (button) {
+        button.innerText = CORE.isMigraineNow()
+            ? "Отметить конец мигрени"
+            : "Отметить мигрень сейчас";
+    }
+});
