@@ -1,146 +1,181 @@
+// Импортируем класс из отдельного модуля
+import { MigraineAttack } from './MigraineAttack.js';
 
-class MigraineAttack {
-    constructor(dtStart, dtEnd = null) { /* Мария: имена переменных должны быть в стиле camelCase: dt_start → dtStart, dt_end → dtEnd */
-        this.startTime = dtStart; /* Мария: имена переменных должны быть в стиле camelCase: DT_Start → startTime */
-        this.endTime = dtEnd; /* Мария: имена переменных должны быть в стиле camelCase: DT_End → endTime */
-    }
-
-    static fromJson(obj) { /* Мария: имена методов должны быть в стиле camelCase: from_json → fromJson */
-        return new MigraineAttack(
-            obj["startTime"] == null ? null : new Date(obj["startTime"]),
-            obj["endTime"] == null ? null : new Date(obj["endTime"]), 
-        );
-    }
-}
-
+/**
+ * Основной класс логики приложения "Дневник мигрени".
+ */
 class MigrenoznikCore {
-
     /**
-     * Does user have migraine now.
-     * @returns True if yes, False if no
+     * Проверяет, есть ли у пользователя мигрень сейчас.
+     * @returns {boolean} true, если мигрень активна, иначе false.
      */
     isMigraineNow() { /* Мария: имена методов должны быть в стиле camelCase: is_migraine_now → isMigraineNow */
-        let migraineNow = localStorage.getItem("migraineNow"); /* Мария: имена переменных должны быть в стиле camelCase: migraine_now → migraineNow */
-        if (migraineNow == undefined) {
-            localStorage.setItem("migraineNow", "false");
-            return false;
-        }
-        return migraineNow == "true";
+        const migraineNow = localStorage.getItem("migraineNow"); /* Мария: имена переменных должны быть в стиле camelCase: migraine_now → migraineNow */
+        return migraineNow === "true";
+        /* Катя: убрано ручное сохранение "false" — не нужно, localStorage вернёт null */
+        /* Катя: раньше был избыточный if (migraineNow == undefined) */
     }
 
     /**
-     * Toggles user's migraine status, i.e. if user has migraine, stops it, otherwise starts it.
+     * Переключает статус мигрени (активна/не активна).
      */
     toggleMigraineStatus() { /* Мария: имена методов должны быть в стиле camelCase: toggle_migraine_status → toggleMigraineStatus */
-        if (this.isMigraineNow()) {
-            localStorage.setItem("migraineNow", "false");
-        } else {
-            localStorage.setItem("migraineNow", "true");
-        }
+        const status = !this.isMigraineNow();
+        localStorage.setItem("migraineNow", status.toString());
     }
 
     /**
-     * Returns the entire diary of migraine attacks.
+     * Возвращает весь дневник атак из localStorage.
+     * @returns {MigraineAttack[]} Массив эпизодов мигрени.
      */
     getMigraineAttacks() { /* Мария: имена методов должны быть в стиле camelCase: get_migraine_attacks → getMigraineAttacks */
-        let migraineAttacks = localStorage.getItem("migraineAttacks"); /* Мария: имена переменных должны быть в стиле camelCase: migraine_attacks → migraineAttacks */
-        if (migraineAttacks == undefined) {
+        const data = localStorage.getItem("migraineAttacks"); /* Мария: имена переменных должны быть в стиле camelCase: migraine_attacks → migraineAttacks */
+        if (!data) return [];
+
+        try {
+            const attacks = JSON.parse(data);
+            if (!Array.isArray(attacks)) return [];
+
+            return attacks
+                .map(MigraineAttack.fromJson)
+                .filter(Boolean);
+            /* Катя: добавлен try/catch и фильтрация null */
+            /* Катя: раньше при битом JSON приложение падало */
+        } catch (e) {
+            console.warn("Failed to parse migraineAttacks, returning empty array", e);
             return [];
         }
-        migraineAttacks = JSON.parse(migraineAttacks);
-        let migraineAttacksObj = []; /* Мария: имена переменных должны быть в стиле camelCase: migraine_attacks_obj → migraineAttacksObj */
-        for (const MIGRAINE_ATTACK of migraineAttacks) {
-            migraineAttacksObj.push(MigraineAttack.fromJson(MIGRAINE_ATTACK));
-        }
-        return migraineAttacksObj;
     }
 
     /**
-     * Adds new migraine attack to the end of the list.
+     * Добавляет новую атаку в конец списка.
+     * @param {MigraineAttack} migraineAttack - Объект атаки.
      */
     addNewMigraineAttack(migraineAttack) { /* Мария: имена методов должны быть в стиле camelCase: add_new_migraine_attack → addNewMigraineAttack */
-        let migraineAttacks = localStorage.getItem("migraineAttacks"); /* Мария: имена переменных должны быть в стиле camelCase:  migraine_attacks →  migraineAttacks */
-        if (migraineAttacks == undefined) {
-            localStorage.setItem("migraineAttacks", JSON.stringify([migraineAttack]));
-            return;
-        }
-        try {
-            migraineAttacks = JSON.parse(migraineAttacks);
-            migraineAttacks.push(migraineAttack);
-            localStorage.setItem("migraineAttacks", JSON.stringify(migraineAttacks));
-        } catch (error) {
-            localStorage.setItem("migraineAttacks", JSON.stringify([migraineAttack]));
-        }
+        const attacks = this.getMigraineAttacks();
+        attacks.push(migraineAttack);
+        this._saveAttacks(attacks);
+        /* Катя: вынесено сохранение в приватный метод _saveAttacks */
+        /* Катя: раньше код сохранения дублировался в нескольких местах */
     }
 
+    /**
+     * Завершает последнюю атаку, установив endTime = сейчас.
+     */
     closeLastMigraineAttack() { /* Мария: имена методов должны быть в стиле camelCase: close_last_migraine_attack → closeLastMigraineAttack */
-        let migraineAttacks = localStorage.getItem("migraineAttacks"); /* Мария: имена переменных должны быть в стиле camelCase:  migraine_attacks → migraineAttacks */
-        if (migraineAttacks == undefined) {
-            return;
+        const attacks = this.getMigraineAttacks();
+        if (attacks.length === 0) return;
+
+        const last = attacks[attacks.length - 1];
+        if (!last.endTime) {
+            last.endTime = new Date();
+            this._saveAttacks(attacks);
         }
-        try {
-            migraineAttacks = JSON.parse(migraineAttacks);
-            let lastElement = migraineAttacks.pop(); /* Мария: имена переменных должны быть в стиле camelCase: last_element → lastElement */
-            lastElement["endTime"] = new Date();
-            migraineAttacks.push(lastElement);
-            localStorage.setItem("migraineAttacks", JSON.stringify(migraineAttacks));
-        } catch (error) {
-            return;
-        }
+        /* Катя: добавлена проверка, что endTime ещё не установлен */
+        /* Катя: раньше можно было случайно перезаписать время окончания */
     }
 
-    constructor() {
-        
+    /**
+     * Удаляет атаку по индексу.
+     * @param {number} index - Индекс атаки в массиве.
+     */
+    removeMigraineAttack(index) {
+        /* Катя: новый метод — ранее не было безопасного удаления */
+        const attacks = this.getMigraineAttacks();
+        if (index < 0 || index >= attacks.length) return;
+        attacks.splice(index, 1);
+        this._saveAttacks(attacks);
+        /* Катя: используем splice — короче и надёжнее, чем цикл */
+    }
+
+    /**
+     * Приватный метод: сохраняет массив атак в localStorage.
+     * @param {MigraineAttack[]} attacks - Массив атак.
+     * @private
+     */
+    _saveAttacks(attacks) {
+        /* Катя: новый метод — устраняет дублирование */
+        /* Катя: теперь все операции с localStorage используют один метод */
+        try {
+            localStorage.setItem("migraineAttacks", JSON.stringify(attacks));
+        } catch (e) {
+            console.error("Failed to save migraineAttacks", e);
+        }
     }
 }
 
 /**
- * Onclick event of pressing the "Migraine now" button
+ * Обработчик клика по кнопке "Мигрень сейчас".
  */
 function migraineNowButtonClicked() { /* Мария: имена функций должны быть в стиле camelCase: migraine_now_button_Clicked → migraineNowButtonClicked */
     if (CORE.isMigraineNow()) {
         CORE.toggleMigraineStatus();
         CORE.closeLastMigraineAttack();
-        document.getElementById("migre-diary-main-bottom-button").innerText = 
-            "Отметить мигрень сейчас"; /* Мария: максимальная длина строки — 80 символов */
+        const button = document.getElementById("migre-diary-main-bottom-button");
+        if (button) {
+            button.innerText = "Отметить мигрень сейчас";
+        }
+        /* Катя: добавлена проверка if (button) — защита от ошибок */
+        /* Катя: раньше падало, если элемента нет */
     } else {
         CORE.toggleMigraineStatus();
         CORE.addNewMigraineAttack(new MigraineAttack(new Date()));
-        document.getElementById("migre-diary-main-bottom-button").innerText = 
-            "Отметить конец мигрени"; /* Мария: максимальная длина строки — 80 символов */
+        const button = document.getElementById("migre-diary-main-bottom-button");
+        if (button) {
+            button.innerText = "Отметить конец мигрени";
+        }
     }
     composeMigraineDiary();
 }
 
+/**
+ * Формирует отображение дневника мигреней.
+ */
 function composeMigraineDiary() { /* Мария: имена функций должны быть в стиле camelCase: compose_migraine_diary → composeMigraineDiary */
-    document.getElementById("migre-diary-wrapper").innerHTML = "";
+    const CONTAINER = document.getElementById("migre-diary-wrapper");
+    if (!CONTAINER) return; /* Катя: защита от отсутствия контейнера */
+    CONTAINER.innerHTML = "";
+
     let migraineAttacks = CORE.getMigraineAttacks(); /* Мария: имена переменных должны быть в стиле camelCase: migraine_attacks → migraineAttacks */
     for (let i = 0; i < migraineAttacks.length; i++) {
         const MIGRAINE_ATTACK = migraineAttacks[i]; /* Мария: константы пишутся ЗАГЛАВНЫМИ_БУКВАМИ_С_ПОДЧЕРКИВАНИЯМИ: migraine_attack → MIGRAINE_ATTACK */
         let diaryItem = document.createElement("div"); /* Мария: имена переменных должны быть в стиле camelCase: diary_item → diaryItem */
         diaryItem.className = "migre-v1-main-diary-item";
-        let today = new Date(); /* Мария: необходимо избегать однобуквенных имен, кроме общепринятых (i, j в циклах): a → today */ 
-        diaryItem.innerHTML = 
-            `<b>Запись&nbsp;${i+1}.</b> 
-            ${MIGRAINE_ATTACK.startTime.getDate()} 
-            ${Calendar.monthNumberToName(MIGRAINE_ATTACK.startTime.getMonth())} 
-            ${MIGRAINE_ATTACK.startTime.getFullYear()} 
+        let today = new Date(); /* Мария: необходимо избегать однобуквенных имен, кроме общепринятых (i, j в циклах): a → today */
+        diaryItem.innerHTML =
+            `<b>Запись&nbsp;${i+1}.</b>
+            ${MIGRAINE_ATTACK.startTime.getDate()}
+            ${Calendar.monthNumberToName(MIGRAINE_ATTACK.startTime.getMonth())}
+            ${MIGRAINE_ATTACK.startTime.getFullYear()}
             ${MIGRAINE_ATTACK.startTime.getHours() < 10 ? "0" : ""}
             ${MIGRAINE_ATTACK.startTime.getHours()}:
             ${MIGRAINE_ATTACK.startTime.getMinutes() < 10 ? "0" : ""}
             ${MIGRAINE_ATTACK.startTime.getMinutes()}`; /* Мария: максимальная длина строки — 80 символов; имена методов должны быть в стиле camelCase: month_number_to_name → monthNumberToName */
         if (MIGRAINE_ATTACK.endTime != null) {
-            diaryItem.innerHTML += 
-                ` &ndash; ${MIGRAINE_ATTACK.endTime.getDate()} 
-                ${Calendar.monthNumberToName(MIGRAINE_ATTACK.endTime.getMonth())} 
-                ${MIGRAINE_ATTACK.endTime.getFullYear()} 
+            diaryItem.innerHTML +=
+                ` &ndash; ${MIGRAINE_ATTACK.endTime.getDate()}
+                ${Calendar.monthNumberToName(MIGRAINE_ATTACK.endTime.getMonth())}
+                ${MIGRAINE_ATTACK.endTime.getFullYear()}
                 ${MIGRAINE_ATTACK.endTime.getHours() < 10 ? "0" : ""}
                 ${MIGRAINE_ATTACK.endTime.getHours()}:
                 ${MIGRAINE_ATTACK.endTime.getMinutes() < 10 ? "0" : ""}
                 ${MIGRAINE_ATTACK.endTime.getMinutes()}`; /* Мария: максимальная длина строки — 80 символов */
+                }
+            CONTAINER.appendChild(diaryItem);
+            }
         }
-        document.getElementById("migre-diary-wrapper").appendChild(diaryItem);
     }
+}
+
+/**
+ * Обработчик удаления записи.
+ * @param {number} index - Индекс записи.
+ */
+function deleteEntryClicked(index) {
+    /* Катя: новый метод — ранее не было безопасного удаления */
+    CORE.removeMigraineAttack(index);
+    composeMigraineDiary();
+    /* Катя: обновляем интерфейс после удаления */
 }
 
 const CORE = new MigrenoznikCore(); /* Мария: константы пишутся ЗАГЛАВНЫМИ_БУКВАМИ_С_ПОДЧЕРКИВАНИЯМИ: Core → CORE */
