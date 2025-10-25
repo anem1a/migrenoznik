@@ -77,6 +77,30 @@ class MigrenoznikCore {
         }
     }
 
+    remove_migraine_attack(no) {
+        let migraine_attacks = localStorage.getItem("migraine_attacks");
+        if (migraine_attacks == undefined) {
+            localStorage.setItem("migraine_attacks", JSON.stringify([]));
+            return;
+        }
+        try {
+            migraine_attacks = JSON.parse(migraine_attacks);
+            if (migraine_attacks.length < no) {
+                return;
+            }
+            let new_migraine_attacks = [];
+            for (let i = 0; i < migraine_attacks.length; i++) {
+                const migraine_attack = migraine_attacks[i];
+                if (i != no) {
+                    new_migraine_attacks.push(migraine_attack);
+                }
+            }
+            localStorage.setItem("migraine_attacks", JSON.stringify(new_migraine_attacks));
+        } catch (error) {
+            localStorage.setItem("migraine_attacks", JSON.stringify([]));
+        }
+    }
+
     close_last_migraine_attack() {
         let migraine_attacks = localStorage.getItem("migraine_attacks");
         if (migraine_attacks == undefined) {
@@ -130,9 +154,44 @@ function compose_migraine_diary() {
         diary_item.innerHTML = `<b>Запись&nbsp;${i+1}.</b> ${migraine_attack.DT_Start.getDate()} ${Calendar.month_number_to_name(migraine_attack.DT_Start.getMonth())} ${migraine_attack.DT_Start.getFullYear()} ${migraine_attack.DT_Start.getHours() < 10 ? "0" : ""}${migraine_attack.DT_Start.getHours()}:${migraine_attack.DT_Start.getMinutes() < 10 ? "0" : ""}${migraine_attack.DT_Start.getMinutes()}`;
         if (migraine_attack.DT_End != null) {
             diary_item.innerHTML += ` &ndash; ${migraine_attack.DT_End.getDate()} ${Calendar.month_number_to_name(migraine_attack.DT_End.getMonth())} ${migraine_attack.DT_End.getFullYear()} ${migraine_attack.DT_End.getHours() < 10 ? "0" : ""}${migraine_attack.DT_End.getHours()}:${migraine_attack.DT_End.getMinutes() < 10 ? "0" : ""}${migraine_attack.DT_End.getMinutes()}`;
+            diary_item.innerHTML += ` <a onclick=\"delete_entry_Clicked(${i})\">Удалить</a>`;
         }
         document.getElementById("migre-diary-wrapper").appendChild(diary_item);
     }
+}
+
+function delete_entry_Clicked(no) {
+    Core.remove_migraine_attack(no);
+    compose_migraine_diary();
+}
+
+async function login_button_Clicked() {
+    const login = document.getElementsByName('login')[0].value;
+    const password = document.getElementsByName('password')[0].value;
+
+    try {
+        let data = new FormData();
+        data.append("login", login);
+        data.append("password", password);
+        
+        const response = await fetch('/api/login', {
+            method: 'POST',
+            body: data,
+        });
+        
+        if (!response.ok) throw new Error(`Ошибка HTTP ${response.status}`);
+        
+        const result = await response.json();
+        if (result["success"]) {
+            alert("Логин и пароль правильные");
+        } else {
+            alert("Неверный логин или пароль");
+        }
+
+    } catch(error) {
+        console.error('Ошибка:', error.message);
+    }
+    
 }
 
 const Core = new MigrenoznikCore();

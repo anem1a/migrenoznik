@@ -1,11 +1,11 @@
+{{ define "login.html" }}
 <!DOCTYPE html>
-<html lang="RU">
-<?php
-    $_head = array(
-        "dir" => __DIR__
-    );
-    include __DIR__ . "/../assets/embed/head.php";
-?>
+<html lang="ru">
+
+<head>
+    {{ template "head.html" . }}
+</head>
+
 <body>
     <div class="migre-v1-content">
         <div class="migre-v1-container">
@@ -16,6 +16,7 @@
                     </div>
                 </div>
             </header>
+
             <div class="migre-v1-main">
                 <div class="migre-v1-main-login">
                     <div class="migre-v1-main-login-header">
@@ -25,24 +26,27 @@
                         <div class="migre-v1-main-login-field-wrapper">
                             <div>Эл. почта</div>
                             <div class="migre-v1-main-login-field-container">
-                                <input type="text">
+                                <input name="login" type="text" placeholder="Логин">
                             </div>
                         </div>
                         <div class="migre-v1-main-login-field-wrapper">
                             <div>Пароль</div>
                             <div class="migre-v1-main-login-field-container">
-                                <input type="text">
+                                <input name="password" type="password" placeholder="Пароль">
                             </div>
                         </div>
                         <div class="migre-v1-main-login-field-wrapper">
                             <div class="migre-v1-main-login-field-container">
-                                <button>Войти</button>
+                                <button onclick="login_button_Clicked()">Войти</button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 </body>
+
 </html>
+{{ end }}
