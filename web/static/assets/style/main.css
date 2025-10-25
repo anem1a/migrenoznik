@@ -179,3 +179,12 @@ body {
         border-bottom: 1px solid rgb(255, 126, 18);
     }
 }
+
+.migre-v1-main-login-field-error-container {
+    background-color: rgb(255, 182, 182);
+    padding: .25em .5em;
+}
+
+.migre-v1-main-login-field-error-container p {
+    margin: .5em 0;
+}
