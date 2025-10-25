@@ -2,7 +2,12 @@
 	--screen-footer-margin: 15px;
 
     --migre-sans-font-family: "Play", sans-serif;
-    --migre-color-bright: #34ebbd;
+    --migre-color-main: #34ebbd;
+    --migre-color-font-black: #000;
+    --migre-color-font-white: #fff;
+    --migre-bg-color-black: #000;
+
+    --migre-diary-max-width: 420px;
 
     --migre-font-size-s: 14px;
     --migre-font-size-m: 16px;
@@ -15,9 +20,9 @@ body {
 	margin: 0;
 	font-family: var(--migre-sans-font-family);
 
-	font-size: 16px;
+	font-size: var(--migre-font-size-m);
 	line-height: 1.2;
-	color: black;
+	color: var(--migre-color-font-black);
 
 	display: flex;
 	flex-direction: column;
@@ -47,7 +52,7 @@ body {
     flex-grow: 1;
     justify-content: space-between;
     overflow-y: hidden;
-    max-width: 420px;
+    max-width: var(--migre-diary-max-width);
     margin: 0 auto;
     width: 100%;
 }
@@ -66,9 +71,9 @@ body {
 
 .migre-v1-main-bottom-button {
     width: 100%;
-    background-color: black;
+    background-color: var(--migre-bg-color-black);
     font-family: var(--migre-sans-font-family);
-    color: white;
+    color: var(--migre-color-font-white);
     padding: 12px 0px;
     font-size: 18px;
     border-radius: 10px;
@@ -87,7 +92,7 @@ body {
 }
 
 .migre-v1-main-header {
-    background-color: var(--migre-color-bright);
+    background-color: var(--migre-color-main);
 }
 
 .migre-v1-main-header-inner {
@@ -126,11 +131,11 @@ body {
 
 .migre-v1-main-login-field-container button {
     width: 100%;
-    background-color: black;
+    background-color: var(--migre-bg-color-black);
     font-family: var(--migre-sans-font-family);
-    color: white;
+    color: var(--migre-color-font-white);
     padding: 12px 0px;
-    font-size: 18px;
+    font-size: var(--migre-font-size-l);
     border-radius: 10px;
     cursor: pointer;
     border: none;
