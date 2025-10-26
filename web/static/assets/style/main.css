@@ -183,6 +183,15 @@ body {
 .migre-v1-main-login-field-error-container {
     background-color: rgb(255, 182, 182);
     padding: .25em .5em;
+    transform-origin: top;
+    transition: transform .15s ease-in;
+    display: none;
+    transform: scaleY(0);
+}
+
+.migre-v1-main-login-field-error-container.migre-v1-visible {
+    display: block;
+    transform: scaleY(1);
 }
 
 .migre-v1-main-login-field-error-container p {

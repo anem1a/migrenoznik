@@ -185,7 +185,7 @@ async function login_button_Clicked() {
         if (result["success"]) {
             alert("Логин и пароль правильные");
         } else {
-            alert("Неверный логин или пароль");
+            document.getElementById("migre-id-main-login-errorbox").classList.add('migre-v1-visible');
         }
 
     } catch(error) {
