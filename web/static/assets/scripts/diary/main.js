@@ -183,7 +183,7 @@ async function login_button_Clicked() {
         
         const result = await response.json();
         if (result["success"]) {
-            alert("Логин и пароль правильные");
+            window.location.href = "/";
         } else {
             document.getElementById("migre-id-main-login-errorbox").classList.add('migre-v1-visible');
             logon_show_errorbox("Неверный логин или пароль.");
