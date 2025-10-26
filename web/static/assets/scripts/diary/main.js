@@ -194,4 +194,8 @@ async function login_button_Clicked() {
     
 }
 
+function login_fields_Oninput() {
+    document.getElementById("migre-id-main-login-errorbox").classList.remove('migre-v1-visible');
+}
+
 const Core = new MigrenoznikCore();
