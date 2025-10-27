@@ -7,20 +7,21 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"time"
 
 	_ "github.com/lib/pq"
 )
-
 
 const (
 	host     = "oferolefket.beget.app"
 	port     = 5432
 	user     = "anna"
-	password = ""
+	password = "POp175Cwq*X4"
 	dbname   = "migrenoznik"
 )
 
 var db *sql.DB
+var sessions = make(map[string]string)
 
 func main() {
 	var err error
@@ -50,6 +51,8 @@ func main() {
 
 	// API
 	mux.HandleFunc("/api/login", loginHandler)
+	mux.HandleFunc("/api/check-session", checkSessionHandler)
+	mux.HandleFunc("/logout", logoutHandler)
 
 	// HTTPS сервер
 	go func() {
@@ -84,7 +87,28 @@ func renderTemplate(w http.ResponseWriter, name string) {
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-	renderTemplate(w, "index.html")
+	// Значение по умолчанию — пустое (пользователь не вошёл)
+	data := map[string]interface{}{
+		"Username": "",
+	}
+
+	// Пробуем получить куку, если она есть
+	if cookie, err := r.Cookie("session_id"); err == nil {
+		if user, ok := sessions[cookie.Value]; ok {
+			data["Username"] = user
+		}
+	}
+
+	// Рендерим шаблон (страница работает в любом случае)
+	tmpl, err := template.ParseFiles("templates/index.html", "templates/head.html")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if err := tmpl.Execute(w, data); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 func loginPageHandler(w http.ResponseWriter, r *http.Request) {
@@ -109,9 +133,56 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if !exists {
+		json.NewEncoder(w).Encode(map[string]bool{"success": false})
+		return
+	}
 
-	res := map[string]bool{"success": exists}
+	sessionID := fmt.Sprintf("%d_%s", time.Now().UnixNano(), login)
+	sessions[sessionID] = login
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "session_id",
+		Value:    sessionID,
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   true,
+	})
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(res)
+	json.NewEncoder(w).Encode(map[string]bool{"success": true})
+}
+
+func checkSessionHandler(w http.ResponseWriter, r *http.Request) {
+	cookie, err := r.Cookie("session_id")
+	if err != nil {
+		json.NewEncoder(w).Encode(map[string]bool{"logged_in": false})
+		return
+	}
+
+	login, ok := sessions[cookie.Value]
+	if !ok {
+		json.NewEncoder(w).Encode(map[string]bool{"logged_in": false})
+		return
+	}
+
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"logged_in": true,
+		"user":      login,
+	})
+}
+
+func logoutHandler(w http.ResponseWriter, r *http.Request) {
+	cookie, err := r.Cookie("session_id")
+	if err == nil {
+		delete(sessions, cookie.Value) // Удаляем сессию
+		// Сбрасываем куку
+		http.SetCookie(w, &http.Cookie{
+			Name:   "session_id",
+			Value:  "",
+			Path:   "/",
+			MaxAge: -1,
+		})
+	}
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
