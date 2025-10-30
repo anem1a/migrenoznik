@@ -143,6 +143,27 @@ function login_Clicked() {
     //window.history.pushState(null, null, "/login/");
 }
 
+async function logout_Clicked() {
+    try {
+        let data = new FormData();
+        
+        const response = await fetch('/api/logout', {
+            method: 'POST',
+            body: data,
+        });
+        
+        if (!response.ok) throw new Error(`Ошибка HTTP ${response.status}`);
+        
+        const result = await response.json();
+        if (result["success"]) {
+            window.location.href = "/login/";
+        }
+
+    } catch(error) {
+        
+    }
+}
+
 function compose_migraine_diary() {
     document.getElementById("migre-diary-wrapper").innerHTML = "";
     let migraine_attacks = Core.get_migraine_attacks();

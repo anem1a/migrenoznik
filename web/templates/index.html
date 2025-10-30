@@ -13,7 +13,7 @@
                         {{ if .Username }}
                         <div class="col-md-3 text-end">
                             <span>Привет, {{ .Username }}</span>
-                            <a href="/logout" class="btn btn-primary">Выход</a>
+                            <button class="migre-v1-main-header-login-button" onclick="logout_Clicked()">Выйти</button>
                         </div>
                         {{ else }}
                         <button class="migre-v1-main-header-login-button" onclick="login_Clicked()">Войти</button>
