@@ -183,15 +183,25 @@ async function login_button_Clicked() {
         
         const result = await response.json();
         if (result["success"]) {
-            alert("Логин и пароль правильные");
+            window.location.href = "/";
         } else {
-            alert("Неверный логин или пароль");
+            document.getElementById("migre-id-main-login-errorbox").classList.add('migre-v1-visible');
+            logon_show_errorbox("Неверный логин или пароль.");
         }
 
     } catch(error) {
-        console.error('Ошибка:', error.message);
+        logon_show_errorbox("Ошибка на сервере.");
     }
     
+}
+
+function login_fields_Oninput() {
+    document.getElementById("migre-id-main-login-errorbox").classList.remove('migre-v1-visible');
+}
+
+function logon_show_errorbox(error_text) {
+    document.getElementById("migre-id-main-login-errorbox").innerHTML = `<p>${error_text}</p>`
+    document.getElementById("migre-id-main-login-errorbox").classList.add('migre-v1-visible');
 }
 
 const Core = new MigrenoznikCore();
