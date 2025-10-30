@@ -1,0 +1,57 @@
+{{ define "login.html" }}
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    {{ template "head.html" . }}
+</head>
+
+<body>
+    <div class="migre-v1-content">
+        <div class="migre-v1-container">
+            <header class="migre-v1-main-header">
+                <div class="migre-v1-main-header-container">
+                    <div class="migre-v1-main-header-inner">
+                        <button class="migre-v1-main-header-login-button" onclick="login_Clicked()">Создать аккаунт</button>
+                    </div>
+                </div>
+            </header>
+
+            <div class="migre-v1-main">
+                <div class="migre-v1-main-login">
+                    <div class="migre-v1-main-login-header">
+                        <h1>Войти</h1>
+                    </div>
+                    <div class="migre-v1-main-login-fields">
+                        <div class="migre-v1-main-login-field-wrapper">
+                            <div>Эл. почта</div>
+                            <div class="migre-v1-main-login-field-container">
+                                <input oninput="login_fields_Oninput()" name="login" type="text" placeholder="Логин">
+                            </div>
+                        </div>
+                        <div class="migre-v1-main-login-field-wrapper">
+                            <div>Пароль</div>
+                            <div class="migre-v1-main-login-field-container">
+                                <input oninput="login_fields_Oninput()" name="password" type="password" placeholder="Пароль">
+                            </div>
+                        </div>
+                        <div class="migre-v1-main-login-field-wrapper">
+                            <div id="migre-id-main-login-errorbox" class="migre-v1-main-login-field-error-container">
+                                <p>Неверный логин или пароль.</p>
+                            </div>
+                        </div>
+                        <div class="migre-v1-main-login-field-wrapper">
+                            <div class="migre-v1-main-login-field-container">
+                                <button onclick="login_button_Clicked()">Войти</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>
+
+</html>
+{{ end }}

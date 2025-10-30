@@ -1,0 +1,43 @@
+<html lang="ru">
+
+<head>
+    {{ template "head.html" . }}
+</head>
+
+<body>
+    <div class="migre-v1-content">
+        <div class="migre-v1-container">
+            <header class="migre-v1-main-header">
+                <div class="migre-v1-main-header-container">
+                    <div class="migre-v1-main-header-inner">
+                        {{ if .Username }}
+                        <div class="col-md-3 text-end">
+                            <span>Привет, {{ .Username }}</span>
+                            <button class="migre-v1-main-header-login-button" onclick="logout_Clicked()">Выйти</button>
+                        </div>
+                        {{ else }}
+                        <button class="migre-v1-main-header-login-button" onclick="login_Clicked()">Войти</button>
+                        {{ end }}
+                    </div>
+                </div>
+            </header>
+
+            <div class="migre-v1-main">
+                <div class="migre-v1-main-diary">
+                    <div class="migre-v1-main-diary-wrapper" id="migre-diary-wrapper"></div>
+                </div>
+
+                <div class="migre-v1-main-bottom">
+                    <div class="migre-v1-main-bottom-row">
+                        <div class="migre-v1-main-bottom-button-wrapper">
+                            <button class="migre-v1-main-bottom-button" id="migre-diary-main-bottom-button"
+                                onclick="migraine_now_button_Clicked()">Отметить мигрень сейчас</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

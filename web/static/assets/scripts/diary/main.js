@@ -47,12 +47,16 @@ class MigrenoznikCore {
         if (migraine_attacks == undefined) {
             return [];
         }
-        migraine_attacks = JSON.parse(migraine_attacks);
-        let migraine_attacks_obj = [];
-        for (const migraine_attack of migraine_attacks) {
-            migraine_attacks_obj.push(MigraineAttack.from_json(migraine_attack));
+        try {
+            migraine_attacks = JSON.parse(migraine_attacks);
+            let migraine_attacks_obj = [];
+            for (const migraine_attack of migraine_attacks) {
+                migraine_attacks_obj.push(MigraineAttack.from_json(migraine_attack));
+            }
+            return migraine_attacks_obj;
+        } catch (error) {
+            return [];
         }
-        return migraine_attacks_obj;
     }
 
     /**
@@ -70,6 +74,30 @@ class MigrenoznikCore {
             localStorage.setItem("migraine_attacks", JSON.stringify(migraine_attacks));
         } catch (error) {
             localStorage.setItem("migraine_attacks", JSON.stringify([migraine_attack]));
+        }
+    }
+
+    remove_migraine_attack(no) {
+        let migraine_attacks = localStorage.getItem("migraine_attacks");
+        if (migraine_attacks == undefined) {
+            localStorage.setItem("migraine_attacks", JSON.stringify([]));
+            return;
+        }
+        try {
+            migraine_attacks = JSON.parse(migraine_attacks);
+            if (migraine_attacks.length < no) {
+                return;
+            }
+            let new_migraine_attacks = [];
+            for (let i = 0; i < migraine_attacks.length; i++) {
+                const migraine_attack = migraine_attacks[i];
+                if (i != no) {
+                    new_migraine_attacks.push(migraine_attack);
+                }
+            }
+            localStorage.setItem("migraine_attacks", JSON.stringify(new_migraine_attacks));
+        } catch (error) {
+            localStorage.setItem("migraine_attacks", JSON.stringify([]));
         }
     }
 
@@ -110,6 +138,32 @@ function migraine_now_button_Clicked() {
     compose_migraine_diary();
 }
 
+function login_Clicked() {
+    window.location.href = "/login/";
+    //window.history.pushState(null, null, "/login/");
+}
+
+async function logout_Clicked() {
+    try {
+        let data = new FormData();
+        
+        const response = await fetch('/api/logout', {
+            method: 'POST',
+            body: data,
+        });
+        
+        if (!response.ok) throw new Error(`Ошибка HTTP ${response.status}`);
+        
+        const result = await response.json();
+        if (result["success"]) {
+            window.location.href = "/login/";
+        }
+
+    } catch(error) {
+        
+    }
+}
+
 function compose_migraine_diary() {
     document.getElementById("migre-diary-wrapper").innerHTML = "";
     let migraine_attacks = Core.get_migraine_attacks();
@@ -121,9 +175,54 @@ function compose_migraine_diary() {
         diary_item.innerHTML = `<b>Запись&nbsp;${i+1}.</b> ${migraine_attack.DT_Start.getDate()} ${Calendar.month_number_to_name(migraine_attack.DT_Start.getMonth())} ${migraine_attack.DT_Start.getFullYear()} ${migraine_attack.DT_Start.getHours() < 10 ? "0" : ""}${migraine_attack.DT_Start.getHours()}:${migraine_attack.DT_Start.getMinutes() < 10 ? "0" : ""}${migraine_attack.DT_Start.getMinutes()}`;
         if (migraine_attack.DT_End != null) {
             diary_item.innerHTML += ` &ndash; ${migraine_attack.DT_End.getDate()} ${Calendar.month_number_to_name(migraine_attack.DT_End.getMonth())} ${migraine_attack.DT_End.getFullYear()} ${migraine_attack.DT_End.getHours() < 10 ? "0" : ""}${migraine_attack.DT_End.getHours()}:${migraine_attack.DT_End.getMinutes() < 10 ? "0" : ""}${migraine_attack.DT_End.getMinutes()}`;
+            diary_item.innerHTML += ` <a onclick=\"delete_entry_Clicked(${i})\">Удалить</a>`;
         }
         document.getElementById("migre-diary-wrapper").appendChild(diary_item);
     }
+}
+
+function delete_entry_Clicked(no) {
+    Core.remove_migraine_attack(no);
+    compose_migraine_diary();
+}
+
+async function login_button_Clicked() {
+    const login = document.getElementsByName('login')[0].value;
+    const password = document.getElementsByName('password')[0].value;
+
+    try {
+        let data = new FormData();
+        data.append("login", login);
+        data.append("password", password);
+        
+        const response = await fetch('/api/login', {
+            method: 'POST',
+            body: data,
+        });
+        
+        if (!response.ok) throw new Error(`Ошибка HTTP ${response.status}`);
+        
+        const result = await response.json();
+        if (result["success"]) {
+            window.location.href = "/";
+        } else {
+            document.getElementById("migre-id-main-login-errorbox").classList.add('migre-v1-visible');
+            logon_show_errorbox("Неверный логин или пароль.");
+        }
+
+    } catch(error) {
+        logon_show_errorbox("Ошибка на сервере.");
+    }
+    
+}
+
+function login_fields_Oninput() {
+    document.getElementById("migre-id-main-login-errorbox").classList.remove('migre-v1-visible');
+}
+
+function logon_show_errorbox(error_text) {
+    document.getElementById("migre-id-main-login-errorbox").innerHTML = `<p>${error_text}</p>`
+    document.getElementById("migre-id-main-login-errorbox").classList.add('migre-v1-visible');
 }
 
 const Core = new MigrenoznikCore();

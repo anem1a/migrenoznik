@@ -1,0 +1,199 @@
+:root {
+	--screen-footer-margin: 15px;
+
+    --migre-sans-font-family: "Play", sans-serif;
+    --migre-color-main: #34ebbd;
+    --migre-color-font-black: #000;
+    --migre-color-font-white: #fff;
+    --migre-bg-color-black: #000;
+
+    --migre-diary-max-width: 420px;
+
+    --migre-font-size-s: 14px;
+    --migre-font-size-m: 16px;
+    --migre-font-size-l: 18px;
+    --migre-font-size-xl: 24px;
+}
+
+
+body {
+	margin: 0;
+	font-family: var(--migre-sans-font-family);
+
+	font-size: var(--migre-font-size-m);
+	line-height: 1.2;
+	color: var(--migre-color-font-black);
+
+	display: flex;
+	flex-direction: column;
+	height: 100dvh;
+}
+
+*,
+*:before,
+*:after {
+	box-sizing: border-box;
+}
+
+.migre-v1-content {
+    height: 100%;
+    margin-bottom: var(--screen-footer-margin);
+}
+
+.migre-v1-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.migre-v1-main {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    justify-content: space-between;
+    overflow-y: hidden;
+    max-width: var(--migre-diary-max-width);
+    margin: 0 auto;
+    width: 100%;
+}
+
+.migre-v1-main-diary {
+    overflow-y: auto;
+}
+
+.migre-v1-main-diary-wrapper {
+    margin: 20px;
+}
+
+.migre-v1-main-bottom-button-wrapper {
+    padding: 15px;
+}
+
+.migre-v1-main-bottom-button {
+    width: 100%;
+    background-color: var(--migre-bg-color-black);
+    font-family: var(--migre-sans-font-family);
+    color: var(--migre-color-font-white);
+    padding: 12px 0px;
+    font-size: 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    border: none;
+}
+@media (hover: hover) {
+    .migre-v1-main-bottom-button:hover {
+        background-color: #444;
+    }
+}
+@media (hover: none) {
+    .migre-v1-main-bottom-button:active {
+        background-color: #444;
+    }
+}
+
+.migre-v1-main-header {
+    background-color: var(--migre-color-main);
+}
+
+.migre-v1-main-header-inner {
+    padding: 6px 10px;
+}
+
+.migre-v1-main-header-login-button {
+    border: none;
+    background-color: white;
+    font-size: 14px;
+    font-family: var(--migre-sans-font-family);
+    border-radius: 4px;
+    padding: 4px 10px;
+    cursor: pointer;
+}
+@media (hover: hover) {
+    .migre-v1-main-header-login-button:hover {
+        background-color: #eee;
+    }
+}
+@media (hover: none) {
+    .migre-v1-main-header-login-button:active {
+        background-color: #eee;
+    }
+}
+
+.migre-v1-main-login-field-container input {
+    border: none;
+    border-bottom: 1px solid black;
+    border-radius: 0;
+    outline: none;
+    width: 100%;
+    font-size: 24px;
+    font-family: var(--migre-sans-font-family);
+}
+
+.migre-v1-main-login-field-container button {
+    width: 100%;
+    background-color: var(--migre-bg-color-black);
+    font-family: var(--migre-sans-font-family);
+    color: var(--migre-color-font-white);
+    padding: 12px 0px;
+    font-size: var(--migre-font-size-l);
+    border-radius: 10px;
+    cursor: pointer;
+    border: none;
+}
+@media (hover: hover) {
+    .migre-v1-main-login-field-container button:hover {
+        background-color: #444;
+    }
+}
+@media (hover: none) {
+    .migre-v1-main-login-field-container button:active {
+        background-color: #444;
+    }
+}
+
+.migre-v1-main-login {
+    margin: 0 auto;
+    width: 100%;
+    max-width: 300px;
+}
+
+.migre-v1-main-login-field-wrapper {
+    margin-bottom: 15px;
+}
+
+.migre-v1-main-diary-item a {
+    color: rgb(18, 126, 255);
+    border-bottom: 1px solid rgb(18, 126, 255);
+    margin-left: .75em;
+    cursor: pointer;
+}
+@media (hover: hover) {
+    .migre-v1-main-diary-item a:hover {
+        color: rgb(255, 126, 18);
+        border-bottom: 1px solid rgb(255, 126, 18);
+    }
+}
+@media (hover: none) {
+    .migre-v1-main-diary-item a:active {
+        color: rgb(255, 126, 18);
+        border-bottom: 1px solid rgb(255, 126, 18);
+    }
+}
+
+.migre-v1-main-login-field-error-container {
+    background-color: rgb(255, 182, 182);
+    padding: .25em .5em;
+    transform-origin: top;
+    transition: transform .15s ease-in;
+    display: none;
+    transform: scaleY(0);
+}
+
+.migre-v1-main-login-field-error-container.migre-v1-visible {
+    display: block;
+    transform: scaleY(1);
+}
+
+.migre-v1-main-login-field-error-container p {
+    margin: .5em 0;
+}
