@@ -48,6 +48,7 @@ func main() {
 	// Страницы
 	mux.HandleFunc("/", indexHandler)
 	mux.HandleFunc("/login/", loginPageHandler)
+	mux.HandleFunc("/sign-up/", signupPageHandler)
 
 	// API
 	mux.HandleFunc("/api/login", loginHandler)
@@ -116,6 +117,10 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 
 func loginPageHandler(w http.ResponseWriter, r *http.Request) {
 	renderTemplate(w, "login.html")
+}
+
+func signupPageHandler(w http.ResponseWriter, r *http.Request) {
+	renderTemplate(w, "sign-up.html")
 }
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
