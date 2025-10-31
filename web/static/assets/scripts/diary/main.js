@@ -222,6 +222,7 @@ async function signup_button_Clicked() {
 
     if (password != password_repeat) {
         logon_show_errorbox("Пароли не совпадают.");
+        return;
     }
 
     try {
