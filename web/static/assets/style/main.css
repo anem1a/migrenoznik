@@ -99,7 +99,8 @@ body {
     padding: 6px 10px;
 }
 
-.migre-v1-main-header-login-button {
+.migre-v1-main-header-login-button,
+.migre-v1-main-header-login-buttonlink {
     border: none;
     background-color: white;
     font-size: 14px;
@@ -109,14 +110,22 @@ body {
     cursor: pointer;
 }
 @media (hover: hover) {
-    .migre-v1-main-header-login-button:hover {
+    .migre-v1-main-header-login-button:hover,
+    .migre-v1-main-header-login-buttonlink:hover {
         background-color: #eee;
     }
 }
 @media (hover: none) {
-    .migre-v1-main-header-login-button:active {
+    .migre-v1-main-header-login-button:active,
+    .migre-v1-main-header-login-buttonlink:active {
         background-color: #eee;
     }
+}
+
+.migre-v1-main-header-login-buttonlink {
+    text-decoration: none;
+    color: black;
+    display: inline-block;
 }
 
 .migre-v1-main-login-field-container input {
