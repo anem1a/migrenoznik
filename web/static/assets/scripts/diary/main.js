@@ -224,6 +224,14 @@ async function signup_button_Clicked() {
         logon_show_errorbox("Пароли не совпадают.");
         return;
     }
+    if (password.length == 0) {
+        logon_show_errorbox("Пароль не должен быть пустым.");
+        return;
+    }
+    if (login.length == 0) {
+        logon_show_errorbox("Логин не должен быть пустым.");
+        return;
+    }
 
     try {
         let data = new FormData();
@@ -248,7 +256,13 @@ async function signup_button_Clicked() {
             } else if (result["code"] == 3) {
                 logon_show_errorbox("Логин содержит недопустимые символы.");
             } else if (result["code"] == 4) {
-                logon_show_errorbox("Логин или пароль пуст.");
+                if (password.length == 0) {
+                    logon_show_errorbox("Пароль не должен быть пустым.");
+                } else if (login.length == 0) {
+                    logon_show_errorbox("Логин не должен быть пустым.");
+                } else {
+                    logon_show_errorbox("Логин или пароль пуст.");
+                }
             } else {
                 logon_show_errorbox("Ошибка на сервере.");
             }
