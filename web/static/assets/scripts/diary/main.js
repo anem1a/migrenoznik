@@ -206,8 +206,51 @@ async function login_button_Clicked() {
         if (result["success"]) {
             window.location.href = "/";
         } else {
-            document.getElementById("migre-id-main-login-errorbox").classList.add('migre-v1-visible');
             logon_show_errorbox("Неверный логин или пароль.");
+        }
+
+    } catch(error) {
+        logon_show_errorbox("Ошибка на сервере.");
+    }
+    
+}
+
+async function signup_button_Clicked() {
+    const login = document.getElementsByName('login')[0].value;
+    const password = document.getElementsByName('password')[0].value;
+    const password_repeat = document.getElementsByName('password_repeat')[0].value;
+
+    if (password != password_repeat) {
+        logon_show_errorbox("Пароли не совпадают.");
+    }
+
+    try {
+        let data = new FormData();
+        data.append("login", login);
+        data.append("password", password);
+        
+        const response = await fetch('/api/signup', {
+            method: 'POST',
+            body: data,
+        });
+        
+        if (!response.ok) throw new Error(`Ошибка HTTP ${response.status}`);
+        
+        const result = await response.json();
+        if (result["success"]) {
+            window.location.href = "/";
+        } else {
+            if (result["code"] == 1) {
+                logon_show_errorbox("Пользователь с таким логином уже есть.");
+            } else if (result["code"] == 2) {
+                logon_show_errorbox("Пароль слишком простой.");
+            } else if (result["code"] == 3) {
+                logon_show_errorbox("Логин содержит недопустимые символы.");
+            } else if (result["code"] == 4) {
+                logon_show_errorbox("Логин или пароль пуст.");
+            } else {
+                logon_show_errorbox("Ошибка на сервере.");
+            }
         }
 
     } catch(error) {
