@@ -1,12 +1,13 @@
 
 class MigraineAttack {
-    constructor(dt_start, dt_end = null) {
+    constructor(client_id, dt_start, dt_end = null, id = null) {
         this.DT_Start = dt_start;
         this.DT_End = dt_end;
     }
 
     static from_json(obj) {
         return new MigraineAttack(
+            1, 
             obj["DT_Start"] == null ? null : new Date(obj["DT_Start"]),
             obj["DT_End"] == null ? null : new Date(obj["DT_End"]),
         );
@@ -132,7 +133,7 @@ function migraine_now_button_Clicked() {
         document.getElementById("migre-diary-main-bottom-button").innerText = "Отметить мигрень сейчас";
     } else {
         Core.toggle_migraine_status();
-        Core.add_new_migraine_attack(new MigraineAttack(new Date()));
+        Core.add_new_migraine_attack(new MigraineAttack(1, new Date()));
         document.getElementById("migre-diary-main-bottom-button").innerText = "Отметить конец мигрени";
     }
     compose_migraine_diary();
