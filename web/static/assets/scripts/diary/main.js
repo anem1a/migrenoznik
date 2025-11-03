@@ -177,15 +177,31 @@ async function logout_Clicked() {
     }
 }
 
+function create_element(el_tag, el_class, el_id, el_html) {
+    let elem = document.createElement(el_tag);
+    if (el_class) {
+        elem.className = el_class;
+    }
+    if (el_id) {
+        elem.id = el_id;
+    }
+    if (el_html) {
+        elem.innerHTML = el_html;
+    }
+    return elem;
+}
+
 function compose_migraine_diary() {
     document.getElementById("migre-diary-wrapper").innerHTML = "";
     let migraine_attacks = Core.get_migraine_attacks();
     for (let i = 0; i < migraine_attacks.length; i++) {
         const migraine_attack = migraine_attacks[i];
-        let diary_item = document.createElement("div");
-        diary_item.className = "migre-v1-main-diary-item";
-        let a = new Date();
-        diary_item.innerHTML = `<b>Запись&nbsp;${i+1}.</b> ${migraine_attack.DT_Start.getDate()} ${Calendar.month_number_to_name(migraine_attack.DT_Start.getMonth())} ${migraine_attack.DT_Start.getFullYear()} ${migraine_attack.DT_Start.getHours() < 10 ? "0" : ""}${migraine_attack.DT_Start.getHours()}:${migraine_attack.DT_Start.getMinutes() < 10 ? "0" : ""}${migraine_attack.DT_Start.getMinutes()}`;
+        let diary_item = create_element(
+            "div",
+            "migre-v1-main-diary-item",
+            undefined,
+            `<b>Запись&nbsp;${i+1}.</b> ${migraine_attack.DT_Start.getDate()} ${Calendar.month_number_to_name(migraine_attack.DT_Start.getMonth())} ${migraine_attack.DT_Start.getFullYear()} ${migraine_attack.DT_Start.getHours() < 10 ? "0" : ""}${migraine_attack.DT_Start.getHours()}:${migraine_attack.DT_Start.getMinutes() < 10 ? "0" : ""}${migraine_attack.DT_Start.getMinutes()}`
+        );
         if (migraine_attack.DT_End != null) {
             diary_item.innerHTML += ` &ndash; ${migraine_attack.DT_End.getDate()} ${Calendar.month_number_to_name(migraine_attack.DT_End.getMonth())} ${migraine_attack.DT_End.getFullYear()} ${migraine_attack.DT_End.getHours() < 10 ? "0" : ""}${migraine_attack.DT_End.getHours()}:${migraine_attack.DT_End.getMinutes() < 10 ? "0" : ""}${migraine_attack.DT_End.getMinutes()}`;
             diary_item.innerHTML += ` <a onclick=\"delete_entry_Clicked(${i})\">Удалить</a>`;
