@@ -254,6 +254,93 @@ function validate_password(password) {
     return regex.test(password);
 }
 
+function calculate_password_strength(password) {
+    let score = 0;
+
+    // Базовые требования
+    if (!validate_password(password)) {
+        return 0;
+    }
+
+    // Длина пароля (+1 балл за каждые дополнительные 4 символа сверх минимальных 8)
+    score += Math.min((password.length - 8) / 4, 3);
+
+    // Наличие специальных символов (+1 балл)
+    if (password.match(/[^a-zA-Z\d\s]/)) {
+        score++;
+    }
+
+    // Количество уникальных символов (+1 балл за каждые дополнительные 5 уникальных символов)
+    const uniqueChars = new Set(password.split('')).size;
+    score += Math.min(uniqueChars / 5, 2); // Максимум +2 балла
+
+    // Отсутствие очевидных последовательностей (-1 балл)
+    if (/abc|def|ghi|jkl|mno|pqr|stu|vwx|yz|\d{3}/i.test(password)) {
+        score--;
+    }
+
+    // Равномерность распределения символов (+1 балл)
+    const groups = { lower: 0, upper: 0, digit: 0, special: 0 };
+    for (let char of password) {
+        if (char >= 'a' && char <= 'z') groups.lower++;
+        else if (char >= 'A' && char <= 'Z') groups.upper++;
+        else if (char >= '0' && char <= '9') groups.digit++;
+        else groups.special++;
+    }
+    const stdDev = Object.values(groups).reduce(
+        (acc, val) => acc + Math.pow(val - (password.length / 4), 2),
+        0
+    ) / 4;
+    if (stdDev > 10) score++; // Чем ближе стандартное отклонение к нулю, тем лучше
+
+    // Частота встречаемости редких символов (+1 балл)
+    const rareSymbols = '@#$%^&*';
+    if ([...password].some(char => rareSymbols.includes(char))) {
+        score++;
+    }
+
+    // Нетривиальность структуры (+1 балл)
+    if (
+        !/(qwertyuiop|asdfghjkl|zxcvbnm|1234567890)/i.test(password) &&
+        !/[a-z]{3,}|[A-Z]{3,}|\d{3,}/.test(password)
+    ) {
+        score++;
+    }
+
+    // Проверяем известный словарь часто употребляемых паролей (-2 балла)
+    const commonPasswords = ['password', 'admin', '123456'];
+    if (commonPasswords.some(pass => pass === password.toLowerCase())) {
+        score -= 2;
+    }
+
+    return Math.max(Math.min(score, 10), 0);
+}
+
+function password_color(strength) {
+    strength = Math.max(0, Math.min(10, strength));
+
+    const normalizedStrength = strength / 10;
+
+    let red, green, blue;
+
+    if (normalizedStrength < 0.5) {
+        red = 255;
+        green = Math.round(normalizedStrength * 2 * 255);
+        blue = 0;
+    } else {
+        red = Math.round((1 - normalizedStrength) * 2 * 255);
+        green = 255;
+        blue = 0;
+    }
+
+    function componentToHex(c) {
+        var hex = c.toString(16);
+        return hex.length === 1 ? "0" + hex : hex;
+    }
+
+    return "#" + componentToHex(red) + componentToHex(green) + componentToHex(blue);
+}
+
 async function signup_button_Clicked() {
     const login = document.getElementsByName('login')[0].value;
     const password = document.getElementsByName('password')[0].value;
@@ -328,6 +415,29 @@ function login_fields_Oninput() {
 function logon_show_errorbox(error_text) {
     document.getElementById("migre-id-main-login-errorbox").innerHTML = `<p>${error_text}</p>`
     document.getElementById("migre-id-main-login-errorbox").classList.add('migre-v1-visible');
+}
+
+function signup_password_fields_Oninput() {
+    login_fields_Oninput();
+    let color = "black";
+    let password = document.getElementById("migre-signup-password").value;
+    if (password.length > 0) {
+        color = password_color(calculate_password_strength(password));
+    }
+
+    document.getElementById("migre-signup-password").style.borderBottom = `1px solid ${color}`;
+}
+
+function signup_password2_fields_Oninput() {
+    login_fields_Oninput();
+    let color = "black";
+    let password1 = document.getElementById("migre-signup-password").value;
+    let password2 = document.getElementById("migre-signup-password2").value;
+    if (password1 == password2 && password1.length > 0) {
+        color = password_color(calculate_password_strength(password1));
+    }
+
+    document.getElementById("migre-signup-password2").style.borderBottom = `1px solid ${color}`;
 }
 
 const Core = new MigrenoznikCore();
