@@ -244,6 +244,16 @@ async function login_button_Clicked() {
     
 }
 
+function validate_login(login) {
+    const regex = /^[a-zA-Z_]{5,20}$/;
+    return regex.test(login);
+}
+
+function validate_password(password) {
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+    return regex.test(password);
+}
+
 async function signup_button_Clicked() {
     const login = document.getElementsByName('login')[0].value;
     const password = document.getElementsByName('password')[0].value;
@@ -259,6 +269,14 @@ async function signup_button_Clicked() {
     }
     if (login.length == 0) {
         logon_show_errorbox("Логин не должен быть пустым.");
+        return;
+    }
+    if (!validate_login(login)) {
+        logon_show_errorbox("Логин должен быть от 5 до 20 символов, допускаются только латинские буквы и символ \"_\".");
+        return;
+    }
+    if (!validate_password(password)) {
+        logon_show_errorbox("Пароль должен быть не менее 8 символов, содержать как минимум одну заглавную, одну строчную букву и одну цифру.");
         return;
     }
 
