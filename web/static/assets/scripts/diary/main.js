@@ -1,6 +1,6 @@
 
 class MigraineAttack {
-    constructor(client_id, dt_start, dt_end = null, id = null) {
+    constructor(local_id, dt_start, dt_end = null, id = null) {
         this.DT_Start = dt_start;
         this.DT_End = dt_end;
     }
@@ -119,7 +119,13 @@ class MigrenoznikCore {
     }
 
     constructor() {
-        
+        let migraine_attack_ai = localStorage.getItem("migraine_attack_ai");
+        if (migraine_attack_ai != undefined && migraine_attack_ai == Number(migraine_attack_ai)) {
+            this.MigraineAttackAI = Number(migraine_attack_ai);
+        } else {
+            this.MigraineAttackAI = 1;
+            localStorage.setItem("migraine_attack_ai", 1);
+        }
     }
 }
 
