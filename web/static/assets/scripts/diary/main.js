@@ -1,197 +1,169 @@
-
 class MigraineAttack {
-    constructor(dt_start, dt_end = null) {
-        this.DT_Start = dt_start;
-        this.DT_End = dt_end;
+    constructor(dtStart, dtEnd = null) {
+        this.dtStart = dtStart;
+        this.dtEnd = dtEnd;
     }
 
-    static from_json(obj) {
+    static fromJson(obj) {
+        parseDate = (val) => { 
+            if (!val) return null;
+            const DATE = new Date(val); /* Мария: константы пишутся ЗАГЛАВНЫМИ_БУКВАМИ_С_ПОДЧЕРКИВАНИЯМИ: date → DATE */
+            return isNaN(DATE.getTime()) ? null : DATE;
+        };
+
         return new MigraineAttack(
-            obj["DT_Start"] == null ? null : new Date(obj["DT_Start"]),
-            obj["DT_End"] == null ? null : new Date(obj["DT_End"]),
+            parseDate(obj["dtStart"] || obj["dtStart"]),
+            parseDate(obj["dtEnd"] || obj["dtEnd"])
         );
     }
 }
 
 class MigrenoznikCore {
+    constructor() {
+        // Конструктор оставлен для возможных будущих расширений.
+    }
 
     /**
-     * Does user have migraine now.
-     * @returns True if yes, False if no
+     * Проверяет, активна ли сейчас мигрень у пользователя.
+     * @returns {boolean}
      */
-    is_migraine_now() {
-        let migraine_now = localStorage.getItem("migraine_now");
-        if (migraine_now == undefined) {
-            localStorage.setItem("migraine_now", "false");
+    isMigraineNow() {
+        let migraineNow = localStorage.getItem("migraineNow"); /* Мария: имена переменных должны быть в стиле camelCase: migraine_now → migraineNow */
+        if (migraineNow === undefined || migraineNow === null) {
+            localStorage.setItem("migraineNow", "false");
             return false;
         }
-        return migraine_now == "true";
+        return migraineNow === "true";
     }
 
     /**
-     * Toggles user's migraine status, i.e. if user has migraine, stops it, otherwise starts it.
+     * Устанавливает состояние мигрени.
      */
-    toggle_migraine_status() {
-        if (this.is_migraine_now()) {
-            localStorage.setItem("migraine_now", "false");
-        } else {
-            localStorage.setItem("migraine_now", "true");
-        }
+    setMigraineStatus(value) {
+        localStorage.setItem("migraineNow", value ? "true" : "false"); /* Мария: имена переменных должны быть в стиле camelCase: migraine_now → migraineNow */
     }
 
     /**
-     * Returns the entire diary of migraine attacks.
+     * Переключает состояние мигрени.
      */
-    get_migraine_attacks() {
-        let migraine_attacks = localStorage.getItem("migraine_attacks");
-        if (migraine_attacks == undefined) {
+    toggleMigraineStatus() {
+        this.setMigraineStatus(!this.isMigraineNow());
+    }
+
+    /**
+     * Возвращает журнал всех приступов мигрени.
+     */
+    getMigraineAttacks() {
+        let migraineAttacks = localStorage.getItem("migraineAttacks"); /* Мария: имена переменных должны быть в стиле camelCase: migraine_attacks → migraineAttacks */
+        if (migraineAttacks === undefined || migraineAttacks === null) {
             return [];
         }
         try {
-            migraine_attacks = JSON.parse(migraine_attacks);
-            let migraine_attacks_obj = [];
-            for (const migraine_attack of migraine_attacks) {
-                migraine_attacks_obj.push(MigraineAttack.from_json(migraine_attack));
-            }
-            return migraine_attacks_obj;
+            migraineAttacks = JSON.parse(migraineAttacks);
+            return migraineAttacks.map(item => MigraineAttack.fromJson(item)); /* Мария: необходимо избегать однобуквенных имен, кроме общепринятых (i, j в циклах): m → item */ 
         } catch (error) {
+            console.error("Ошибка при чтении данных о мигренях:", error);
             return [];
         }
     }
 
     /**
-     * Adds new migraine attack to the end of the list.
+     * Добавляет новую запись о приступе мигрени.
      */
-    add_new_migraine_attack(migraine_attack) {
-        let migraine_attacks = localStorage.getItem("migraine_attacks");
-        if (migraine_attacks == undefined) {
-            localStorage.setItem("migraine_attacks", JSON.stringify([migraine_attack]));
-            return;
-        }
+    addNewMigraineAttack(migraineAttack) {
+        let migraineAttacks = localStorage.getItem("migraineAttacks"); /* Мария: имена переменных должны быть в стиле camelCase: migraine_attacks → migraineAttacks */
         try {
-            migraine_attacks = JSON.parse(migraine_attacks);
-            migraine_attacks.push(migraine_attack);
-            localStorage.setItem("migraine_attacks", JSON.stringify(migraine_attacks));
-        } catch (error) {
-            localStorage.setItem("migraine_attacks", JSON.stringify([migraine_attack]));
-        }
-    }
-
-    remove_migraine_attack(no) {
-        let migraine_attacks = localStorage.getItem("migraine_attacks");
-        if (migraine_attacks == undefined) {
-            localStorage.setItem("migraine_attacks", JSON.stringify([]));
-            return;
-        }
-        try {
-            migraine_attacks = JSON.parse(migraine_attacks);
-            if (migraine_attacks.length < no) {
+            if (!migraineAttacks) {
+                localStorage.setItem("migraineAttacks", JSON.stringify([migraineAttack]));
                 return;
             }
-            let new_migraine_attacks = [];
-            for (let i = 0; i < migraine_attacks.length; i++) {
-                const migraine_attack = migraine_attacks[i];
-                if (i != no) {
-                    new_migraine_attacks.push(migraine_attack);
-                }
-            }
-            localStorage.setItem("migraine_attacks", JSON.stringify(new_migraine_attacks));
+            migraineAttacks = JSON.parse(migraineAttacks);
+            migraineAttacks.push(migraineAttack);
+            localStorage.setItem("migraineAttacks", JSON.stringify(migraineAttacks));
         } catch (error) {
-            localStorage.setItem("migraine_attacks", JSON.stringify([]));
+            console.error("Ошибка при добавлении новой записи о мигрени:", error);
+            localStorage.setItem("migraineAttacks", JSON.stringify([migraineAttack]));
         }
     }
 
-    close_last_migraine_attack() {
-        let migraine_attacks = localStorage.getItem("migraine_attacks");
-        if (migraine_attacks == undefined) {
+    /**
+     * Закрывает последний приступ мигрени.
+     */
+    closeLastMigraineAttack() {
+        let migraineAttacks = localStorage.getItem("migraineAttacks"); /* Мария: имена переменных должны быть в стиле camelCase: migraine_attacks → migraineAttacks */
+        if (!migraineAttacks) {
+            console.warn("Попытка закрыть приступ, но журнал мигреней пуст.");
             return;
         }
         try {
-            migraine_attacks = JSON.parse(migraine_attacks);
-            let last_element = migraine_attacks.pop();
-            last_element["DT_End"] = new Date();
-            migraine_attacks.push(last_element);
-            localStorage.setItem("migraine_attacks", JSON.stringify(migraine_attacks));
+            migraineAttacks = JSON.parse(migraineAttacks);
+            if (migraineAttacks.length === 0) {
+                console.warn("Нет записей для закрытия приступа.");
+                return;
+            }
+            let lastElement = migraineAttacks.pop();
+            lastElement.dtEnd = new Date();
+            migraineAttacks.push(lastElement);
+            localStorage.setItem("migraineAttacks", JSON.stringify(migraineAttacks)); /* Мария: имена переменных должны быть в стиле camelCase: migraine_attacks → migraineAttacks */
         } catch (error) {
-            return;
+            console.error("Ошибка при закрытии последнего приступа:", error);
         }
-    }
-
-    constructor() {
-        
     }
 }
 
 /**
- * Onclick event of pressing the "Migraine now" button
+ * Форматирует дату в строку "DD MMM YYYY HH:MM".
  */
-function migraine_now_button_Clicked() {
-    if (Core.is_migraine_now()) {
-        Core.toggle_migraine_status();
-        Core.close_last_migraine_attack();
-        document.getElementById("migre-diary-main-bottom-button").innerText = "Отметить мигрень сейчас";
+function formatDate(date) {
+    if (!date) return "";
+    const MONTHS = [ /* Мария: константы пишутся ЗАГЛАВНЫМИ_БУКВАМИ_С_ПОДЧЕРКИВАНИЯМИ: months → MONTHS */
+        "января", "февраля", "марта", "апреля", "мая", "июня",
+        "июля", "августа", "сентября", "октября", "ноября", "декабря"
+    ];
+    const DD = date.getDate(); /* Мария: константы пишутся ЗАГЛАВНЫМИ_БУКВАМИ_С_ПОДЧЕРКИВАНИЯМИ: dd → DD */
+    const MM = MONTHS[date.getMonth()]; /* Мария: константы пишутся ЗАГЛАВНЫМИ_БУКВАМИ_С_ПОДЧЕРКИВАНИЯМИ: mm → MM */
+    const YYYY = date.getFullYear(); /* Мария: константы пишутся ЗАГЛАВНЫМИ_БУКВАМИ_С_ПОДЧЕРКИВАНИЯМИ: yyyy → YYYY */
+    const HH = date.getHours().toString().padStart(2, "0"); /* Мария: константы пишутся ЗАГЛАВНЫМИ_БУКВАМИ_С_ПОДЧЕРКИВАНИЯМИ: hh → HH */
+    const MIN = date.getMinutes().toString().padStart(2, "0"); /* Мария: константы пишутся ЗАГЛАВНЫМИ_БУКВАМИ_С_ПОДЧЕРКИВАНИЯМИ: min → MIN */
+    return `${DD} ${MM} ${YYYY} ${HH}:${MIN}`;
+}
+
+/**
+ * Обработчик клика по кнопке "Мигрень сейчас".
+ */
+function migraineNowButtonClicked() {
+    if (CORE.isMigraineNow()) {
+        CORE.toggleMigraineStatus();
+        CORE.closeLastMigraineAttack();
+        document.getElementById("migre-diary-main-bottom-button").innerText = 
+            "Отметить мигрень сейчас"; /* Мария: максимальная длина строки — 80 символов */
     } else {
-        Core.toggle_migraine_status();
-        Core.add_new_migraine_attack(new MigraineAttack(new Date()));
-        document.getElementById("migre-diary-main-bottom-button").innerText = "Отметить конец мигрени";
+        CORE.toggleMigraineStatus();
+        CORE.addNewMigraineAttack(new MigraineAttack(new Date()));
+        document.getElementById("migre-diary-main-bottom-button").innerText = 
+            "Отметить конец мигрени"; /* Мария: максимальная длина строки — 80 символов */
     }
-    compose_migraine_diary();
+    composeMigraineDiary();
 }
 
-function login_Clicked() {
-    window.location.href = "/login/";
-    //window.history.pushState(null, null, "/login/");
-}
+/**
+ * Формирует визуальное представление дневника мигреней.
+ */
+function composeMigraineDiary() {
+    const WRAPPER = document.getElementById("migre-diary-wrapper"); /* Мария: константы пишутся ЗАГЛАВНЫМИ_БУКВАМИ_С_ПОДЧЕРКИВАНИЯМИ: wrapper → WRAPPER */
+    WRAPPER.innerHTML = "";
+    const MIGRAINE_ATTACKS = CORE.getMigraineAttacks(); /* Мария: константы пишутся ЗАГЛАВНЫМИ_БУКВАМИ_С_ПОДЧЕРКИВАНИЯМИ: migraineAttacks → MIGRAINE_ATTACKS */
 
-function compose_migraine_diary() {
-    document.getElementById("migre-diary-wrapper").innerHTML = "";
-    let migraine_attacks = Core.get_migraine_attacks();
-    for (let i = 0; i < migraine_attacks.length; i++) {
-        const migraine_attack = migraine_attacks[i];
-        let diary_item = document.createElement("div");
-        diary_item.className = "migre-v1-main-diary-item";
-        let a = new Date();
-        diary_item.innerHTML = `<b>Запись&nbsp;${i+1}.</b> ${migraine_attack.DT_Start.getDate()} ${Calendar.month_number_to_name(migraine_attack.DT_Start.getMonth())} ${migraine_attack.DT_Start.getFullYear()} ${migraine_attack.DT_Start.getHours() < 10 ? "0" : ""}${migraine_attack.DT_Start.getHours()}:${migraine_attack.DT_Start.getMinutes() < 10 ? "0" : ""}${migraine_attack.DT_Start.getMinutes()}`;
-        if (migraine_attack.DT_End != null) {
-            diary_item.innerHTML += ` &ndash; ${migraine_attack.DT_End.getDate()} ${Calendar.month_number_to_name(migraine_attack.DT_End.getMonth())} ${migraine_attack.DT_End.getFullYear()} ${migraine_attack.DT_End.getHours() < 10 ? "0" : ""}${migraine_attack.DT_End.getHours()}:${migraine_attack.DT_End.getMinutes() < 10 ? "0" : ""}${migraine_attack.DT_End.getMinutes()}`;
-            diary_item.innerHTML += ` <a onclick=\"delete_entry_Clicked(${i})\">Удалить</a>`;
+    MIGRAINE_ATTACKS.forEach((attack, i) => {
+        const DIARY_ITEM = document.createElement("div"); /* Мария: константы пишутся ЗАГЛАВНЫМИ_БУКВАМИ_С_ПОДЧЕРКИВАНИЯМИ: diaryItem → DIARY_ITEM */
+        DIARY_ITEM.className = "migre-v1-main-diary-item";
+        let content = `<b>Запись&nbsp;${i + 1}.</b> ${formatDate(attack.dtStart)}`;
+        if (attack.dtEnd) {
+            content += ` &ndash; ${formatDate(attack.dtEnd)}`;
         }
-        document.getElementById("migre-diary-wrapper").appendChild(diary_item);
-    }
+        DIARY_ITEM.innerHTML = content;
+        WRAPPER.appendChild(DIARY_ITEM);
+    });
 }
 
-function delete_entry_Clicked(no) {
-    Core.remove_migraine_attack(no);
-    compose_migraine_diary();
-}
-
-async function login_button_Clicked() {
-    const login = document.getElementsByName('login')[0].value;
-    const password = document.getElementsByName('password')[0].value;
-
-    try {
-        let data = new FormData();
-        data.append("login", login);
-        data.append("password", password);
-        
-        const response = await fetch('/api/login', {
-            method: 'POST',
-            body: data,
-        });
-        
-        if (!response.ok) throw new Error(`Ошибка HTTP ${response.status}`);
-        
-        const result = await response.json();
-        if (result["success"]) {
-            alert("Логин и пароль правильные");
-        } else {
-            alert("Неверный логин или пароль");
-        }
-
-    } catch(error) {
-        console.error('Ошибка:', error.message);
-    }
-    
-}
-
-const Core = new MigrenoznikCore();
+const CORE = new MigrenoznikCore(); /* Мария: константы пишутся ЗАГЛАВНЫМИ_БУКВАМИ_С_ПОДЧЕРКИВАНИЯМИ: Core → CORE */
