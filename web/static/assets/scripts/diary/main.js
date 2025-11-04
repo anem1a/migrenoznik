@@ -440,4 +440,52 @@ function signup_password2_fields_Oninput() {
     document.getElementById("migre-signup-password2").style.borderBottom = `1px solid ${color}`;
 }
 
+function clear_element(elem) {
+    while (elem?.firstChild) {
+        elem.removeChild(elem.firstChild);
+    }
+}
+
+function stop_animation_and_remove(element) {
+    if (!element) { 
+        return; 
+    }
+    element.onanimationend = null;
+    element.remove();
+}
+
+function play_animation(element, animation, duration, func, delay = 0) {
+    if (!element) {
+        return;
+    }
+    element.style.removeProperty('animation');
+    element.style.animation = `trams-v3-ani-${animation} ${duration}s ${func} forwards`;
+    element.style.animationDelay = `${delay}s`;
+}
+
+function play_animation_and_remove(element, animation, duration, func, absolute = true) {
+    if (!element) {
+        return;
+    }
+    if (absolute) {
+        element.style.position = 'absolute';
+    }
+    play_animation(element, animation, duration, func, absolute);
+    element.onanimationend = function () {
+        stop_animation_and_remove(element);
+    }
+}
+
+function play_animation_and_calm(element, animation, duration, func, delay = 0) {
+    if (!element) {
+        return;
+    }
+    play_animation(element, animation, duration, func, delay);
+    element.onanimationend = function() {
+        element.onanimationend = null;
+        element.style.removeProperty('transform');
+        element.style.removeProperty('animation');
+    };
+}
+
 const Core = new MigrenoznikCore();
