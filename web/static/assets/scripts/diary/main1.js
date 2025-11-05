@@ -1,12 +1,12 @@
 
 class MigraineAttack {
-    constructor(local_id, dt_start, dt_end = null, id = null) {
-        this.LocalID = local_id;
-        this.DT_Start = dt_start;
-        this.DT_End = dt_end;
+    constructor(localId, dtStart, dtEnd = null, id = null) {
+        this.LocalID = localId;
+        this.DT_Start = dtStart;
+        this.DT_End = dtEnd;
     }
 
-    static from_json(obj) {
+    static fromJson(obj) {
         return new MigraineAttack(
             obj["LocalID"] == null ? null : Number(obj["LocalID"]),
             obj["DT_Start"] == null ? null : new Date(obj["DT_Start"]),
@@ -21,7 +21,7 @@ class MigrenoznikCore {
      * Does user have migraine now.
      * @returns True if yes, False if no
      */
-    is_migraine_now() {
+    isMigraineNow() {
         let migraine_now = localStorage.getItem("migraine_now");
         if (migraine_now == undefined) {
             localStorage.setItem("migraine_now", "false");
@@ -33,7 +33,7 @@ class MigrenoznikCore {
     /**
      * Toggles user's migraine status, i.e. if user has migraine, stops it, otherwise starts it.
      */
-    toggle_migraine_status() {
+    toggleMigraineStatus() {
         if (this.is_migraine_now()) {
             localStorage.setItem("migraine_now", "false");
         } else {
@@ -44,7 +44,7 @@ class MigrenoznikCore {
     /**
      * Returns the entire diary of migraine attacks.
      */
-    get_migraine_attacks() {
+    getMigraineAttacks() {
         let migraine_attacks = localStorage.getItem("migraine_attacks");
         if (migraine_attacks == undefined) {
             return [];
@@ -64,7 +64,7 @@ class MigrenoznikCore {
     /**
      * Adds new migraine attack to the end of the list.
      */
-    add_new_migraine_attack(migraine_attack) {
+    addNewMigraineAttack(migraine_attack) {
         let migraine_attacks = localStorage.getItem("migraine_attacks");
         if (migraine_attacks == undefined) {
             localStorage.setItem("migraine_attacks", JSON.stringify([migraine_attack]));
@@ -79,7 +79,7 @@ class MigrenoznikCore {
         }
     }
 
-    remove_migraine_attack(no) {
+    removeMigraineAttack(no) {
         let migraine_attacks = localStorage.getItem("migraine_attacks");
         if (migraine_attacks == undefined) {
             localStorage.setItem("migraine_attacks", JSON.stringify([]));
@@ -103,7 +103,7 @@ class MigrenoznikCore {
         }
     }
 
-    close_last_migraine_attack() {
+    closeLastMigraineAttack() {
         let migraine_attacks = localStorage.getItem("migraine_attacks");
         if (migraine_attacks == undefined) {
             return;
@@ -119,9 +119,10 @@ class MigrenoznikCore {
         }
     }
 
-    next_autoincrement() {
-        localStorage.setItem("migraine_attack_ai", this.MigraineAttackAI + 1);
-        return this.MigraineAttackAI++;
+    nextAutoincrement() {
+        this.MigraineAttackAI++;
+        localStorage.setItem("migraine_attack_ai", this.MigraineAttackAI);
+        return this.MigraineAttackAI;
     }
 
     constructor() {
@@ -137,7 +138,7 @@ class MigrenoznikCore {
 
 
 class Calendar {
-    static month_number_to_name(month_number) {
+    static monthNumberToAame(month_number) {
         switch (month_number) {
             case 0:
                 return "янв";
@@ -174,7 +175,7 @@ class BrowserSystem {
      * Is website launched as standalone application.
      * @returns _true_ if as standalone, _false_ if as website
      */
-    static is_standalone() {
+    static isStandalone() {
         if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone || document.referrer.includes('android-app://')) {
           return true;
         }
@@ -183,4 +184,4 @@ class BrowserSystem {
 }
 
 
-const Core = new MigrenoznikCore();
+var Core = new MigrenoznikCore();
