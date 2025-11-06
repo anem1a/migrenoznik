@@ -1,104 +1,110 @@
-async function signup_button_Clicked() {
+// начало модуля "HandleLoginAndPasswordErrors"
+async function signupButtonClicked() {
     const login = document.getElementsByName('login')[0].value;
     const password = document.getElementsByName('password')[0].value;
-    const password_repeat = document.getElementsByName('password_repeat')[0].value;
-
-    if (password != password_repeat) {
-        logon_show_errorbox("Пароли не совпадают.");
+    const passwordRepeat = document.getElementsByName('password_repeat')[0].value; // Планируется обновление имён всех элементов после окончания реализации полного функционала для регистрации
+    if (password != passwordRepeat) {
+        logonShowErrorbox("Пароли не совпадают.");
         return;
     }
     if (password.length == 0) {
-        logon_show_errorbox("Пароль не должен быть пустым.");
+        logonShowErrorbox("Пароль не должен быть пустым.");
         return;
     }
     if (login.length == 0) {
-        logon_show_errorbox("Логин не должен быть пустым.");
+        logonShowErrorbox("Логин не должен быть пустым.");
         return;
     }
-    if (!validate_login(login)) {
-        logon_show_errorbox("Логин должен быть от 5 до 20 символов, допускаются только латинские буквы и символ \"_\".");
+    if (!validateLogin(login)) {
+        logonShowErrorbox("Логин должен быть от 5 до 20 символов, допускаются только латинские буквы и символ \"_\".");
         return;
     }
-    if (!validate_password(password)) {
-        logon_show_errorbox("Пароль должен быть не менее 8 символов, содержать как минимум одну заглавную, одну строчную букву и одну цифру.");
+    if (!validatePassword(password)) {
+        logonShowErrorbox("Пароль должен быть не менее 8 символов, содержать как минимум одну заглавную, одну строчную букву и одну цифру.");
         return;
     }
 
+const API_SIGNUP_URL = 'https://migrenoznik.ru/api/signup';
+    
     try {
         let data = new FormData();
         data.append("login", login);
         data.append("password", password);
         
-        const response = await fetch('/api/signup', {
+        const response = await fetch(API_SIGNUP_URL, {
             method: 'POST',
             body: data,
         });
         
         if (!response.ok) throw new Error(`Ошибка HTTP ${response.status}`);
-        
+       
         const result = await response.json();
+        const errorMessages = {
+            1: "Пользователь с таким логином уже есть.",
+            2: "Пароль слишком простой.",
+            3: "Логин содержит недопустимые символы.",
+            // 4 — особый случай, обрабатывается отдельно
+         };     
         if (result["success"]) {
             window.location.href = "/";
         } else {
-            if (result["code"] == 1) {
-                logon_show_errorbox("Пользователь с таким логином уже есть.");
-            } else if (result["code"] == 2) {
-                logon_show_errorbox("Пароль слишком простой.");
-            } else if (result["code"] == 3) {
-                logon_show_errorbox("Логин содержит недопустимые символы.");
-            } else if (result["code"] == 4) {
+            if (result["code"] == 4) {
                 if (password.length == 0) {
-                    logon_show_errorbox("Пароль не должен быть пустым.");
+                    logonShowErrorbox("Пароль не должен быть пустым.");
                 } else if (login.length == 0) {
-                    logon_show_errorbox("Логин не должен быть пустым.");
+                    logonShowErrorbox("Логин не должен быть пустым.");
                 } else {
-                    logon_show_errorbox("Логин или пароль пуст.");
+                    logonShowErrorbox("Логин или пароль пуст.");
                 }
             } else {
-                logon_show_errorbox("Ошибка на сервере.");
-            }
+                logonShowErrorbox(errorMessages[result["code"]]);
+            } 
         }
 
     } catch(error) {
-        logon_show_errorbox("Ошибка на сервере.");
+        logonShowErrorbox("Ошибка на сервере.");
     }
     
 }
+// конец модуля "HandleLoginAndPasswordErrors"
 
-function login_fields_Oninput() {
+// начало модуля "PasswordStrengthAssessment"
+function loginFieldsOninput() {
     document.getElementById("migre-id-main-login-errorbox").classList.remove('migre-v1-visible');
 }
 
-function signup_password_fields_Oninput() {
-    login_fields_Oninput();
+function signupPasswordFieldsOninput() {
+    loginFieldsOninput();
     let color = "black";
     let password = document.getElementById("migre-signup-password").value;
     if (password.length > 0) {
-        color = password_color(calculate_password_strength(password));
+        color = passwordColorСhange(calculatePasswordStrength(password));
     }
 
     document.getElementById("migre-signup-password").style.borderBottom = `1px solid ${color}`;
 }
 
-function signup_password2_fields_Oninput() {
-    login_fields_Oninput();
+function signupPassword2FieldsOninput() {
+    loginFieldsOninput();
     let color = "black";
     let password1 = document.getElementById("migre-signup-password").value;
     let password2 = document.getElementById("migre-signup-password2").value;
     if (password1 == password2 && password1.length > 0) {
-        color = password_color(calculate_password_strength(password1));
+        color = passwordColorСhange(calculatePasswordStrength(password1));
     }
 
     document.getElementById("migre-signup-password2").style.borderBottom = `1px solid ${color}`;
 }
+// конец модуля "PasswordStrengthAssessment"
 
-function clear_element(elem) {
-    while (elem?.firstChild) {
-        elem.removeChild(elem.firstChild);
+// начало модуля "ElementsAnimation"
+function clearElement(element) {
+    while (element?.firstChild) {
+        element.removeChild(element.firstChild);
     }
 }
 
-function stop_animation_and_remove(element) {
+function stopAnimationAndRemove(element) {
     if (!element) { 
         return; 
     }
@@ -106,11 +112,12 @@ function stop_animation_and_remove(element) {
     element.remove();
 }
 
-function play_animation(element, animation, duration, func, delay = 0) {
+function playAnimation(element, animation, duration, func, delay = 0) {
     if (!element) {
         return;
     }
     element.style.removeProperty('animation');
-    element.style.animation = `trams-v3-ani-${animation} ${duration}s ${func} forwards`;
+    element.style.animation = `migren-v3-ani-${animation} ${duration}s ${func} forwards`;
     element.style.animationDelay = `${delay}s`;
 }
+// конец модуля "ElementsAnimation"
