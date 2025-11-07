@@ -1,4 +1,4 @@
-{{ define "login.html" }}
+{{ define "sign-up.html" }}
 <!DOCTYPE html>
 <html lang="ru">
 
@@ -12,7 +12,7 @@
             <header class="migre-v1-main-header">
                 <div class="migre-v1-main-header-container">
                     <div class="migre-v1-main-header-inner">
-                        <a class="migre-v1-main-header-login-buttonlink" href="/sign-up/">Создать аккаунт</a>
+                        <a class="migre-v1-main-header-login-buttonlink" href="/login/">Войти</a>
                     </div>
                 </div>
             </header>
@@ -20,11 +20,11 @@
             <div class="migre-v1-main">
                 <div class="migre-v1-main-login">
                     <div class="migre-v1-main-login-header">
-                        <h1>Войти</h1>
+                        <h1>Зарегистрироваться</h1>
                     </div>
                     <div class="migre-v1-main-login-fields">
                         <div class="migre-v1-main-login-field-wrapper">
-                            <div>Эл. почта</div>
+                            <div>Логин</div>
                             <div class="migre-v1-main-login-field-container">
                                 <input oninput="login_fields_Oninput()" name="login" type="text" placeholder="Логин">
                             </div>
@@ -32,7 +32,13 @@
                         <div class="migre-v1-main-login-field-wrapper">
                             <div>Пароль</div>
                             <div class="migre-v1-main-login-field-container">
-                                <input oninput="login_fields_Oninput()" name="password" type="password" placeholder="Пароль">
+                                <input id="migre-signup-password" oninput="signup_password_fields_Oninput()" name="password" type="password" placeholder="Пароль">
+                            </div>
+                        </div>
+                        <div class="migre-v1-main-login-field-wrapper">
+                            <div>Повторите пароль</div>
+                            <div class="migre-v1-main-login-field-container">
+                                <input id="migre-signup-password2" oninput="signup_password2_fields_Oninput()" name="password_repeat" type="password" placeholder="Пароль">
                             </div>
                         </div>
                         <div class="migre-v1-main-login-field-wrapper">
@@ -42,7 +48,7 @@
                         </div>
                         <div class="migre-v1-main-login-field-wrapper">
                             <div class="migre-v1-main-login-field-container">
-                                <button onclick="login_button_Clicked()">Войти</button>
+                                <button onclick="signup_button_Clicked()">Зарегистрироваться</button>
                             </div>
                         </div>
                     </div>

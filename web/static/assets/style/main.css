@@ -99,7 +99,8 @@ body {
     padding: 6px 10px;
 }
 
-.migre-v1-main-header-login-button {
+.migre-v1-main-header-login-button,
+.migre-v1-main-header-login-buttonlink {
     border: none;
     background-color: white;
     font-size: 14px;
@@ -109,14 +110,22 @@ body {
     cursor: pointer;
 }
 @media (hover: hover) {
-    .migre-v1-main-header-login-button:hover {
+    .migre-v1-main-header-login-button:hover,
+    .migre-v1-main-header-login-buttonlink:hover {
         background-color: #eee;
     }
 }
 @media (hover: none) {
-    .migre-v1-main-header-login-button:active {
+    .migre-v1-main-header-login-button:active,
+    .migre-v1-main-header-login-buttonlink:active {
         background-color: #eee;
     }
+}
+
+.migre-v1-main-header-login-buttonlink {
+    text-decoration: none;
+    color: black;
+    display: inline-block;
 }
 
 .migre-v1-main-login-field-container input {
@@ -154,7 +163,7 @@ body {
 .migre-v1-main-login {
     margin: 0 auto;
     width: 100%;
-    max-width: 300px;
+    max-width: 320px;
 }
 
 .migre-v1-main-login-field-wrapper {
@@ -178,4 +187,22 @@ body {
         color: rgb(255, 126, 18);
         border-bottom: 1px solid rgb(255, 126, 18);
     }
+}
+
+.migre-v1-main-login-field-error-container {
+    background-color: rgb(255, 182, 182);
+    padding: .25em .5em;
+    transform-origin: top;
+    transition: transform .15s ease-in;
+    display: none;
+    transform: scaleY(0);
+}
+
+.migre-v1-main-login-field-error-container.migre-v1-visible {
+    display: block;
+    transform: scaleY(1);
+}
+
+.migre-v1-main-login-field-error-container p {
+    margin: .5em 0;
 }
