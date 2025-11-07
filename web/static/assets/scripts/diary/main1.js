@@ -38,21 +38,23 @@ async function logoutClicked() {
     try {
         const DATA = new FormData();
 
-        const response = await fetch('/api/logout', {
+        console.log("API Request: POST /api/logout");
+        const RESPONSE = await fetch('/api/logout', {
             method: 'POST',
             body: DATA,
         });
 
-        if (!response.ok) throw new Error(`Ошибка HTTP ${response.status}`);
+        if (!RESPONSE.ok) throw new Error(`Ошибка HTTP ${RESPONSE.status}`);
         
-        const RESULT = await response.json();
+        const RESULT = await RESPONSE.json();
         if (RESULT["success"]) {
             window.location.href = "/login/";
         }
 
     } catch (error) {
         console.error("Ошибка при выходе из системы:", error);
-
+    }
+}
 function deleteEntryClicked(entryId) {
     Core.removeMigraineAttack(entryId);
     composeMigraineDiary();
@@ -64,10 +66,10 @@ async function loginButtonClicked() {
 
     try {
         const DATA = new FormData();
-        DATA.append("login", login);
+        DATA.append("login", LOGIN);
         DATA.append("password", PASSWORD);
         
-        console.log("API Request: POST /api/login", { login: login });
+        console.log("API Request: POST /api/login", { login: LOGIN });
         const RESPONSE = await fetch('/api/login', {
             method: 'POST',
             body: DATA,
