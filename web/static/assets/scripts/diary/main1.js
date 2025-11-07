@@ -138,7 +138,7 @@ class MigrenoznikCore {
 
 
 class Calendar {
-    static monthNumberToAame(month_number) {
+    static monthNumberToName(month_number) {
         switch (month_number) {
             case 0:
                 return "янв";
