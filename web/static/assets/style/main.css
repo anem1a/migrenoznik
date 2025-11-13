@@ -67,6 +67,8 @@ body {
 
 .migre-v1-main-bottom-button-wrapper {
     padding: 15px;
+    display: flex;
+    flex-direction: row;
 }
 
 .migre-v1-main-bottom-button {
@@ -79,15 +81,36 @@ body {
     border-radius: 10px;
     cursor: pointer;
     border: none;
+    margin: 0 5px;
+}
+.migre-v1-main-bottom-button[data-square="true"] {
+    width: 54px;
+    background-color: white;
+    border: 1px solid black;
+    color: black;
+    font-size: 30px;
+    line-height: 0;
+}
+.migre-v1-main-bottom-button:first-child {
+    margin-left: 0;
+}
+.migre-v1-main-bottom-button:last-child {
+    margin-right: 0;
 }
 @media (hover: hover) {
     .migre-v1-main-bottom-button:hover {
         background-color: #444;
     }
+    .migre-v1-main-bottom-button[data-square="true"]:hover {
+        background-color: #bbb;
+    }
 }
 @media (hover: none) {
     .migre-v1-main-bottom-button:active {
         background-color: #444;
+    }
+    .migre-v1-main-bottom-button[data-square="true"]:active {
+        background-color: #bbb;
     }
 }
 
