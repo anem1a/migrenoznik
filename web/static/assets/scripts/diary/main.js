@@ -120,8 +120,9 @@ class MigrenoznikCore {
     }
 
     next_autoincrement() {
-        localStorage.setItem("migraine_attack_ai", this.MigraineAttackAI + 1);
-        return this.MigraineAttackAI++;
+        this.MigraineAttackAI++;
+        localStorage.setItem("migraine_attack_ai", this.MigraineAttackAI);
+        return this.MigraineAttackAI;
     }
 
     constructor() {
