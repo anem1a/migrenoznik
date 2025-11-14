@@ -102,7 +102,7 @@ body {
         background-color: #444;
     }
     .migre-v1-main-bottom-button[data-square="true"]:hover {
-        background-color: #bbb;
+        background-color: #ddd;
     }
 }
 @media (hover: none) {
@@ -110,7 +110,7 @@ body {
         background-color: #444;
     }
     .migre-v1-main-bottom-button[data-square="true"]:active {
-        background-color: #bbb;
+        background-color: #ddd;
     }
 }
 
