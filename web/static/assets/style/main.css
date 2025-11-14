@@ -63,6 +63,22 @@ body {
 
 .migre-v1-main-diary-wrapper {
     margin: 20px;
+    border: 1px solid #bbb;
+    border-radius: 10px;
+    padding: 15px 10px;
+}
+
+.migre-v1-main-diary-wrapper h1 {
+    font-size: var(--migre-font-size-l);
+    margin-bottom: .25em;
+    margin-top: 0;
+}
+
+.migre-v1-main-diary-wrapper h2 {
+    font-size: var(--migre-font-size-m);
+    font-weight: 400;
+    color: #666;
+    margin-top: 0;
 }
 
 .migre-v1-main-bottom-button-wrapper {
