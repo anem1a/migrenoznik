@@ -144,10 +144,12 @@ function migraine_now_button_Clicked() {
         Core.toggle_migraine_status();
         Core.close_last_migraine_attack();
         document.getElementById("migre-diary-main-bottom-button").innerText = "Отметить мигрень сейчас";
+        document.getElementById("migre-now-wrapper").style.display = 'none';
     } else {
         Core.toggle_migraine_status();
         Core.add_new_migraine_attack(new MigraineAttack(Core.next_autoincrement(), new Date()));
         document.getElementById("migre-diary-main-bottom-button").innerText = "Отметить конец мигрени";
+        document.getElementById("migre-now-wrapper").style.display = 'block';
     }
     compose_migraine_diary();
 }
