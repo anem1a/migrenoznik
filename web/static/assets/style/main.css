@@ -245,3 +245,29 @@ body {
 .migre-v1-main-login-field-error-container p {
     margin: .5em 0;
 }
+
+.migre-v1-main-now-item {
+    margin-bottom: 10px;
+}
+
+.migre-v1-main-now-item-suptitle {
+    color: #999;
+    font-size: var(--migre-font-size-s);
+}
+
+.migre-v1-main-now-item-value-scrollbar {
+    display: flex;
+}
+
+.migre-v1-main-now-item-value-scrollbar-wrapper {
+    width: 100%;
+}
+
+.migre-v1-main-now-item-value-scrollbar-wrapper input {
+    width: 100%;
+}
+
+.migre-v1-main-now-item-value-scrollbar-current {
+    width: 2em;
+    padding: 0 1em;
+}

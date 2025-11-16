@@ -1,9 +1,10 @@
 
 class MigraineAttack {
-    constructor(local_id, dt_start, dt_end = null, id = null) {
+    constructor(local_id, dt_start, strength, dt_end = null, id = null) {
         this.LocalID = local_id;
         this.DT_Start = dt_start;
         this.DT_End = dt_end;
+        this.Strength = strength;
     }
 
     static from_json(obj) {
@@ -11,6 +12,7 @@ class MigraineAttack {
             obj["LocalID"] == null ? null : Number(obj["LocalID"]),
             obj["DT_Start"] == null ? null : new Date(obj["DT_Start"]),
             obj["DT_End"] == null ? null : new Date(obj["DT_End"]),
+            obj["Strength"] == null ? null : new Date(obj["Strength"]),
         );
     }
 }
@@ -119,6 +121,22 @@ class MigrenoznikCore {
         }
     }
 
+    change_last_migraine_attack(strength) {
+        let migraine_attacks = localStorage.getItem("migraine_attacks");
+        if (migraine_attacks == undefined) {
+            return;
+        }
+        try {
+            migraine_attacks = JSON.parse(migraine_attacks);
+            let last_element = migraine_attacks.pop();
+            last_element["Strength"] = strength;
+            migraine_attacks.push(last_element);
+            localStorage.setItem("migraine_attacks", JSON.stringify(migraine_attacks));
+        } catch (error) {
+            return;
+        }
+    }
+
     next_autoincrement() {
         this.MigraineAttackAI++;
         localStorage.setItem("migraine_attack_ai", this.MigraineAttackAI);
@@ -147,7 +165,7 @@ function migraine_now_button_Clicked() {
         document.getElementById("migre-now-wrapper").style.display = 'none';
     } else {
         Core.toggle_migraine_status();
-        Core.add_new_migraine_attack(new MigraineAttack(Core.next_autoincrement(), new Date()));
+        Core.add_new_migraine_attack(new MigraineAttack(Core.next_autoincrement(), new Date(), 4));
         document.getElementById("migre-diary-main-bottom-button").innerText = "Отметить конец мигрени";
         document.getElementById("migre-now-wrapper").style.display = 'block';
     }
@@ -203,7 +221,7 @@ function compose_migraine_diary() {
             "div",
             "migre-v1-main-diary-item",
             undefined,
-            `<b>Запись&nbsp;${i+1}.</b> ${migraine_attack.DT_Start.getDate()} ${Calendar.month_number_to_name(migraine_attack.DT_Start.getMonth())} ${migraine_attack.DT_Start.getFullYear()} ${migraine_attack.DT_Start.getHours() < 10 ? "0" : ""}${migraine_attack.DT_Start.getHours()}:${migraine_attack.DT_Start.getMinutes() < 10 ? "0" : ""}${migraine_attack.DT_Start.getMinutes()}`
+            `<b>Запись&nbsp;${i+1}.</b> Сила: ${migraine_attack.Strength} / ${migraine_attack.DT_Start.getDate()} ${Calendar.month_number_to_name(migraine_attack.DT_Start.getMonth())} ${migraine_attack.DT_Start.getFullYear()} ${migraine_attack.DT_Start.getHours() < 10 ? "0" : ""}${migraine_attack.DT_Start.getHours()}:${migraine_attack.DT_Start.getMinutes() < 10 ? "0" : ""}${migraine_attack.DT_Start.getMinutes()}`
         );
         if (migraine_attack.DT_End != null) {
             diary_item.innerHTML += ` &ndash; ${migraine_attack.DT_End.getDate()} ${Calendar.month_number_to_name(migraine_attack.DT_End.getMonth())} ${migraine_attack.DT_End.getFullYear()} ${migraine_attack.DT_End.getHours() < 10 ? "0" : ""}${migraine_attack.DT_End.getHours()}:${migraine_attack.DT_End.getMinutes() < 10 ? "0" : ""}${migraine_attack.DT_End.getMinutes()}`;
@@ -489,6 +507,14 @@ function play_animation_and_calm(element, animation, duration, func, delay = 0) 
         element.style.removeProperty('transform');
         element.style.removeProperty('animation');
     };
+}
+
+function migraine_now_strength_Inputed(value) {
+    document.getElementById("migre-current-strength-value").innerHTML = value;
+}
+
+function migraine_now_strength_Changed(value) {
+    Core.change_last_migraine_attack(value);
 }
 
 const Core = new MigrenoznikCore();
