@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded',
             let current = Core.get_current_migraine_attack();
             document.getElementById("migre-current-strength-input").value = current.Strength;
             document.getElementById("migre-current-strength-value").innerHTML = current.Strength;
+            document.getElementById("migre-current-dt-start-value").innerHTML = `${current.DT_Start.getDate()} ${Calendar.month_number_to_name(current.DT_Start.getMonth())} ${current.DT_Start.getFullYear()} ${current.DT_Start.getHours() < 10 ? "0" : ""}${current.DT_Start.getHours()}:${current.DT_Start.getMinutes() < 10 ? "0" : ""}${current.DT_Start.getMinutes()}`;
         }
     }
 );

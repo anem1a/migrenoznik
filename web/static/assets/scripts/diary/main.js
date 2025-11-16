@@ -210,6 +210,8 @@ function migraine_now_button_Clicked() {
         Core.toggle_migraine_status();
         Core.add_new_migraine_attack(new MigraineAttack(Core.next_autoincrement(), new Date(), 4));
         document.getElementById("migre-diary-main-bottom-button").innerText = "Отметить конец мигрени";
+        let now = new Date();
+        document.getElementById("migre-current-dt-start-value").innerHTML = `${now.getDate()} ${Calendar.month_number_to_name(now.getMonth())} ${now.getFullYear()} ${now.getHours() < 10 ? "0" : ""}${now.getHours()}:${now.getMinutes() < 10 ? "0" : ""}${now.getMinutes()}`;
         display_migraine_now_block(true);
     }
     compose_migraine_diary();
