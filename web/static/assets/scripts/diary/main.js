@@ -12,9 +12,9 @@ class MigraineAttack {
         return new MigraineAttack(
             obj["LocalID"] == null ? null : Number(obj["LocalID"]),
             obj["DT_Start"] == null ? null : new Date(obj["DT_Start"]),
+            obj["Strength"] == null ? null : Number(obj["Strength"]),
             obj["DT_End"] == null ? null : new Date(obj["DT_End"]),
-            obj["Strength"] == null ? null : new Date(obj["Strength"]),
-            obj["ID"] == null ? null : new Date(obj["ID"]),
+            obj["ID"] == null ? null : Number(obj["ID"]),
         );
     }
 }
@@ -134,6 +134,15 @@ class MigrenoznikCore {
         }
     }
 
+    close_current_migraine_attack() {
+        let attacks = this.get_migraine_attacks();
+        let current = this.get_current_migraine_attack();
+        current.DT_End = new Date();
+        attacks.push(current);
+        localStorage.setItem("migraine_attacks", JSON.stringify(attacks));
+        localStorage.removeItem("current_migraine_attack");
+    }
+
     close_last_migraine_attack() {
         let migraine_attacks = localStorage.getItem("migraine_attacks");
         let current = this.get_current_migraine_attack();
@@ -158,19 +167,9 @@ class MigrenoznikCore {
     }
 
     change_last_migraine_attack(strength) {
-        let migraine_attacks = localStorage.getItem("migraine_attacks");
-        if (migraine_attacks == undefined) {
-            return;
-        }
-        try {
-            migraine_attacks = JSON.parse(migraine_attacks);
-            let last_element = migraine_attacks.pop();
-            last_element["Strength"] = strength;
-            migraine_attacks.push(last_element);
-            localStorage.setItem("migraine_attacks", JSON.stringify(migraine_attacks));
-        } catch (error) {
-            return;
-        }
+        let current = this.get_current_migraine_attack();
+        current.Strength = strength;
+        localStorage.setItem("current_migraine_attack", JSON.stringify(current));
     }
 
     next_autoincrement() {
@@ -204,7 +203,7 @@ function display_migraine_now_block(show) {
 function migraine_now_button_Clicked() {
     if (Core.is_migraine_now()) {
         Core.toggle_migraine_status();
-        Core.close_last_migraine_attack();
+        Core.close_current_migraine_attack();
         document.getElementById("migre-diary-main-bottom-button").innerText = "Отметить мигрень сейчас";
         document.getElementById("migre-now-wrapper").style.display = 'none';
     } else {

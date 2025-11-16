@@ -10,7 +10,10 @@ document.addEventListener('DOMContentLoaded',
         }
         if (Core.is_migraine_now()) {
             document.getElementById("migre-diary-main-bottom-button").innerText = "Отметить конец мигрени";
-            document.getElementById("migre-now-wrapper").style.display = 'block';
+            display_migraine_now_block(true);
+            let current = Core.get_current_migraine_attack();
+            document.getElementById("migre-current-strength-input").value = current.Strength;
+            document.getElementById("migre-current-strength-value").innerHTML = current.Strength;
         }
     }
 );
