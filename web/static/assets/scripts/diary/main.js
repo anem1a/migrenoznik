@@ -5,6 +5,7 @@ class MigraineAttack {
         this.DT_Start = dt_start;
         this.DT_End = dt_end;
         this.Strength = strength;
+        this.ID = id;
     }
 
     static from_json(obj) {
@@ -13,6 +14,7 @@ class MigraineAttack {
             obj["DT_Start"] == null ? null : new Date(obj["DT_Start"]),
             obj["DT_End"] == null ? null : new Date(obj["DT_End"]),
             obj["Strength"] == null ? null : new Date(obj["Strength"]),
+            obj["ID"] == null ? null : new Date(obj["ID"]),
         );
     }
 }
@@ -64,20 +66,47 @@ class MigrenoznikCore {
     }
 
     /**
+     * Returns the current migraine attack. Undefined if no attacks found.
+     */
+    get_current_migraine_attack() {
+        let current_migraine_attack = localStorage.getItem("current_migraine_attack");
+        try {
+            current_migraine_attack = JSON.parse(current_migraine_attack);
+            let current_migraine_attack_obj = MigraineAttack.from_json(current_migraine_attack);
+            return current_migraine_attack_obj;
+        } catch (error) {
+            return undefined;
+        }
+    }
+
+    assign_id_to_current_migraine_attack(id) {
+        let current = this.get_current_migraine_attack();
+        current.ID = id;
+        localStorage.setItem("current_migraine_attack", JSON.stringify(current));
+    }
+
+    /**
      * Adds new migraine attack to the end of the list.
      */
-    add_new_migraine_attack(migraine_attack) {
-        let migraine_attacks = localStorage.getItem("migraine_attacks");
-        if (migraine_attacks == undefined) {
-            localStorage.setItem("migraine_attacks", JSON.stringify([migraine_attack]));
-            return;
-        }
-        try {
-            migraine_attacks = JSON.parse(migraine_attacks);
-            migraine_attacks.push(migraine_attack);
-            localStorage.setItem("migraine_attacks", JSON.stringify(migraine_attacks));
-        } catch (error) {
-            localStorage.setItem("migraine_attacks", JSON.stringify([migraine_attack]));
+    async add_new_migraine_attack(migraine_attack) {
+        /* Save to local storage */
+        localStorage.setItem("current_migraine_attack", JSON.stringify(migraine_attack));
+
+        /* Save to remote storage */
+        let data = new FormData();
+        data.append("dt_start", migraine_attack.DT_Start);
+        data.append("strength", migraine_attack.Strength);
+        
+        const response = await fetch('/api/add_entry', {
+            method: 'POST',
+            body: data,
+        });
+        
+        if (!response.ok) throw new Error(`Ошибка HTTP ${response.status}`);
+        
+        const result = await response.json();
+        if (result["success"]) {
+            this.assign_id_to_current_migraine_attack(result["id"]);
         }
     }
 
@@ -107,16 +136,23 @@ class MigrenoznikCore {
 
     close_last_migraine_attack() {
         let migraine_attacks = localStorage.getItem("migraine_attacks");
-        if (migraine_attacks == undefined) {
+        let current = this.get_current_migraine_attack();
+        if (current == undefined) {
             return;
         }
         try {
-            migraine_attacks = JSON.parse(migraine_attacks);
-            let last_element = migraine_attacks.pop();
-            last_element["DT_End"] = new Date();
-            migraine_attacks.push(last_element);
+            current.DT_End = new Date();
+            if (migraine_attacks == undefined) {
+                migraine_attacks = [last_element];
+            } else {
+                migraine_attacks = JSON.parse(migraine_attacks);
+                migraine_attacks.push(last_element);
+            }
             localStorage.setItem("migraine_attacks", JSON.stringify(migraine_attacks));
+            localStorage.removeItem("current_migraine_attack");
         } catch (error) {
+            migraine_attacks = [last_element];
+            localStorage.setItem("migraine_attacks", JSON.stringify(migraine_attacks));
             return;
         }
     }
@@ -154,6 +190,14 @@ class MigrenoznikCore {
     }
 }
 
+function display_migraine_now_block(show) {
+    if (show) {
+        document.getElementById("migre-now-wrapper").style.display = 'block';
+    } else {
+        document.getElementById("migre-now-wrapper").style.display = 'none';
+    }
+}
+
 /**
  * Onclick event of pressing the "Migraine now" button
  */
@@ -167,7 +211,7 @@ function migraine_now_button_Clicked() {
         Core.toggle_migraine_status();
         Core.add_new_migraine_attack(new MigraineAttack(Core.next_autoincrement(), new Date(), 4));
         document.getElementById("migre-diary-main-bottom-button").innerText = "Отметить конец мигрени";
-        document.getElementById("migre-now-wrapper").style.display = 'block';
+        display_migraine_now_block(true);
     }
     compose_migraine_diary();
 }
