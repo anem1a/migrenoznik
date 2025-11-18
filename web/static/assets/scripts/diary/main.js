@@ -1,10 +1,11 @@
 
 class MigraineAttack {
-    constructor(local_id, dt_start, strength, dt_end = null, id = null) {
+    constructor(local_id, dt_start, strength, dt_end = null, triggers = [], id = null) {
         this.LocalID = local_id;
         this.DT_Start = dt_start;
         this.DT_End = dt_end;
         this.Strength = strength;
+        this.Triggers = triggers;
         this.ID = id;
     }
 
@@ -14,8 +15,30 @@ class MigraineAttack {
             obj["DT_Start"] == null ? null : new Date(obj["DT_Start"]),
             obj["Strength"] == null ? null : Number(obj["Strength"]),
             obj["DT_End"] == null ? null : new Date(obj["DT_End"]),
+            obj["Triggers"] == null ? [] : obj["Triggers"],
             obj["ID"] == null ? null : Number(obj["ID"]),
         );
+    }
+}
+
+class MigraineTrigger {
+    static code_to_name(code) {
+        switch (code) {
+            case 0:
+                return 'Триггер 1'
+            case 1:
+                return 'Триггер 2'
+            case 2:
+                return 'Триггер 3'
+            case 3:
+                return 'Триггер 4'
+            case 4:
+                return 'Триггер 5'
+            case 5:
+                return 'Триггер 6'
+            default:
+                break;
+        }
     }
 }
 
@@ -166,9 +189,21 @@ class MigrenoznikCore {
         }
     }
 
-    change_last_migraine_attack(strength) {
+    edit_strength_of_current_migraine_attack(strength) {
         let current = this.get_current_migraine_attack();
         current.Strength = strength;
+        localStorage.setItem("current_migraine_attack", JSON.stringify(current));
+    }
+
+    add_trigger_to_current_migraine_attack(trigger) {
+        let current = this.get_current_migraine_attack();
+        current.Triggers.push(trigger);
+        localStorage.setItem("current_migraine_attack", JSON.stringify(current));
+    }
+
+    remove_trigger_from_current_migraine_attack(trigger) {
+        let current = this.get_current_migraine_attack();
+        current.Triggers = current.Triggers.filter(item => item !== trigger);
         localStorage.setItem("current_migraine_attack", JSON.stringify(current));
     }
 
@@ -208,6 +243,9 @@ function migraine_now_button_Clicked() {
         document.getElementById("migre-now-wrapper").style.display = 'none';
     } else {
         Core.toggle_migraine_status();
+        for (let i = 0; i <= 5; i++) {
+            document.getElementById(`migre-trigger-${i}`).setAttribute("data-selected", false);
+        }
         Core.add_new_migraine_attack(new MigraineAttack(Core.next_autoincrement(), new Date(), 4));
         document.getElementById("migre-diary-main-bottom-button").innerText = "Отметить конец мигрени";
         let now = new Date();
@@ -262,11 +300,15 @@ function compose_migraine_diary() {
     let migraine_attacks = Core.get_migraine_attacks();
     for (let i = 0; i < migraine_attacks.length; i++) {
         const migraine_attack = migraine_attacks[i];
+        let triggers = [];
+        for (const trigger of migraine_attack.Triggers) {
+            triggers.push(MigraineTrigger.code_to_name(trigger));
+        }
         let diary_item = create_element(
             "div",
             "migre-v1-main-diary-item",
             undefined,
-            `<b>Запись&nbsp;${i+1}.</b> Сила: ${migraine_attack.Strength} / ${migraine_attack.DT_Start.getDate()} ${Calendar.month_number_to_name(migraine_attack.DT_Start.getMonth())} ${migraine_attack.DT_Start.getFullYear()} ${migraine_attack.DT_Start.getHours() < 10 ? "0" : ""}${migraine_attack.DT_Start.getHours()}:${migraine_attack.DT_Start.getMinutes() < 10 ? "0" : ""}${migraine_attack.DT_Start.getMinutes()}`
+            `<b>Запись&nbsp;${i+1}.</b> Сила: ${migraine_attack.Strength} / Триггеры: ${triggers.join(", ")} / ${migraine_attack.DT_Start.getDate()} ${Calendar.month_number_to_name(migraine_attack.DT_Start.getMonth())} ${migraine_attack.DT_Start.getFullYear()} ${migraine_attack.DT_Start.getHours() < 10 ? "0" : ""}${migraine_attack.DT_Start.getHours()}:${migraine_attack.DT_Start.getMinutes() < 10 ? "0" : ""}${migraine_attack.DT_Start.getMinutes()}`
         );
         if (migraine_attack.DT_End != null) {
             diary_item.innerHTML += ` &ndash; ${migraine_attack.DT_End.getDate()} ${Calendar.month_number_to_name(migraine_attack.DT_End.getMonth())} ${migraine_attack.DT_End.getFullYear()} ${migraine_attack.DT_End.getHours() < 10 ? "0" : ""}${migraine_attack.DT_End.getHours()}:${migraine_attack.DT_End.getMinutes() < 10 ? "0" : ""}${migraine_attack.DT_End.getMinutes()}`;
@@ -559,7 +601,17 @@ function migraine_now_strength_Inputed(value) {
 }
 
 function migraine_now_strength_Changed(value) {
-    Core.change_last_migraine_attack(value);
+    Core.edit_strength_of_current_migraine_attack(value);
+}
+
+function toggle_trigger_Clicked(id, item) {
+    let selected = item.getAttribute("data-selected") == "true";
+    if (selected) {
+        Core.remove_trigger_from_current_migraine_attack(id);
+    } else {
+        Core.add_trigger_to_current_migraine_attack(id);
+    }
+    item.setAttribute("data-selected", selected == false);
 }
 
 const Core = new MigrenoznikCore();

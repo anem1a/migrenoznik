@@ -271,3 +271,33 @@ body {
     width: 2em;
     padding: 0 1em;
 }
+
+.migre-v1-main-now-item-value-tags {
+    /* margin-top: 10px; */
+}
+
+.migre-v1-main-now-item-value-tags-item {
+    background-color: #ddd;
+    color: black;
+    padding: .2em .75em;
+    border-radius: 6px;
+    margin-right: .25em;
+    line-height: 2;
+    cursor: pointer;
+    touch-action: none;
+    user-select: none;
+}
+@media (hover: hover) {
+    .migre-v1-main-now-item-value-tags-item:hover {
+        background-color: #ccc;
+    }
+}
+@media (hover: none) {
+    .migre-v1-main-now-item-value-tags-item:active {
+        background-color: #ccc;
+    }
+}
+
+.migre-v1-main-now-item-value-tags-item[data-selected="true"] {
+    background-color: var(--migre-color-main);
+}

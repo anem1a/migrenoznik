@@ -12,8 +12,14 @@ document.addEventListener('DOMContentLoaded',
             document.getElementById("migre-diary-main-bottom-button").innerText = "Отметить конец мигрени";
             display_migraine_now_block(true);
             let current = Core.get_current_migraine_attack();
-            document.getElementById("migre-current-strength-input").value = current.Strength;
-            document.getElementById("migre-current-strength-value").innerHTML = current.Strength;
+            if (current) {
+                document.getElementById("migre-current-strength-input").value = current.Strength;
+                document.getElementById("migre-current-strength-value").innerHTML = current.Strength;
+                document.getElementById("migre-current-strength-value").innerHTML = current.Strength;
+                for (const trigger of current.Triggers) {
+                    document.getElementById(`migre-trigger-${trigger}`).setAttribute("data-selected", true);
+                }
+            }
             document.getElementById("migre-current-dt-start-value").innerHTML = `${current.DT_Start.getDate()} ${Calendar.month_number_to_name(current.DT_Start.getMonth())} ${current.DT_Start.getFullYear()} ${current.DT_Start.getHours() < 10 ? "0" : ""}${current.DT_Start.getHours()}:${current.DT_Start.getMinutes() < 10 ? "0" : ""}${current.DT_Start.getMinutes()}`;
         }
     }
