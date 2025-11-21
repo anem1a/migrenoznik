@@ -153,7 +153,7 @@ class MigrenoznikCore {
         data.append("dt_start", current.DT_Start.getTime());
         data.append("dt_end", current.DT_End.getTime());
         data.append("strength", current.Strength);
-        data.append("triggers", current.Triggers);
+        data.append("triggers", JSON.stringify(current.Triggers));
         
         const response = await fetch('/api/add_entry', {
             method: 'POST',
