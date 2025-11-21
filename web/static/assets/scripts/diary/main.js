@@ -114,23 +114,6 @@ class MigrenoznikCore {
     async add_new_migraine_attack(migraine_attack) {
         /* Save to local storage */
         localStorage.setItem("current_migraine_attack", JSON.stringify(migraine_attack));
-
-        /* Save to remote storage */
-        let data = new FormData();
-        data.append("dt_start", migraine_attack.DT_Start);
-        data.append("strength", migraine_attack.Strength);
-        
-        const response = await fetch('/api/add_entry', {
-            method: 'POST',
-            body: data,
-        });
-        
-        if (!response.ok) throw new Error(`Ошибка HTTP ${response.status}`);
-        
-        const result = await response.json();
-        if (result["success"]) {
-            this.assign_id_to_current_migraine_attack(result["id"]);
-        }
     }
 
     remove_migraine_attack(no) {
@@ -157,13 +140,32 @@ class MigrenoznikCore {
         }
     }
 
-    close_current_migraine_attack() {
+    async close_current_migraine_attack() {
         let attacks = this.get_migraine_attacks();
         let current = this.get_current_migraine_attack();
         current.DT_End = new Date();
         attacks.push(current);
         localStorage.setItem("migraine_attacks", JSON.stringify(attacks));
         localStorage.removeItem("current_migraine_attack");
+
+        /* Save to remote storage */
+        let data = new FormData();
+        data.append("dt_start", current.DT_Start.getTime());
+        data.append("dt_end", current.DT_End.getTime());
+        data.append("strength", current.Strength);
+        data.append("triggers", current.Triggers);
+        
+        const response = await fetch('/api/add_entry', {
+            method: 'POST',
+            body: data,
+        });
+        
+        if (!response.ok) throw new Error(`Ошибка HTTP ${response.status}`);
+        
+        const result = await response.json();
+        if (result["success"]) {
+            this.assign_id_to_current_migraine_attack(result["id"]);
+        }
     }
 
     close_last_migraine_attack() {
