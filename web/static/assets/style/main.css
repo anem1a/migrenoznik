@@ -59,6 +59,9 @@ body {
 
 .migre-v1-main-diary {
     overflow-y: auto;
+    /* flex-direction: column-reverse;
+    flex-grow: 1;
+    display: flex; */
 }
 
 .migre-v1-main-diary-wrapper {

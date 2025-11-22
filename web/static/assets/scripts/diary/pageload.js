@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded',
             compose_migraine_diary();
         }
         if (Core.is_migraine_now()) {
-            document.getElementById("migre-diary-main-bottom-button").innerText = "Отметить конец мигрени";
+            configure_main_bottom_buttoms(true);
             display_migraine_now_block(true);
             let current = Core.get_current_migraine_attack();
             if (current) {

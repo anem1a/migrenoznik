@@ -234,6 +234,16 @@ function display_migraine_now_block(show) {
     }
 }
 
+function configure_main_bottom_buttoms(migraine_now) {
+    if (migraine_now) {
+        document.getElementById("migre-diary-main-bottom-button-now").innerText = "Отметить конец мигрени";
+        document.getElementById("migre-diary-main-bottom-button-add").style.display = 'none';
+    } else {
+        document.getElementById("migre-diary-main-bottom-button-now").innerText = "Отметить мигрень сейчас";
+        document.getElementById("migre-diary-main-bottom-button-add").style.display = 'block';
+    }
+}
+
 /**
  * Onclick event of pressing the "Migraine now" button
  */
@@ -241,7 +251,7 @@ function migraine_now_button_Clicked() {
     if (Core.is_migraine_now()) {
         Core.toggle_migraine_status();
         Core.close_current_migraine_attack();
-        document.getElementById("migre-diary-main-bottom-button").innerText = "Отметить мигрень сейчас";
+        configure_main_bottom_buttoms(false);
         document.getElementById("migre-now-wrapper").style.display = 'none';
     } else {
         Core.toggle_migraine_status();
@@ -249,7 +259,7 @@ function migraine_now_button_Clicked() {
             document.getElementById(`migre-trigger-${i}`).setAttribute("data-selected", false);
         }
         Core.add_new_migraine_attack(new MigraineAttack(Core.next_autoincrement(), new Date(), 4));
-        document.getElementById("migre-diary-main-bottom-button").innerText = "Отметить конец мигрени";
+        configure_main_bottom_buttoms(true);
         let now = new Date();
         document.getElementById("migre-current-dt-start-value").innerHTML = `${now.getDate()} ${Calendar.month_number_to_name(now.getMonth())} ${now.getFullYear()} ${now.getHours() < 10 ? "0" : ""}${now.getHours()}:${now.getMinutes() < 10 ? "0" : ""}${now.getMinutes()}`;
         display_migraine_now_block(true);
