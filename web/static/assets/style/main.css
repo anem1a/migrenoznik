@@ -81,7 +81,7 @@ body {
     font-size: var(--migre-font-size-m);
     font-weight: 400;
     color: #666;
-    margin-top: 0;
+    margin: 0;
 }
 
 .migre-v1-main-bottom-button-wrapper {
@@ -303,4 +303,8 @@ body {
 
 .migre-v1-main-now-item-value-tags-item[data-selected="true"] {
     background-color: var(--migre-color-main);
+}
+
+.migre-v1-main-card-titles-block {
+    margin-bottom: 20px;
 }
