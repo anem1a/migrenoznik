@@ -82,6 +82,9 @@ class MigrenoznikCore {
             for (const migraine_attack of migraine_attacks) {
                 migraine_attacks_obj.push(MigraineAttack.from_json(migraine_attack));
             }
+            migraine_attacks_obj.sort((a, b) => {
+                return new Date(b.DT_Start) - new Date(a.DT_Start);
+            });
             return migraine_attacks_obj;
         } catch (error) {
             return [];
