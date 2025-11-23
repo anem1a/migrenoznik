@@ -102,10 +102,15 @@ class MigrenoznikCore {
         }
     }
 
-    assign_id_to_current_migraine_attack(id) {
-        let current = this.get_current_migraine_attack();
-        current.ID = id;
-        localStorage.setItem("current_migraine_attack", JSON.stringify(current));
+    assign_id_to_migraine_attack(local_id, id) {
+        let attacks = this.get_migraine_attacks();
+        for (let i = 0; i < attacks.length; i++) {
+            if (attacks[i].LocalID == local_id) {
+                attacks[i].ID = id;
+                break;
+            }
+        }
+        localStorage.setItem("migraine_attacks", JSON.stringify(attacks));
     }
 
     /**
@@ -164,7 +169,7 @@ class MigrenoznikCore {
         
         const result = await response.json();
         if (result["success"]) {
-            this.assign_id_to_current_migraine_attack(result["id"]);
+            this.assign_id_to_migraine_attack(current.LocalID, result["id"]);
         }
     }
 
