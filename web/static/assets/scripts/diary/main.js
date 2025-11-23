@@ -168,29 +168,6 @@ class MigrenoznikCore {
         }
     }
 
-    close_last_migraine_attack() {
-        let migraine_attacks = localStorage.getItem("migraine_attacks");
-        let current = this.get_current_migraine_attack();
-        if (current == undefined) {
-            return;
-        }
-        try {
-            current.DT_End = new Date();
-            if (migraine_attacks == undefined) {
-                migraine_attacks = [last_element];
-            } else {
-                migraine_attacks = JSON.parse(migraine_attacks);
-                migraine_attacks.push(last_element);
-            }
-            localStorage.setItem("migraine_attacks", JSON.stringify(migraine_attacks));
-            localStorage.removeItem("current_migraine_attack");
-        } catch (error) {
-            migraine_attacks = [last_element];
-            localStorage.setItem("migraine_attacks", JSON.stringify(migraine_attacks));
-            return;
-        }
-    }
-
     edit_strength_of_current_migraine_attack(strength) {
         let current = this.get_current_migraine_attack();
         current.Strength = strength;
