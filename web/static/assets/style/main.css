@@ -212,10 +212,22 @@ body {
     margin-bottom: 15px;
 }
 
+.migre-v1-main-diary-item {
+    padding-bottom: 1em;
+    padding-top: 1em;
+    border-bottom: 1px solid #999;
+}
+.migre-v1-main-diary-item:last-child {
+    border-bottom: none;
+}
+
+.migre-v1-main-diary-item div {
+    margin-bottom: .15em;
+}
+
 .migre-v1-main-diary-item a {
     color: rgb(18, 126, 255);
     border-bottom: 1px solid rgb(18, 126, 255);
-    margin-left: .75em;
     cursor: pointer;
 }
 @media (hover: hover) {
@@ -308,4 +320,60 @@ body {
 
 .migre-v1-main-card-titles-block {
     margin-bottom: 20px;
+}
+
+.migre-v1-main-diary-item-left {
+    display: flex;
+    flex-direction: row;
+}
+
+.migre-v1-main-diary-item-left img {
+    height: 1em;
+    margin-right: .35em;
+}
+
+.migre-v1-main-diary-item-strength {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.migre-v1-main-diary-item-strength-visual {
+    display: inline-block;
+    width: 50px;
+    background-color: gray;
+    height: .75em;
+    border-radius: 10px;
+    margin-right: .5em;
+    margin-left: .5em;
+}
+.migre-v1-main-diary-item-strength-visual[data-strength="1"] {
+    background-color: #00FF00;
+}
+.migre-v1-main-diary-item-strength-visual[data-strength="2"] {
+    background-color: #33CC00;
+}
+.migre-v1-main-diary-item-strength-visual[data-strength="3"] {
+    background-color: #66CC00;
+}
+.migre-v1-main-diary-item-strength-visual[data-strength="4"] {
+    background-color: #99CC00;
+}
+.migre-v1-main-diary-item-strength-visual[data-strength="5"] {
+    background-color: #CC9900;
+}
+.migre-v1-main-diary-item-strength-visual[data-strength="6"] {
+    background-color: #FFA500;
+}
+.migre-v1-main-diary-item-strength-visual[data-strength="7"] {
+    background-color: #FF8C00;
+}
+.migre-v1-main-diary-item-strength-visual[data-strength="8"] {
+    background-color: #FF6A00;
+}
+.migre-v1-main-diary-item-strength-visual[data-strength="9"] {
+    background-color: #FF4500;
+}
+.migre-v1-main-diary-item-strength-visual[data-strength="10"] {
+    background-color: #FF0000;
 }

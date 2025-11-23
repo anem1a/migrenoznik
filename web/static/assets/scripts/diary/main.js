@@ -303,14 +303,35 @@ function compose_migraine_diary() {
         }
         let diary_item = create_element(
             "div",
-            "migre-v1-main-diary-item",
-            undefined,
-            `<b>Запись&nbsp;${i+1}.</b> Сила: ${migraine_attack.Strength} / Триггеры: ${triggers.join(", ")} / ${migraine_attack.DT_Start.getDate()} ${Calendar.month_number_to_name(migraine_attack.DT_Start.getMonth())} ${migraine_attack.DT_Start.getFullYear()} ${migraine_attack.DT_Start.getHours() < 10 ? "0" : ""}${migraine_attack.DT_Start.getHours()}:${migraine_attack.DT_Start.getMinutes() < 10 ? "0" : ""}${migraine_attack.DT_Start.getMinutes()}`
+            "migre-v1-main-diary-item"
         );
-        if (migraine_attack.DT_End != null) {
-            diary_item.innerHTML += ` &ndash; ${migraine_attack.DT_End.getDate()} ${Calendar.month_number_to_name(migraine_attack.DT_End.getMonth())} ${migraine_attack.DT_End.getFullYear()} ${migraine_attack.DT_End.getHours() < 10 ? "0" : ""}${migraine_attack.DT_End.getHours()}:${migraine_attack.DT_End.getMinutes() < 10 ? "0" : ""}${migraine_attack.DT_End.getMinutes()}`;
-            diary_item.innerHTML += ` <a onclick=\"delete_entry_Clicked(${i})\">Удалить</a>`;
-        }
+        diary_item.appendChild(create_element(
+            "div",
+            "migre-v1-main-diary-item-basics",
+            undefined,
+            `<div class="migre-v1-main-diary-item-left"><img src="/static/assets/images/icons/calendar.svg">${Calendar.date_to_quick_format(migraine_attack.DT_Start)} &ndash; ${Calendar.date_to_quick_format(migraine_attack.DT_End)}</div>`
+        ));
+        diary_item.appendChild(create_element(
+            "div",
+            "migre-v1-main-diary-item-strength",
+            undefined,
+            `Интенсивность: <div class="migre-v1-main-diary-item-strength-visual" data-strength="${migraine_attack.Strength}"></div>${migraine_attack.Strength}/10`
+        ));
+        diary_item.appendChild(create_element(
+            "div",
+            "migre-v1-main-diary-item-triggers",
+            undefined,
+            `Триггеры: ${triggers.join(", ")}`
+        ));
+        let delete_button = create_element(
+            "a",
+            undefined, undefined,
+            "Удалить"
+        );
+        delete_button.addEventListener("click", () => {
+            delete_entry_Clicked(i);
+        })
+        diary_item.appendChild(delete_button);
         document.getElementById("migre-diary-wrapper").appendChild(diary_item);
     }
 }
