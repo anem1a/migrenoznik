@@ -270,7 +270,8 @@ function migraine_now_button_Clicked() {
         for (let i = 0; i < MigraineTrigger.total_triggers(); i++) {
             document.getElementById(`migre-trigger-${i}`).setAttribute("data-selected", false);
         }
-        Core.add_new_migraine_attack(new MigraineAttack(Core.next_autoincrement(), new Date(), 4));
+        let strength = document.getElementById("migre-current-strength-input").value;
+        Core.add_new_migraine_attack(new MigraineAttack(Core.next_autoincrement(), new Date(), strength));
         configure_main_bottom_buttoms(true);
         let now = new Date();
         document.getElementById("migre-current-dt-start-value").innerHTML = `${now.getDate()} ${Calendar.month_number_to_name(now.getMonth())} ${now.getFullYear()} ${now.getHours() < 10 ? "0" : ""}${now.getHours()}:${now.getMinutes() < 10 ? "0" : ""}${now.getMinutes()}`;
