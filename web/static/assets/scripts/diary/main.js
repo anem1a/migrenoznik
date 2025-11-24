@@ -22,20 +22,49 @@ class MigraineAttack {
 }
 
 class MigraineTrigger {
+    static total_triggers() {
+        return 19;
+    }
     static code_to_name(code) {
         switch (code) {
             case 0:
-                return 'Триггер 1'
+                return 'Менструальный цикл'
             case 1:
-                return 'Триггер 2'
+                return 'Стресс'
             case 2:
-                return 'Триггер 3'
+                return 'Нарушение сна'
             case 3:
-                return 'Триггер 4'
+                return 'Переутомление'
             case 4:
-                return 'Триггер 5'
+                return 'Голод'
             case 5:
-                return 'Триггер 6'
+                return 'Яркий свет'
+            case 6:
+                return 'Громкие звуки'
+            case 7:
+                return 'Сильные запахи'
+            case 8:
+                return 'Кофеин'
+            case 9:
+                return 'Алкоголь'
+            case 10:
+                return 'Красное вино'
+            case 11:
+                return 'Пиво'
+            case 12:
+                return 'Темный шоколад'
+            case 13:
+                return 'Твердый сыр'
+            case 14:
+                return 'Цитрусы'
+            case 15:
+                return 'Орехи'
+            case 16:
+                return 'Консерванты'
+            case 17:
+                return 'Погода'
+            case 18:
+                return 'Препараты'
             default:
                 break;
         }
@@ -240,7 +269,7 @@ function migraine_now_button_Clicked() {
         document.getElementById("migre-now-wrapper").style.display = 'none';
     } else {
         Core.toggle_migraine_status();
-        for (let i = 0; i <= 5; i++) {
+        for (let i = 0; i < MigraineTrigger.total_triggers(); i++) {
             document.getElementById(`migre-trigger-${i}`).setAttribute("data-selected", false);
         }
         Core.add_new_migraine_attack(new MigraineAttack(Core.next_autoincrement(), new Date(), 4));
