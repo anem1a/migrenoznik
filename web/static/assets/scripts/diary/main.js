@@ -103,6 +103,7 @@ class MigrenoznikCore {
     get_migraine_attacks() {
         let migraine_attacks = localStorage.getItem("migraine_attacks");
         if (migraine_attacks == undefined) {
+            localStorage.setItem("migraine_attacks", JSON.stringify([]));
             return [];
         }
         try {
@@ -121,7 +122,7 @@ class MigrenoznikCore {
     }
 
     /**
-     * Returns the current migraine attack. Undefined if no attacks found.
+     * Returns the current migraine attack. Undefined if no attacks found or there's no migraine now.
      */
     get_current_migraine_attack() {
         let current_migraine_attack = localStorage.getItem("current_migraine_attack");
@@ -146,14 +147,14 @@ class MigrenoznikCore {
     }
 
     /**
-     * Adds new migraine attack to the end of the list.
+     * Adds new migraine attack.
      */
     async add_new_migraine_attack(migraine_attack) {
         /* Save to local storage */
         localStorage.setItem("current_migraine_attack", JSON.stringify(migraine_attack));
     }
 
-    remove_migraine_attack(no) {
+    remove_migraine_attack(local_id) {
         let migraine_attacks = localStorage.getItem("migraine_attacks");
         if (migraine_attacks == undefined) {
             localStorage.setItem("migraine_attacks", JSON.stringify([]));
@@ -161,13 +162,10 @@ class MigrenoznikCore {
         }
         try {
             migraine_attacks = JSON.parse(migraine_attacks);
-            if (migraine_attacks.length < no) {
-                return;
-            }
             let new_migraine_attacks = [];
             for (let i = 0; i < migraine_attacks.length; i++) {
-                const migraine_attack = migraine_attacks[i];
-                if (i != no) {
+                const migraine_attack = MigraineAttack.from_json(migraine_attacks[i]);
+                if (migraine_attack.LocalID != local_id) {
                     new_migraine_attacks.push(migraine_attack);
                 }
             }
@@ -358,15 +356,15 @@ function compose_migraine_diary() {
             "Удалить"
         );
         delete_button.addEventListener("click", () => {
-            delete_entry_Clicked(i);
+            delete_entry_Clicked(migraine_attack.LocalID);
         })
         diary_item.appendChild(delete_button);
         document.getElementById("migre-diary-wrapper").appendChild(diary_item);
     }
 }
 
-function delete_entry_Clicked(no) {
-    Core.remove_migraine_attack(no);
+function delete_entry_Clicked(local_id) {
+    Core.remove_migraine_attack(local_id);
     compose_migraine_diary();
 }
 
