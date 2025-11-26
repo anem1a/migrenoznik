@@ -24,3 +24,12 @@ document.addEventListener('DOMContentLoaded',
         }
     }
 );
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', async () => {
+    try {
+      const registration = await navigator.serviceWorker.register('/static/assets/scripts/lib/sw.js');
+    } catch (error) {
+    }
+  });
+}
