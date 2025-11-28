@@ -18,7 +18,7 @@ const (
 	host     = "oferolefket.beget.app"
 	port     = 5432
 	user     = "anna"
-	password = "a06q*ZtF*JXN"
+	password = ""
 	dbname   = "migrenoznik"
 )
 
@@ -51,6 +51,7 @@ func main() {
 	mux.HandleFunc("/", indexHandler)
 	mux.HandleFunc("/login/", loginPageHandler)
 	mux.HandleFunc("/sign-up/", signupPageHandler)
+	mux.HandleFunc("/doctor/", doctorPageHandler)
 
 	// API
 	mux.HandleFunc("/api/login", loginHandler)
@@ -58,6 +59,7 @@ func main() {
 	mux.HandleFunc("/api/logout", logoutHandler)
 	mux.HandleFunc("/api/signup", signupHandler)
 	mux.HandleFunc("/api/add_entry", addEntryHandler)
+	mux.HandleFunc("/api/entries", entriesHandler)
 	// HTTPS сервер
 	go func() {
 		log.Println("🚀 HTTPS сервер запущен на https://migrenoznik.ru")
@@ -124,6 +126,10 @@ func loginPageHandler(w http.ResponseWriter, r *http.Request) {
 
 func signupPageHandler(w http.ResponseWriter, r *http.Request) {
 	renderTemplate(w, "sign-up.html")
+}
+
+func doctorPageHandler(w http.ResponseWriter, r *http.Request) {
+	renderTemplate(w, "doctor.html")
 }
 
 func isPasswordStrong(pw string) bool {
@@ -401,16 +407,16 @@ func addEntryHandler(w http.ResponseWriter, r *http.Request) {
 	// triggers — JSON массив
 	var triggers []int
 	err = json.Unmarshal([]byte(triggersJSON), &triggers)
-	if err != nil || len(triggers) == 0 {
+	if err != nil {
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"success":    false,
 			"id":         nil,
 			"error_code": 444,
 		})
+		fmt.Println("Triggers:", err)
 		return
 	}
 
-	fmt.Println(accID, date, timeValue, strength, durationHours)
 	// 1. Вставляем запись в Attacks
 	var entryID int
 	err = db.QueryRow(`
@@ -425,27 +431,28 @@ func addEntryHandler(w http.ResponseWriter, r *http.Request) {
 			"id":         nil,
 			"error_code": 666,
 		})
-		fmt.Println("что-то не то в запросе бд 1")
+		fmt.Println("SQL Error:", err)
 		return
 	}
 
-	fmt.Println(entryID, triggers)
 	// 2. Вставляем триггеры
-	for _, trID := range triggers {
-		fmt.Println(entryID, trID)
-		_, err = db.Exec(`
+	if len(triggers) > 0 {
+		for _, trID := range triggers {
+			fmt.Println(entryID, trID)
+			_, err = db.Exec(`
             INSERT INTO "Attack-Trigger" (id_entry, id_trigger)
             VALUES ($1, $2)
         `, entryID, trID)
 
-		if err != nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"success":    false,
-				"id":         nil,
-				"error_code": 666,
-			})
-			fmt.Println("SQL Error:", err)
-			return
+			if err != nil {
+				json.NewEncoder(w).Encode(map[string]interface{}{
+					"success":    false,
+					"id":         nil,
+					"error_code": 666,
+				})
+				fmt.Println("SQL Error:", err)
+				return
+			}
 		}
 	}
 
@@ -457,4 +464,108 @@ func addEntryHandler(w http.ResponseWriter, r *http.Request) {
 	})
 	log.Println("✅ Запись добавлена")
 
+}
+
+func entriesHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	login := r.FormValue("login")
+	if login == "" {
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"entries": nil,
+		})
+		return
+	}
+
+	var accID int
+	err := db.QueryRow(`
+        SELECT acc_id
+        FROM "Accounts"
+        WHERE acc_login = $1
+    `, login).Scan(&accID)
+
+	if err != nil {
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"entries": nil,
+		})
+		return
+	}
+
+	rows, err := db.Query(`
+        SELECT id_entry, date, duration, pain_level
+        FROM "Attacks"
+        WHERE acc_id = $1
+        ORDER BY date DESC
+    `, accID)
+	if err != nil {
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"entries": nil,
+		})
+		return
+	}
+	defer rows.Close()
+
+	type Entry struct {
+		DT_Start string   `json:"DT_Start"`
+		Duration float64  `json:"Duration"` // в часах
+		Strength int      `json:"Strength"`
+		Triggers []string `json:"Triggers"`
+	}
+
+	var entries []Entry
+
+	for rows.Next() {
+		var id int
+		var date time.Time
+		var duration float64
+		var strength int
+
+		if err := rows.Scan(&id, &date, &duration, &strength); err != nil {
+			continue
+		}
+		// Форматируем дату: 27.11.25
+		dtDisplay := date.Format("02.01.06")
+
+		// Получаем триггеры для этой атаки
+		trigRows, err := db.Query(`
+    		SELECT t.name
+    		FROM "Attack-Trigger" at
+    		JOIN "Triggers" t ON at.id_trigger = t.id_trigger
+    		WHERE at.id_entry = $1
+		`, id)
+		if err != nil {
+			fmt.Println("Trigger error:", err)
+			continue
+		}
+
+		var triggers []string
+		for trigRows.Next() {
+			var name string
+			trigRows.Scan(&name)
+			triggers = append(triggers, name)
+		}
+
+		trigRows.Close()
+
+		if triggers == nil {
+			triggers = []string{}
+		}
+
+		// Добавляем запись с нужными полями
+		entries = append(entries, Entry{
+			DT_Start: dtDisplay,
+			Duration: duration,
+			Strength: strength,
+			Triggers: triggers,
+		})
+	}
+
+	// Отправляем JSON
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"success": true,
+		"entries": entries,
+	})
 }
