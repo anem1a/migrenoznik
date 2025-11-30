@@ -2,7 +2,6 @@ const CACHE_NAME = 'migrenoznik-v1.0.0';
 
 const urlsToCache = [
   '/',
-  '/index.html',
   '/static/assets/style/main.css',
   '/static/assets/scripts/diary/main.js',
   '/static/assets/scripts/diary/pageload.js',
