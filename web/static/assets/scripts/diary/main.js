@@ -1,76 +1,3 @@
-
-class MigraineAttack {
-    constructor(local_id, dt_start, strength, dt_end = null, triggers = [], id = null) {
-        this.LocalID = local_id;
-        this.DT_Start = dt_start;
-        this.DT_End = dt_end;
-        this.Strength = strength;
-        this.Triggers = triggers;
-        this.ID = id;
-    }
-
-    static from_json(obj) {
-        return new MigraineAttack(
-            obj["LocalID"] == null ? null : Number(obj["LocalID"]),
-            obj["DT_Start"] == null ? null : new Date(obj["DT_Start"]),
-            obj["Strength"] == null ? null : Number(obj["Strength"]),
-            obj["DT_End"] == null ? null : new Date(obj["DT_End"]),
-            obj["Triggers"] == null ? [] : obj["Triggers"],
-            obj["ID"] == null ? null : Number(obj["ID"]),
-        );
-    }
-}
-
-class MigraineTrigger {
-    static total_triggers() {
-        return 19;
-    }
-    static code_to_name(code) {
-        switch (code) {
-            case 0:
-                return 'Менструальный цикл'
-            case 1:
-                return 'Стресс'
-            case 2:
-                return 'Нарушение сна'
-            case 3:
-                return 'Переутомление'
-            case 4:
-                return 'Голод'
-            case 5:
-                return 'Яркий свет'
-            case 6:
-                return 'Громкие звуки'
-            case 7:
-                return 'Сильные запахи'
-            case 8:
-                return 'Кофеин'
-            case 9:
-                return 'Алкоголь'
-            case 10:
-                return 'Красное вино'
-            case 11:
-                return 'Пиво'
-            case 12:
-                return 'Темный шоколад'
-            case 13:
-                return 'Твердый сыр'
-            case 14:
-                return 'Цитрусы'
-            case 15:
-                return 'Орехи'
-            case 16:
-                return 'Консерванты'
-            case 17:
-                return 'Погода'
-            case 18:
-                return 'Препараты'
-            default:
-                break;
-        }
-    }
-}
-
 class MigrenoznikCore {
 
     /**
@@ -235,24 +162,6 @@ class MigrenoznikCore {
             this.MigraineAttackAI = 1;
             localStorage.setItem("migraine_attack_ai", 1);
         }
-    }
-}
-
-function display_migraine_now_block(show) {
-    if (show) {
-        document.getElementById("migre-now-wrapper").style.display = 'block';
-    } else {
-        document.getElementById("migre-now-wrapper").style.display = 'none';
-    }
-}
-
-function configure_main_bottom_buttoms(migraine_now) {
-    if (migraine_now) {
-        document.getElementById("migre-diary-main-bottom-button-now").innerText = "Отметить конец мигрени";
-        document.getElementById("migre-diary-main-bottom-button-add").style.display = 'none';
-    } else {
-        document.getElementById("migre-diary-main-bottom-button-now").innerText = "Отметить мигрень сейчас";
-        document.getElementById("migre-diary-main-bottom-button-add").style.display = 'block';
     }
 }
 
