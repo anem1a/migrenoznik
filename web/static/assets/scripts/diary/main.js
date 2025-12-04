@@ -116,6 +116,7 @@ class MigrenoznikCore {
         data.append("dt_end", current.DT_End.getTime());
         data.append("strength", current.Strength);
         data.append("triggers", JSON.stringify(current.Triggers));
+        data.append("symptoms", JSON.stringify(current.Symptoms));
         
         const response = await fetch('/api/add_entry', {
             method: 'POST',
@@ -145,9 +146,21 @@ class MigrenoznikCore {
         localStorage.setItem("current_migraine_attack", JSON.stringify(current));
     }
 
+    add_symptom_to_current_migraine_attack(symptom) {
+        let current = this.get_current_migraine_attack();
+        current.Symptoms.push(symptom);
+        localStorage.setItem("current_migraine_attack", JSON.stringify(current));
+    }
+
     remove_trigger_from_current_migraine_attack(trigger) {
         let current = this.get_current_migraine_attack();
         current.Triggers = current.Triggers.filter(item => item !== trigger);
+        localStorage.setItem("current_migraine_attack", JSON.stringify(current));
+    }
+
+    remove_symptom_from_current_migraine_attack(symptom) {
+        let current = this.get_current_migraine_attack();
+        current.Symptoms = current.Symptoms.filter(item => item !== symptom);
         localStorage.setItem("current_migraine_attack", JSON.stringify(current));
     }
 
@@ -181,6 +194,9 @@ function migraine_now_button_Clicked() {
         Core.toggle_migraine_status();
         for (let i = 0; i < MigraineTrigger.total_triggers(); i++) {
             document.getElementById(`migre-trigger-${i}`).setAttribute("data-selected", false);
+        }
+        for (let i = 0; i < MigraineSymptom.total_symptoms(); i++) {
+            document.getElementById(`migre-symptom-${i}`).setAttribute("data-selected", false);
         }
         let strength = document.getElementById("migre-current-strength-input").value;
         Core.add_new_migraine_attack(new MigraineAttack(Core.next_autoincrement(), new Date(), strength));
@@ -568,6 +584,16 @@ function toggle_trigger_Clicked(id, item) {
         Core.remove_trigger_from_current_migraine_attack(id);
     } else {
         Core.add_trigger_to_current_migraine_attack(id);
+    }
+    item.setAttribute("data-selected", selected == false);
+}
+
+function toggle_symptom_Clicked(id, item) {
+    let selected = item.getAttribute("data-selected") == "true";
+    if (selected) {
+        Core.remove_symptom_from_current_migraine_attack(id);
+    } else {
+        Core.add_symptom_to_current_migraine_attack(id);
     }
     item.setAttribute("data-selected", selected == false);
 }
