@@ -257,6 +257,10 @@ function compose_migraine_diary() {
         for (const trigger of migraine_attack.Triggers) {
             triggers.push(MigraineTrigger.code_to_name(trigger));
         }
+        let symptoms = [];
+        for (const symptom of migraine_attack.Symptoms) {
+            symptoms.push(MigraineSymptom.code_to_name(symptom));
+        }
         let diary_item = create_element(
             "div",
             "migre-v1-main-diary-item"
@@ -278,6 +282,12 @@ function compose_migraine_diary() {
             "migre-v1-main-diary-item-triggers",
             undefined,
             `Триггеры: ${triggers.join(", ")}`
+        ));
+        diary_item.appendChild(create_element(
+            "div",
+            "migre-v1-main-diary-item-triggers",
+            undefined,
+            `Симптомы: ${symptoms.join(", ")}`
         ));
         let delete_button = create_element(
             "a",
