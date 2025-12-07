@@ -22,6 +22,9 @@ document.addEventListener('DOMContentLoaded',
                 for (const symptom of current.Symptoms) {
                     document.getElementById(`migre-symptom-${symptom}`).setAttribute("data-selected", true);
                 }
+                for (const drug of current.Drugs) {
+                    document.getElementById(`migre-drug-${drug}`).setAttribute("data-selected", true);
+                }
             }
             document.getElementById("migre-current-dt-start-value").innerHTML = `${current.DT_Start.getDate()} ${Calendar.month_number_to_name(current.DT_Start.getMonth())} ${current.DT_Start.getFullYear()} ${current.DT_Start.getHours() < 10 ? "0" : ""}${current.DT_Start.getHours()}:${current.DT_Start.getMinutes() < 10 ? "0" : ""}${current.DT_Start.getMinutes()}`;
         }

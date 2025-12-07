@@ -211,6 +211,9 @@ function migraine_now_button_Clicked() {
         for (let i = 0; i < MigraineSymptom.total_symptoms(); i++) {
             document.getElementById(`migre-symptom-${i}`).setAttribute("data-selected", false);
         }
+        for (let i = 0; i < MigraineDrug.total_drugs(); i++) {
+            document.getElementById(`migre-drug-${i}`).setAttribute("data-selected", false);
+        }
         let strength = document.getElementById("migre-current-strength-input").value;
         Core.add_new_migraine_attack(new MigraineAttack(Core.next_autoincrement(), new Date(), strength));
         configure_main_bottom_buttoms(true);
