@@ -117,6 +117,7 @@ class MigrenoznikCore {
         data.append("strength", current.Strength);
         data.append("triggers", JSON.stringify(current.Triggers));
         data.append("symptoms", JSON.stringify(current.Symptoms));
+        data.append("drugs", JSON.stringify(current.Drugs));
         
         const response = await fetch('/api/add_entry', {
             method: 'POST',
@@ -152,6 +153,12 @@ class MigrenoznikCore {
         localStorage.setItem("current_migraine_attack", JSON.stringify(current));
     }
 
+    add_drug_to_current_migraine_attack(symptom) {
+        let current = this.get_current_migraine_attack();
+        current.Drugs.push(symptom);
+        localStorage.setItem("current_migraine_attack", JSON.stringify(current));
+    }
+
     remove_trigger_from_current_migraine_attack(trigger) {
         let current = this.get_current_migraine_attack();
         current.Triggers = current.Triggers.filter(item => item !== trigger);
@@ -161,6 +168,12 @@ class MigrenoznikCore {
     remove_symptom_from_current_migraine_attack(symptom) {
         let current = this.get_current_migraine_attack();
         current.Symptoms = current.Symptoms.filter(item => item !== symptom);
+        localStorage.setItem("current_migraine_attack", JSON.stringify(current));
+    }
+
+    remove_drug_from_current_migraine_attack(symptom) {
+        let current = this.get_current_migraine_attack();
+        current.Drugs = current.Drugs.filter(item => item !== symptom);
         localStorage.setItem("current_migraine_attack", JSON.stringify(current));
     }
 
@@ -261,6 +274,10 @@ function compose_migraine_diary() {
         for (const symptom of migraine_attack.Symptoms) {
             symptoms.push(MigraineSymptom.code_to_name(symptom));
         }
+        let drugs = [];
+        for (const drug of migraine_attack.Drugs) {
+            drugs.push(MigraineDrug.code_to_name(drug));
+        }
         let diary_item = create_element(
             "div",
             "migre-v1-main-diary-item"
@@ -285,9 +302,15 @@ function compose_migraine_diary() {
         ));
         diary_item.appendChild(create_element(
             "div",
-            "migre-v1-main-diary-item-triggers",
+            "migre-v1-main-diary-item-symptoms",
             undefined,
             `Симптомы: ${symptoms.join(", ")}`
+        ));
+        diary_item.appendChild(create_element(
+            "div",
+            "migre-v1-main-diary-item-drugs",
+            undefined,
+            `Препараты: ${drugs.join(", ")}`
         ));
         let delete_button = create_element(
             "a",
@@ -604,6 +627,16 @@ function toggle_symptom_Clicked(id, item) {
         Core.remove_symptom_from_current_migraine_attack(id);
     } else {
         Core.add_symptom_to_current_migraine_attack(id);
+    }
+    item.setAttribute("data-selected", selected == false);
+}
+
+function toggle_drug_Clicked(id, item) {
+    let selected = item.getAttribute("data-selected") == "true";
+    if (selected) {
+        Core.remove_drug_from_current_migraine_attack(id);
+    } else {
+        Core.add_drug_to_current_migraine_attack(id);
     }
     item.setAttribute("data-selected", selected == false);
 }

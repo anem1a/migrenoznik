@@ -1,11 +1,12 @@
 class MigraineAttack {
-    constructor(local_id, dt_start, strength, dt_end = null, triggers = [], symptoms = [], id = null) {
+    constructor(local_id, dt_start, strength, dt_end = null, triggers = [], symptoms = [], drugs = [], id = null) {
         this.LocalID = local_id;
         this.DT_Start = dt_start;
         this.DT_End = dt_end;
         this.Strength = strength;
         this.Triggers = triggers;
         this.Symptoms = symptoms;
+        this.Drugs = drugs;
         this.ID = id;
     }
 
@@ -17,6 +18,7 @@ class MigraineAttack {
             obj["DT_End"] == null ? null : new Date(obj["DT_End"]),
             obj["Triggers"] == null ? [] : obj["Triggers"],
             obj["Symptoms"] == null ? [] : obj["Symptoms"],
+            obj["Drugs"] == null ? [] : obj["Drugs"],
             obj["ID"] == null ? null : Number(obj["ID"]),
         );
     }
