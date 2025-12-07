@@ -117,7 +117,7 @@ class MigrenoznikCore {
         data.append("strength", current.Strength);
         data.append("triggers", JSON.stringify(current.Triggers));
         data.append("symptoms", JSON.stringify(current.Symptoms));
-        data.append("drugs", JSON.stringify(current.Drugs));
+        data.append("drugs", JSON.stringify(current.Drugs.map(element => MigraineDrug.code_to_atx(element))));
         
         const response = await fetch('/api/add_entry', {
             method: 'POST',
