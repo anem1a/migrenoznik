@@ -18,7 +18,7 @@ const (
 	host     = "oferolefket.beget.app"
 	port     = 5432
 	user     = "anna"
-	password = "a06q*ZtF*JXN"
+	password = ""
 	dbname   = "migrenoznik"
 )
 
@@ -309,6 +309,7 @@ func addEntryHandler(w http.ResponseWriter, r *http.Request) {
 			"id":         nil,
 			"error_code": 13,
 		})
+		fmt.Println("сессия не але")
 		return
 	}
 
@@ -319,6 +320,7 @@ func addEntryHandler(w http.ResponseWriter, r *http.Request) {
 			"id":         nil,
 			"error_code": 13,
 		})
+		fmt.Println("логин не але")
 		return
 	}
 
@@ -335,6 +337,7 @@ func addEntryHandler(w http.ResponseWriter, r *http.Request) {
 			"id":         nil,
 			"error_code": 666,
 		})
+		fmt.Println("аккаунт не найден")
 		return
 	}
 
@@ -342,9 +345,11 @@ func addEntryHandler(w http.ResponseWriter, r *http.Request) {
 	dtStartStr := r.FormValue("dt_start")
 	dtEndStr := r.FormValue("dt_end")
 	strengthStr := r.FormValue("strength")
-	triggersJSON := r.FormValue("triggers")
-	// Валидация
-	if dtStartStr == "" || dtEndStr == "" || strengthStr == "" || triggersJSON == "" {
+	triggersSlice := r.FormValue("triggers")
+	symptomsSlice := r.FormValue("symptoms")
+	drugsSliceMap := r.FormValue("drugs")
+
+	if dtStartStr == "" || dtEndStr == "" || strengthStr == "" || triggersSlice == "" || symptomsSlice == "" || drugsSliceMap == "" {
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"success":    false,
 			"id":         nil,
@@ -353,7 +358,6 @@ func addEntryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Парс dt_start и dt_end
 	dtStartUnix, err := strconv.ParseInt(dtStartStr, 10, 64)
 	dtStartUnix /= 1000
 	if err != nil {
@@ -362,6 +366,7 @@ func addEntryHandler(w http.ResponseWriter, r *http.Request) {
 			"id":         nil,
 			"error_code": 444,
 		})
+		fmt.Println("что-то с датой")
 		return
 	}
 
@@ -395,22 +400,49 @@ func addEntryHandler(w http.ResponseWriter, r *http.Request) {
 			"id":         nil,
 			"error_code": 444,
 		})
+		fmt.Println("что-то с силой")
 		return
 	}
 
 	// triggers — JSON массив
 	var triggers []int
-	err = json.Unmarshal([]byte(triggersJSON), &triggers)
+	err = json.Unmarshal([]byte(triggersSlice), &triggers)
 	if err != nil || len(triggers) == 0 {
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"success":    false,
 			"id":         nil,
 			"error_code": 444,
 		})
+		fmt.Println("что-то с триггерами")
 		return
 	}
 
-	fmt.Println(accID, date, timeValue, strength, durationHours)
+	// symptoms — JSON массив
+	var symptoms []int
+	err = json.Unmarshal([]byte(symptomsSlice), &symptoms)
+	if err != nil || len(symptoms) == 0 {
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success":    false,
+			"id":         nil,
+			"error_code": 444,
+		})
+		fmt.Println("что-то с симптомами")
+		return
+	}
+
+	// drugs — JSON объект (словарь)
+	var drugs []string
+	err = json.Unmarshal([]byte(drugsSliceMap), &drugs)
+	if err != nil {
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success":    false,
+			"id":         nil,
+			"error_code": 444,
+		})
+		fmt.Println("что-то с лекарствами")
+		return
+	}
+
 	// 1. Вставляем запись в Attacks
 	var entryID int
 	err = db.QueryRow(`
@@ -429,14 +461,12 @@ func addEntryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println(entryID, triggers)
 	// 2. Вставляем триггеры
 	for _, trID := range triggers {
-		fmt.Println(entryID, trID)
 		_, err = db.Exec(`
-            INSERT INTO "Attack-Trigger" (id_entry, id_trigger)
-            VALUES ($1, $2)
-        `, entryID, trID)
+        INSERT INTO "Attack-Trigger" (id_entry, id_trigger)
+        VALUES ($1, $2)
+    `, entryID, trID)
 
 		if err != nil {
 			json.NewEncoder(w).Encode(map[string]interface{}{
@@ -444,7 +474,41 @@ func addEntryHandler(w http.ResponseWriter, r *http.Request) {
 				"id":         nil,
 				"error_code": 666,
 			})
-			fmt.Println("SQL Error:", err)
+			fmt.Println("SQL Trigger Error:", err)
+			return
+		}
+	}
+
+	// 2. Вставляем симптомы
+	for _, symID := range symptoms {
+		_, err = db.Exec(`
+		INSERT INTO "Attack-Symptom" (id_entry, id_sympt)
+		VALUES ($1, $2)
+	`, entryID, symID)
+		if err != nil {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"success":    false,
+				"id":         nil,
+				"error_code": 666,
+			})
+			fmt.Println("SQL Symptom Error:", err)
+			return
+		}
+	}
+	// 3. Вставляем лекарства
+	for _, drugName := range drugs {
+		fmt.Println(entryID, drugName)
+		_, err = db.Exec(`
+		INSERT INTO "Attack-Drug" (id_entry, atx_code, dosage)	
+		VALUES ($1, $2, '')
+	`, entryID, drugName)
+		if err != nil {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"success":    false,
+				"id":         nil,
+				"error_code": 666,
+			})
+			fmt.Println("SQL Drug Error:", err)
 			return
 		}
 	}
