@@ -1,5 +1,5 @@
 function patient() {
-    fetch(`https://migrenoznik.ru/api/entries?login=${document.getElementById("migre-login").value}`)
+    fetch(`https://migrenoznik.ru/api/doctor-entries?login=${document.getElementById("migre-login").value}`)
         .then(response => {
             if (!response.ok) {
                 throw new Error('Ошибка сети: ' + response.status);

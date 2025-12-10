@@ -19,7 +19,6 @@ const (
 	port     = 5432
 	user     = "anna"
 	password = ""
-	password = ""
 	dbname   = "migrenoznik"
 )
 
@@ -61,6 +60,8 @@ func main() {
 	mux.HandleFunc("/api/signup", signupHandler)
 	mux.HandleFunc("/api/add_entry", addEntryHandler)
 	mux.HandleFunc("/api/entries", entriesHandler)
+	mux.HandleFunc("/api/doctor-entries", doctorEntriesHandler)
+
 	// HTTPS сервер
 	go func() {
 		log.Println("🚀 HTTPS сервер запущен на https://migrenoznik.ru")
@@ -692,6 +693,162 @@ func entriesHandler(w http.ResponseWriter, r *http.Request) {
 		})
 
 		// fmt.Println(dtDisplay, duration, strength, triggers, symptoms, drugs)
+	}
+
+	// Отправляем JSON
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"success": true,
+		"entries": entries,
+	})
+}
+
+func doctorEntriesHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	login := r.FormValue("login")
+	if login == "" {
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"entries": nil,
+		})
+		return
+	}
+
+	var accID int
+	err := db.QueryRow(`
+        	SELECT acc_id
+        	FROM "Accounts"
+        	WHERE acc_login = $1
+    	`, login).Scan(&accID)
+
+	if err != nil {
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"entries": nil,
+		})
+		fmt.Println("логин не найден")
+		return
+	}
+
+	rows, err := db.Query(`
+        SELECT id_entry, date, duration, pain_level
+        FROM "Attacks"
+        WHERE acc_id = $1
+        ORDER BY date DESC
+    	`, accID)
+	if err != nil {
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"entries": nil,
+		})
+		fmt.Println("запрос в бд не сработал(", err)
+		return
+	}
+	defer rows.Close()
+
+	type Entry struct {
+		DT_Start string   `json:"DT_Start"`
+		Duration float64  `json:"Duration"` // в часах
+		Strength int      `json:"Strength"`
+		Triggers []string `json:"Triggers"`
+		Symptoms []string `json:"Symptoms"`
+		Drugs    []string `json:"Drugs"`
+	}
+
+	var entries []Entry
+
+	for rows.Next() {
+		var id int
+		var date time.Time
+		var duration float64
+		var strength int
+
+		if err := rows.Scan(&id, &date, &duration, &strength); err != nil {
+			continue
+		}
+		// Форматируем дату: 27.11.25
+		dtDisplay := date.Format("02.01.06")
+
+		// Получаем триггеры для этой атаки
+		trigRows, err := db.Query(`
+        	SELECT t.name
+        	FROM "Attack-Trigger" at
+        	JOIN "Triggers" t ON at.id_trigger = t.id_trigger
+        	WHERE at.id_entry = $1
+   		`, id)
+		if err != nil {
+			fmt.Println("Trigger error:", err)
+			continue
+		}
+
+		var triggers []string
+		for trigRows.Next() {
+			var name string
+			trigRows.Scan(&name)
+			triggers = append(triggers, name)
+		}
+
+		trigRows.Close()
+
+		if triggers == nil {
+			triggers = []string{}
+		}
+
+		// Получаем симптомы для этой атаки
+		symptRows, err := db.Query(`
+      		SELECT s.name
+      		FROM "Attack-Symptom" ast    
+      		JOIN "Symptoms" s ON ast.id_sympt = s.id_sympt
+      		WHERE ast.id_entry = $1
+    	`, id)
+		if err != nil {
+			fmt.Println("Symptom error:", err)
+			continue
+		}
+		var symptoms []string
+		for symptRows.Next() {
+			var name string
+			symptRows.Scan(&name)
+			symptoms = append(symptoms, name)
+		}
+		symptRows.Close()
+		if symptoms == nil {
+			symptoms = []string{}
+		}
+
+		// Получаем лекарства для этой атаки
+		drugsRows, err := db.Query(`
+      		SELECT ad.drug_name
+      		FROM "Attack-Drug" add
+      		JOIN "Drugs" ad ON add.atx_code = ad.atx_code
+      		WHERE add.id_entry = $1
+    	`, id)
+		if err != nil {
+			fmt.Println("Drug error:", err)
+			continue
+		}
+
+		var drugs []string
+		for drugsRows.Next() {
+			var atxCode string
+			drugsRows.Scan(&atxCode)
+			drugs = append(drugs, atxCode)
+		}
+		drugsRows.Close()
+		if drugs == nil {
+			drugs = []string{}
+		}
+
+		// Добавляем запись с нужными полями
+		entries = append(entries, Entry{
+			DT_Start: dtDisplay,
+			Duration: duration,
+			Strength: strength,
+			Triggers: triggers,
+			Symptoms: symptoms,
+			Drugs:    drugs,
+		})
+
 	}
 
 	// Отправляем JSON
