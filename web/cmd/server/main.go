@@ -19,6 +19,7 @@ const (
 	port     = 5432
 	user     = "anna"
 	password = ""
+	password = ""
 	dbname   = "migrenoznik"
 )
 
@@ -51,6 +52,7 @@ func main() {
 	mux.HandleFunc("/", indexHandler)
 	mux.HandleFunc("/login/", loginPageHandler)
 	mux.HandleFunc("/sign-up/", signupPageHandler)
+	mux.HandleFunc("/doctor/", doctorPageHandler)
 
 	// API
 	mux.HandleFunc("/api/login", loginHandler)
@@ -125,6 +127,10 @@ func loginPageHandler(w http.ResponseWriter, r *http.Request) {
 
 func signupPageHandler(w http.ResponseWriter, r *http.Request) {
 	renderTemplate(w, "sign-up.html")
+}
+
+func doctorPageHandler(w http.ResponseWriter, r *http.Request) {
+	renderTemplate(w, "doctor.html")
 }
 
 func isPasswordStrong(pw string) bool {
@@ -458,7 +464,7 @@ func addEntryHandler(w http.ResponseWriter, r *http.Request) {
 			"id":         nil,
 			"error_code": 666,
 		})
-		fmt.Println("что-то не то в запросе бд 1")
+		fmt.Println("SQL Error:", err)
 		return
 	}
 
