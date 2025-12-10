@@ -317,7 +317,7 @@ func addEntryHandler(w http.ResponseWriter, r *http.Request) {
 			"id":         nil,
 			"error_code": 13,
 		})
-		fmt.Println("сессия не але")
+		log.Println("Ошибка сессии")
 		return
 	}
 
@@ -328,7 +328,7 @@ func addEntryHandler(w http.ResponseWriter, r *http.Request) {
 			"id":         nil,
 			"error_code": 13,
 		})
-		fmt.Println("логин не але")
+		log.Println("Ошибка логина")
 		return
 	}
 
@@ -345,7 +345,7 @@ func addEntryHandler(w http.ResponseWriter, r *http.Request) {
 			"id":         nil,
 			"error_code": 666,
 		})
-		fmt.Println("аккаунт не найден")
+		log.Println("Аккаунт не найден")
 		return
 	}
 
@@ -541,7 +541,7 @@ func entriesHandler(w http.ResponseWriter, r *http.Request) {
 			"success": false,
 			"entries": nil,
 		})
-		fmt.Println("сессия не але")
+		log.Println("Ошибка сессии")
 		return
 	}
 
@@ -551,7 +551,7 @@ func entriesHandler(w http.ResponseWriter, r *http.Request) {
 			"success": false,
 			"entries": nil,
 		})
-		fmt.Println("логин не але")
+		log.Println("Ошибка логина")
 		return
 	}
 
@@ -567,7 +567,7 @@ func entriesHandler(w http.ResponseWriter, r *http.Request) {
 			"success": false,
 			"entries": nil,
 		})
-		fmt.Println("логин не найден")
+		log.Println("Аккаунт не найден")
 		return
 	}
 
@@ -582,7 +582,7 @@ func entriesHandler(w http.ResponseWriter, r *http.Request) {
 			"success": false,
 			"entries": nil,
 		})
-		fmt.Println("запрос в бд не сработал(", err)
+		log.Println("Ошибка запроса в бд")
 		return
 	}
 	defer rows.Close()
@@ -689,7 +689,7 @@ func entriesHandler(w http.ResponseWriter, r *http.Request) {
 			Triggers: triggers,
 			Symptoms: symptoms,
 			Drugs:    drugs,
-			ID:       accID,
+			ID:       id,
 		})
 
 		// fmt.Println(dtDisplay, duration, strength, triggers, symptoms, drugs)
