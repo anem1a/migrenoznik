@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"regexp"
+	"strconv"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -56,7 +57,7 @@ func main() {
 	mux.HandleFunc("/api/check-session", checkSessionHandler)
 	mux.HandleFunc("/api/logout", logoutHandler)
 	mux.HandleFunc("/api/signup", signupHandler)
-
+	mux.HandleFunc("/api/add_entry", addEntryHandler)
 	// HTTPS сервер
 	go func() {
 		log.Println("🚀 HTTPS сервер запущен на https://migrenoznik.ru")
@@ -292,4 +293,232 @@ func logoutHandler(w http.ResponseWriter, r *http.Request) {
 	// Отвечаем JSON
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]bool{"success": true})
+}
+
+func addEntryHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Проверка сессии
+	cookie, err := r.Cookie("session_id")
+	if err != nil {
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success":    false,
+			"id":         nil,
+			"error_code": 13,
+		})
+		fmt.Println("сессия не але")
+		return
+	}
+
+	login, ok := sessions[cookie.Value]
+	if !ok {
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success":    false,
+			"id":         nil,
+			"error_code": 13,
+		})
+		fmt.Println("логин не але")
+		return
+	}
+
+	// Находим acc_id по логину
+	var accID int
+	err = db.QueryRow(
+		`SELECT acc_id FROM "Accounts" WHERE acc_login = $1`,
+		login,
+	).Scan(&accID)
+
+	if err != nil {
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success":    false,
+			"id":         nil,
+			"error_code": 666,
+		})
+		fmt.Println("аккаунт не найден")
+		return
+	}
+
+	// Получаем POST-поля
+	dtStartStr := r.FormValue("dt_start")
+	dtEndStr := r.FormValue("dt_end")
+	strengthStr := r.FormValue("strength")
+	triggersSlice := r.FormValue("triggers")
+	symptomsSlice := r.FormValue("symptoms")
+	drugsSliceMap := r.FormValue("drugs")
+
+	if dtStartStr == "" || dtEndStr == "" || strengthStr == "" || triggersSlice == "" || symptomsSlice == "" || drugsSliceMap == "" {
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success":    false,
+			"id":         nil,
+			"error_code": 444,
+		})
+		return
+	}
+
+	dtStartUnix, err := strconv.ParseInt(dtStartStr, 10, 64)
+	dtStartUnix /= 1000
+	if err != nil {
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success":    false,
+			"id":         nil,
+			"error_code": 444,
+		})
+		fmt.Println("что-то с датой")
+		return
+	}
+
+	dtEndUnix, err := strconv.ParseInt(dtEndStr, 10, 64)
+	dtEndUnix /= 1000
+	if err != nil || dtEndUnix < dtStartUnix {
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success":    false,
+			"id":         nil,
+			"error_code": 444,
+		})
+		return
+	}
+
+	tStart := time.Unix(dtStartUnix, 0)
+	tEnd := time.Unix(dtEndUnix, 0)
+
+	date := tStart.Format("2006-01-02")
+	timeValue := tStart.Format("15:04:05")
+
+	durationHours := int(tEnd.Sub(tStart).Hours())
+	if durationHours < 0 {
+		durationHours = 0
+	}
+
+	// Парсим strength
+	strength, err := strconv.Atoi(strengthStr)
+	if err != nil || strength < 0 || strength > 10 {
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success":    false,
+			"id":         nil,
+			"error_code": 444,
+		})
+		fmt.Println("что-то с силой")
+		return
+	}
+
+	// triggers — JSON массив
+	var triggers []int
+	err = json.Unmarshal([]byte(triggersSlice), &triggers)
+	if err != nil || len(triggers) == 0 {
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success":    false,
+			"id":         nil,
+			"error_code": 444,
+		})
+		fmt.Println("что-то с триггерами")
+		return
+	}
+
+	// symptoms — JSON массив
+	var symptoms []int
+	err = json.Unmarshal([]byte(symptomsSlice), &symptoms)
+	if err != nil || len(symptoms) == 0 {
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success":    false,
+			"id":         nil,
+			"error_code": 444,
+		})
+		fmt.Println("что-то с симптомами")
+		return
+	}
+
+	// drugs — JSON объект (словарь)
+	var drugs []string
+	err = json.Unmarshal([]byte(drugsSliceMap), &drugs)
+	if err != nil {
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success":    false,
+			"id":         nil,
+			"error_code": 444,
+		})
+		fmt.Println("что-то с лекарствами")
+		return
+	}
+
+	// 1. Вставляем запись в Attacks
+	var entryID int
+	err = db.QueryRow(`
+        INSERT INTO "Attacks" (acc_id, date, time, pain_level, duration, notes)
+        VALUES ($1, $2, $3, $4, $5, '')
+        RETURNING id_entry
+    `, accID, date, timeValue, strength, durationHours).Scan(&entryID)
+
+	if err != nil {
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success":    false,
+			"id":         nil,
+			"error_code": 666,
+		})
+		fmt.Println("что-то не то в запросе бд 1")
+		return
+	}
+
+	// 2. Вставляем триггеры
+	for _, trID := range triggers {
+		_, err = db.Exec(`
+        INSERT INTO "Attack-Trigger" (id_entry, id_trigger)
+        VALUES ($1, $2)
+    `, entryID, trID)
+
+		if err != nil {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"success":    false,
+				"id":         nil,
+				"error_code": 666,
+			})
+			fmt.Println("SQL Trigger Error:", err)
+			return
+		}
+	}
+
+	// 2. Вставляем симптомы
+	for _, symID := range symptoms {
+		_, err = db.Exec(`
+		INSERT INTO "Attack-Symptom" (id_entry, id_sympt)
+		VALUES ($1, $2)
+	`, entryID, symID)
+		if err != nil {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"success":    false,
+				"id":         nil,
+				"error_code": 666,
+			})
+			fmt.Println("SQL Symptom Error:", err)
+			return
+		}
+	}
+	// 3. Вставляем лекарства
+	for _, drugName := range drugs {
+		fmt.Println(entryID, drugName)
+		_, err = db.Exec(`
+		INSERT INTO "Attack-Drug" (id_entry, atx_code, dosage)	
+		VALUES ($1, $2, '')
+	`, entryID, drugName)
+		if err != nil {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"success":    false,
+				"id":         nil,
+				"error_code": 666,
+			})
+			fmt.Println("SQL Drug Error:", err)
+			return
+		}
+	}
+
+	// Успех
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"success":    true,
+		"id":         entryID,
+		"error_code": 0,
+	})
+	log.Println("✅ Запись добавлена")
+
 }
