@@ -19,7 +19,6 @@ const (
 	port     = 5432
 	user     = "anna"
 	password = ""
-	password = ""
 	dbname   = "migrenoznik"
 )
 
@@ -52,7 +51,6 @@ func main() {
 	mux.HandleFunc("/", indexHandler)
 	mux.HandleFunc("/login/", loginPageHandler)
 	mux.HandleFunc("/sign-up/", signupPageHandler)
-	mux.HandleFunc("/doctor/", doctorPageHandler)
 
 	// API
 	mux.HandleFunc("/api/login", loginHandler)
@@ -127,10 +125,6 @@ func loginPageHandler(w http.ResponseWriter, r *http.Request) {
 
 func signupPageHandler(w http.ResponseWriter, r *http.Request) {
 	renderTemplate(w, "sign-up.html")
-}
-
-func doctorPageHandler(w http.ResponseWriter, r *http.Request) {
-	renderTemplate(w, "doctor.html")
 }
 
 func isPasswordStrong(pw string) bool {
@@ -414,7 +408,7 @@ func addEntryHandler(w http.ResponseWriter, r *http.Request) {
 	// triggers — JSON массив
 	var triggers []int
 	err = json.Unmarshal([]byte(triggersSlice), &triggers)
-	if err != nil || len(triggers) == 0 {
+	if err != nil {
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"success":    false,
 			"id":         nil,
@@ -427,7 +421,7 @@ func addEntryHandler(w http.ResponseWriter, r *http.Request) {
 	// symptoms — JSON массив
 	var symptoms []int
 	err = json.Unmarshal([]byte(symptomsSlice), &symptoms)
-	if err != nil || len(symptoms) == 0 {
+	if err != nil {
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"success":    false,
 			"id":         nil,
@@ -437,7 +431,7 @@ func addEntryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// drugs — JSON объект (словарь)
+	// drugs — JSON объект должен быть потом (словарь) пока массив
 	var drugs []string
 	err = json.Unmarshal([]byte(drugsSliceMap), &drugs)
 	if err != nil {
@@ -700,3 +694,4 @@ func entriesHandler(w http.ResponseWriter, r *http.Request) {
 		"entries": entries,
 	})
 }
+
