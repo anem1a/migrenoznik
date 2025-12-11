@@ -39,6 +39,7 @@ document.addEventListener('DOMContentLoaded',
             if (data["entries"] == null) {
                 return;
             }
+            console.log(data["entries"]);
             let attacks = Core.get_migraine_attacks();
             let new_attacks = [];
             // костыль, пока Аня не переделала
@@ -79,6 +80,8 @@ document.addEventListener('DOMContentLoaded',
                     }
                 }
                 if (!is_in_local_storage) {
+                    console.log(data["entries"][i]);
+                    console.log(MigraineAttack.from_json(data["entries"][i]));
                     new_attacks.push(MigraineAttack.from_json(data["entries"][i]));
                 }
             }
