@@ -11,6 +11,8 @@ import (
 	"strconv"
 	"time"
 
+	"migrenoznik/cmd/server/telegram"
+
 	_ "github.com/lib/pq"
 )
 
@@ -76,6 +78,7 @@ func main() {
 		}
 	}()
 
+	go telegram.StartReminderBot("")
 	// HTTP → HTTPS редирект
 	log.Println("➡️ HTTP сервер запущен (редиректит на HTTPS)")
 	log.Fatal(http.ListenAndServe(":80", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
