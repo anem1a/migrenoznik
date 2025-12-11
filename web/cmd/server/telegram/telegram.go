@@ -53,34 +53,23 @@ func StartReminderBot(botToken string) {
 
 	// Горутинa: отправляет напоминения каждый день в 20:00
 	go func() {
+		loc, _ := time.LoadLocation("Europe/Moscow")
+
 		for {
-			// текущее время
-			now := time.Now()
-
-			// время следующего запуска — сегодня в 20:00
-			nextRun := time.Date(
-				now.Year(),
-				now.Month(),
-				now.Day(),
-				20, 0, 0, 0,
-				now.Location(),
-			)
-
-			// если 20:00 уже прошло — запускаем завтра
+			now := time.Now().In(loc)
+			nextRun := time.Date(now.Year(), now.Month(), now.Day(), 20, 0, 0, 0, loc)
 			if now.After(nextRun) {
 				nextRun = nextRun.Add(24 * time.Hour)
 			}
 
-			// ждем до 20:00
-			sleepDuration := time.Until(nextRun)
-			log.Println("Следующая отправка уведомлений в:", nextRun.Format("15:04"))
-			time.Sleep(sleepDuration)
+			time.Sleep(time.Until(nextRun))
 
-			// отправляем уведомления
 			for chatID := range subscribers {
 				msg := tgbotapi.NewMessage(chatID, "Надеемся вы не забыли оставить запись в дневнике мигрени! migrenoznik.ru")
 				bot.Send(msg)
 			}
+
+			log.Println("✅ Уведомления отправлены в:", time.Now().In(loc).Format("15:04"))
 		}
 	}()
 }
