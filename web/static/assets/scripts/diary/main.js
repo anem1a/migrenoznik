@@ -105,6 +105,17 @@ class MigrenoznikCore {
         compose_migraine_diary();
     }
 
+    clear_local_storage_from_remote_entries() {
+        let attacks = this.get_migraine_attacks();
+        let only_local = [];
+        for (const attack of attacks) {
+            if (attack.ID == null) {
+                only_local.push(attack);
+            }
+        }
+        localStorage.setItem("migraine_attacks", JSON.stringify(only_local));
+    }
+
     get_current_migraine_attack() {
         let current_migraine_attack = localStorage.getItem("current_migraine_attack");
         try {
@@ -296,6 +307,7 @@ async function logout_Clicked() {
         
         const result = await response.json();
         if (result["success"]) {
+            Core.clear_local_storage_from_remote_entries();
             window.location.href = "/login/";
         }
 
