@@ -36,6 +36,11 @@ document.addEventListener('DOMContentLoaded',
             return response.json();
         })
         .then(data => {
+            if (data["entries"] == null) {
+                return;
+            }
+            let attacks = Core.get_migraine_attacks();
+            let new_attacks = [];
             // костыль, пока Аня не переделала
             for (let i = 0; i < data["entries"].length; i++) {
                 for (let j = 0; j < data["entries"][i]["Triggers"].length; j++) {
@@ -62,14 +67,24 @@ document.addEventListener('DOMContentLoaded',
                         }
                     }
                 }
+                
+                data["entries"][i]["DT_Start"] = `20${data["entries"][i]["DT_Start"].substring(6,8)}-${data["entries"][i]["DT_Start"].substring(3,5)}-${data["entries"][i]["DT_Start"].substring(0,2)}T00:00Z`;
 
                 // Конец костыля
-
-                let attacks = Core.get_migraine_attacks();
-                attacks.push(MigraineAttack.from_json(data["entries"][i]));
-                localStorage.setItem("migraine_attacks", JSON.stringify(attacks));
+                let is_in_local_storage = false;
+                for (const attack of attacks) {
+                    if (attack.ID == data["entries"][i]["ID"]) {
+                        is_in_local_storage = true;
+                        break;
+                    }
+                }
+                if (!is_in_local_storage) {
+                    new_attacks.push(MigraineAttack.from_json(data["entries"][i]));
+                }
             }
-            console.log(data);
+            attacks.push(...new_attacks);
+            localStorage.setItem("migraine_attacks", JSON.stringify(attacks));
+            compose_migraine_diary();
         })
         .catch(error => {
             console.error('Произошла ошибка:', error);

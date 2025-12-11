@@ -3,6 +3,7 @@ class MigraineAttack {
         this.LocalID = local_id;
         this.DT_Start = dt_start;
         this.DT_End = dt_end;
+        this.Duration = (dt_end - dt_start) / 3600000;
         this.Strength = strength;
         this.Triggers = triggers;
         this.Symptoms = symptoms;
@@ -15,7 +16,8 @@ class MigraineAttack {
             obj["LocalID"] == null ? null : Number(obj["LocalID"]),
             obj["DT_Start"] == null ? null : new Date(obj["DT_Start"]),
             obj["Strength"] == null ? null : Number(obj["Strength"]),
-            obj["DT_End"] == null ? null : new Date(obj["DT_End"]),
+            obj["Duration"] == null ? null : Number(obj["Duration"]),
+            obj["DT_End"] == null ? (obj["Duration"] == null ? null : new Date(obj["DT_Start"]) + Number(obj["Duration"])) : new Date(obj["DT_End"]),
             obj["Triggers"] == null ? [] : obj["Triggers"],
             obj["Symptoms"] == null ? [] : obj["Symptoms"],
             obj["Drugs"] == null ? [] : obj["Drugs"],
