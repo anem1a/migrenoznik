@@ -48,9 +48,63 @@ class MigrenoznikCore {
         }
     }
 
-    /**
-     * Returns the current migraine attack. Undefined if no attacks found or there's no migraine now.
-     */
+    async fetch_remote_migraine_attacks() {
+        let response = await fetch('https://migrenoznik.ru/api/entries');
+        if (!response.ok) {
+            throw new Error(`Ошибка HTTP: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        let attacks = Core.get_migraine_attacks();
+        let new_attacks = [];
+        // костыль, пока Аня не переделала
+        for (let i = 0; i < data["entries"].length; i++) {
+            for (let j = 0; j < data["entries"][i]["Triggers"].length; j++) {
+                const element = data["entries"][i]["Triggers"][j];
+                for (let k = 0; k < MigraineTrigger.total_triggers(); k++) {
+                    if (MigraineTrigger.code_to_name(k) == element) {
+                        data["entries"][i]["Triggers"][j] = k;
+                    }
+                }
+            }
+            for (let j = 0; j < data["entries"][i]["Symptoms"].length; j++) {
+                const element = data["entries"][i]["Symptoms"][j];
+                for (let k = 0; k < MigraineSymptom.total_symptoms(); k++) {
+                    if (MigraineSymptom.code_to_name(k) == element) {
+                        data["entries"][i]["Symptoms"][j] = k;
+                    }
+                }
+            }
+            for (let j = 0; j < data["entries"][i]["Drugs"].length; j++) {
+                const element = data["entries"][i]["Drugs"][j];
+                for (let k = 0; k < MigraineDrug.total_drugs(); k++) {
+                    if (MigraineDrug.code_to_name(k) == element) {
+                        data["entries"][i]["Drugs"][j] = MigraineDrug.code_to_atx(k);
+                    }
+                }
+            }
+            
+            data["entries"][i]["DT_Start"] = `20${data["entries"][i]["DT_Start"].substring(6,8)}-${data["entries"][i]["DT_Start"].substring(3,5)}-${data["entries"][i]["DT_Start"].substring(0,2)}T00:00Z`;
+
+            // Конец костыля
+            let is_in_local_storage = false;
+            for (const attack of attacks) {
+                if (attack.ID == data["entries"][i]["ID"]) {
+                    is_in_local_storage = true;
+                    break;
+                }
+            }
+            if (!is_in_local_storage) {
+                console.log(data["entries"][i]);
+                console.log(MigraineAttack.from_json(data["entries"][i]));
+                new_attacks.push(MigraineAttack.from_json(data["entries"][i]));
+            }
+        }
+        attacks.push(...new_attacks);
+        localStorage.setItem("migraine_attacks", JSON.stringify(attacks));
+        compose_migraine_diary();
+    }
+
     get_current_migraine_attack() {
         let current_migraine_attack = localStorage.getItem("current_migraine_attack");
         try {
