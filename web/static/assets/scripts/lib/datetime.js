@@ -32,6 +32,9 @@ class Calendar {
     }
 
     static date_to_quick_format(date) {
+        if (date == null) {
+            return "null";
+        }
         return `${date.getDate()} ${Calendar.month_number_to_name(date.getMonth())} ${date.getFullYear()} ${date.getHours() < 10 ? "0" : ""}${date.getHours()}:${date.getMinutes() < 10 ? "0" : ""}${date.getMinutes()}`;
     }
 }
