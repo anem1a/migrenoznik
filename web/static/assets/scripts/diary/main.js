@@ -397,9 +397,28 @@ function compose_migraine_diary() {
     }
 }
 
-function delete_entry_Clicked(local_id) {
-    Core.remove_migraine_attack(local_id);
-    compose_migraine_diary();
+async function delete_entry_Clicked(local_id) {
+    let attacks = Core.get_migraine_attacks();
+    let attack_to_delete = null;
+    for (const attack of attacks) {
+        if (attack.local_id == local_id) {
+            attack_to_delete = attack.ID;
+            break;
+        }
+    }
+    if (attack_to_delete == null) {
+        return;
+    }
+    let response = await fetch(`https://migrenoznik.ru/api/delete_entry?id=${attack_to_delete}`);
+        if (!response.ok) {
+            throw new Error(`Ошибка HTTP: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        if (data["success"]) {
+            Core.remove_migraine_attack(local_id);
+            compose_migraine_diary();
+        }
 }
 
 async function login_button_Clicked() {

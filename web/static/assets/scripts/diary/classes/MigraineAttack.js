@@ -13,7 +13,7 @@ class MigraineAttack {
 
     static from_json(obj) {
         return new MigraineAttack(
-            obj["LocalID"] == null ? null : Number(obj["LocalID"]),
+            obj["LocalID"] == null ? Core.next_autoincrement() : Number(obj["LocalID"]),
             obj["DT_Start"] == null ? null : new Date(obj["DT_Start"]),
             obj["Strength"] == null ? null : Number(obj["Strength"]),
             obj["DT_End"] == null ? (obj["Duration"] == null ? null : new Date(obj["DT_Start"])) : new Date(obj["DT_End"]),
