@@ -53,6 +53,7 @@ func main() {
 	mux.HandleFunc("/api/add_entry", handlers.AddEntryHandler)
 	mux.HandleFunc("/api/entries", handlers.EntriesHandler)
 	mux.HandleFunc("/api/doctor-entries", handlers.DoctorEntriesHandler)
+	mux.HandleFunc("/api/delete_entry", handlers.DeleteEntryHandler)
 
 	// HTTPS сервер
 	go func() {
