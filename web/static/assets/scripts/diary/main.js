@@ -55,9 +55,11 @@ class MigrenoznikCore {
         }
         
         const data = await response.json();
-        if (data["success"]) {
-            
+        if (data["success"] == false) {
+            this.LoggedIn = false;
+            return;
         }
+        this.LoggedIn = true;
         let attacks = Core.get_migraine_attacks();
         let new_attacks = [];
         // костыль, пока Аня не переделала
@@ -170,6 +172,32 @@ class MigrenoznikCore {
         }
     }
 
+    async send_migraine_attack(current) {
+        /* Save to remote storage */
+        let data = new FormData();
+        data.append("dt_start", current.DT_Start.getTime());
+        data.append("dt_end", current.DT_End.getTime());
+        data.append("strength", current.Strength);
+        data.append("triggers", JSON.stringify(current.Triggers));
+        data.append("symptoms", JSON.stringify(current.Symptoms));
+        data.append("drugs", JSON.stringify(current.Drugs.map(element => MigraineDrug.code_to_atx(element))));
+        
+        const response = await fetch('/api/add_entry', {
+            method: 'POST',
+            body: data,
+        });
+        
+        if (!response.ok) throw new Error(`Ошибка HTTP ${response.status}`);
+        
+        const result = await response.json();
+        if (result["success"]) {
+            this.assign_id_to_migraine_attack(current.LocalID, result["id"]);
+        } else if (result["error_code"] != 13) {
+            this.remove_migraine_attack(current.LocalID);
+            compose_migraine_diary();
+        }
+    }
+
     async close_current_migraine_attack() {
         let attacks = this.get_migraine_attacks();
         let current = this.get_current_migraine_attack();
@@ -259,6 +287,7 @@ class MigrenoznikCore {
             this.MigraineAttackAI = 1;
             localStorage.setItem("migraine_attack_ai", 1);
         }
+        this.LoggedIn = false;
     }
 }
 
@@ -335,6 +364,7 @@ function create_element(el_tag, el_class, el_id, el_html) {
 
 function compose_migraine_diary() {
     document.getElementById("migre-diary-wrapper").innerHTML = "";
+    document.getElementById("migre-unspecified-diary-wrapper").innerHTML = "";
     let migraine_attacks = Core.get_migraine_attacks();
     for (let i = 0; i < migraine_attacks.length; i++) {
         const migraine_attack = migraine_attacks[i];
@@ -393,7 +423,23 @@ function compose_migraine_diary() {
             delete_entry_Clicked(migraine_attack.LocalID);
         })
         diary_item.appendChild(delete_button);
-        document.getElementById("migre-diary-wrapper").appendChild(diary_item);
+        if (migraine_attack.ID == null && Core.LoggedIn == true) {
+            let delete_button = create_element(
+                "a",
+                undefined, undefined,
+                "Сохранить"
+            );
+            delete_button.addEventListener("click", () => {
+                Core.send_migraine_attack(migraine_attack);
+            })
+            diary_item.appendChild(delete_button);
+        }
+        if (migraine_attack.ID != null || Core.LoggedIn == false) {
+            document.getElementById("migre-diary-wrapper").appendChild(diary_item);
+        } else {
+            document.getElementById("migre-unspecified-diary-wrapper").appendChild(diary_item);
+            document.getElementById("migre-unspecified-entries-wrapper").style.display = "block";
+        }
     }
 }
 
