@@ -197,7 +197,7 @@ class MigrenoznikCore {
         const result = await response.json();
         if (result["success"]) {
             this.assign_id_to_migraine_attack(current.LocalID, result["id"]);
-        } else {
+        } else if (result["error_code"] != 13) {
             this.remove_migraine_attack(current.LocalID);
             compose_migraine_diary();
         }
