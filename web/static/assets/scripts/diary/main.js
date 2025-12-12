@@ -55,6 +55,9 @@ class MigrenoznikCore {
         }
         
         const data = await response.json();
+        if (data["success"]) {
+            
+        }
         let attacks = Core.get_migraine_attacks();
         let new_attacks = [];
         // костыль, пока Аня не переделала
