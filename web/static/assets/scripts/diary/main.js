@@ -444,14 +444,16 @@ function compose_migraine_diary() {
 }
 
 async function delete_entry_Clicked(local_id) {
+    console.log(local_id);
     let attacks = Core.get_migraine_attacks();
     let attack_to_delete = null;
     for (const attack of attacks) {
-        if (attack.local_id == local_id) {
+        if (attack.LocalID == local_id) {
             attack_to_delete = attack.ID;
             break;
         }
     }
+    console.log(attack_to_delete);
     if (attack_to_delete == null) {
         return;
     }
