@@ -1,3 +1,6 @@
+// package handlers содержит HTTP-обработчики API, реализующие бизнес-логику веб-приложения «Мигренозник».
+// Отвечает за регистрацию новых пользователей,
+// валидацию вводимых данных и создание пользовательской сессии.
 package handlers
 
 import (
@@ -10,11 +13,23 @@ import (
 	"time"
 )
 
+// SignupHandler обрабатывает запрос на регистрацию пользователя.
+// Функция:
+//   - принимает POST-запрос с логином и паролем;
+//   - выполняет валидацию входных данных;
+//   - проверяет уникальность логина;
+//   - создаёт новую запись пользователя в базе данных;
+//   - автоматически создаёт пользовательскую сессию.
+//
+// В ответ клиенту возвращается JSON-объект с кодом результата.
 func SignupHandler(w http.ResponseWriter, r *http.Request) {
+	// Разрешён только POST-метод
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
+
+	w.Header().Set("Content-Type", "application/json")
 
 	login := r.FormValue("login")
 	password := r.FormValue("password")
@@ -25,7 +40,7 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Проверка логина: 5–20 символов, латиница и "_"
+	// Проверка логина: длина 5–20 символов, латинские буквы и символ "_"
 	matchLogin, _ := regexp.MatchString(`^[A-Za-z_]{5,20}$`, login)
 	if !matchLogin {
 		json.NewEncoder(w).Encode(map[string]interface{}{"success": false, "code": 3})
@@ -38,7 +53,7 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Проверка, существует ли пользователь
+	// Проверка, существует ли пользователь с таким логином
 	var exists bool
 	err := global.DB.QueryRow(`SELECT EXISTS(SELECT 1 FROM "Accounts" WHERE acc_login = $1);`, login).Scan(&exists)
 	if err != nil {
@@ -59,21 +74,29 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Создание сессионного идентификатора
 	sessionID := fmt.Sprintf("%d_%s", time.Now().UnixNano(), login)
 	global.Sessions[sessionID] = login
 
+	// Установка cookie с идентификатором сессии
 	http.SetCookie(w, &http.Cookie{
 		Name:     "session_id",
 		Value:    sessionID,
 		Path:     "/",
-		HttpOnly: true,
-		Secure:   true,
+		HttpOnly: true, // недоступна из JavaScript
+		Secure:   true, // передаётся только по HTTPS
 	})
-
-	w.Header().Set("Content-Type", "application/json")
+	
+	// Отправка успешного ответа
 	json.NewEncoder(w).Encode(map[string]interface{}{"success": true, "code": 0})
 }
 
+// isPasswordStrong проверяет сложность пароля.
+// Пароль считается корректным, если:
+//   - его длина не менее 8 символов;
+//   - он содержит хотя бы одну заглавную букву;
+//   - одну строчную букву;
+//   - и одну цифру.
 func isPasswordStrong(pw string) bool {
 	if len(pw) < 8 {
 		return false
