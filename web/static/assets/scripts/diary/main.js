@@ -424,15 +424,15 @@ function compose_migraine_diary() {
         })
         diary_item.appendChild(delete_button);
         if (migraine_attack.ID == null && Core.LoggedIn == true) {
-            let delete_button = create_element(
+            let save_button = create_element(
                 "a",
                 undefined, undefined,
                 "Сохранить"
             );
-            delete_button.addEventListener("click", () => {
+            save_button.addEventListener("click", () => {
                 Core.send_migraine_attack(migraine_attack);
             })
-            diary_item.appendChild(delete_button);
+            diary_item.appendChild(save_button);
         }
         if (migraine_attack.ID != null || Core.LoggedIn == false) {
             document.getElementById("migre-diary-wrapper").appendChild(diary_item);
