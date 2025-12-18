@@ -1,3 +1,6 @@
+// package handlers содержит HTTP-обработчики API, реализующие бизнес-логику веб-приложения «Мигренозник».
+//
+// В данном файле реализован обработчик добавления новой записи о приступе мигрени.
 package handlers
 
 import (
@@ -10,7 +13,31 @@ import (
 	"time"
 )
 
+// AddEntryHandler обрабатывает POST-запрос на добавление новой записи о приступе мигрени.
+// Функция выполняет следующие действия:
+// 1. Проверяет метод запроса (разрешён только POST).
+// 2. Проверяет наличие сессии пользователя по cookie.
+// 3. Находит acc_id пользователя в базе по его логину.
+// 4. Получает данные из POST-запроса:
+//   - dt_start, dt_end — время начала и конца приступа в миллисекундах;
+//   - strength — интенсивность боли (0–10);
+//   - triggers — JSON-массив идентификаторов триггеров;
+//   - symptoms — JSON-массив идентификаторов симптомов;
+//   - drugs — JSON-массив названий лекарств.
+//
+// 5. Выполняет валидацию данных:
+//   - проверка пустых полей;
+//   - проверка правильности дат и диапазона времени;
+//   - проверка диапазона силы боли;
+//   - корректность JSON-полей.
+//
+// 6. Добавляет запись в таблицу "Attacks".
+// 7. Добавляет связи с триггерами в таблицу "Attack-Trigger".
+// 8. Добавляет связи с симптомами в таблицу "Attack-Symptom".
+// 9. Добавляет лекарства в таблицу "Attack-Drug".
+// 10. Возвращает JSON-ответ с результатом операции.
 func AddEntryHandler(w http.ResponseWriter, r *http.Request) {
+	// Разрешён только POST-метод
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -28,6 +55,7 @@ func AddEntryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Получение логина из массива сессий
 	login, ok := global.Sessions[cookie.Value]
 	if !ok {
 		json.NewEncoder(w).Encode(map[string]interface{}{
@@ -35,11 +63,11 @@ func AddEntryHandler(w http.ResponseWriter, r *http.Request) {
 			"id":         nil,
 			"error_code": 13,
 		})
-		log.Println("Ошибка логина")
+		log.Println("Сессия не найдена")
 		return
 	}
 
-	// Находим acc_id по логину
+	// Нахождение acc_id по логину в БД
 	var accID int
 	err = global.DB.QueryRow(
 		`SELECT acc_id FROM "Accounts" WHERE acc_login = $1`,
@@ -56,7 +84,7 @@ func AddEntryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Получаем POST-поля
+	// Получение POST-полей
 	dtStartStr := r.FormValue("dt_start")
 	dtEndStr := r.FormValue("dt_end")
 	strengthStr := r.FormValue("strength")
@@ -73,6 +101,7 @@ func AddEntryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Парсинг и конвертация дат
 	dtStartUnix, err := strconv.ParseInt(dtStartStr, 10, 64)
 	dtStartUnix /= 1000
 	if err != nil {
@@ -81,7 +110,7 @@ func AddEntryHandler(w http.ResponseWriter, r *http.Request) {
 			"id":         nil,
 			"error_code": 444,
 		})
-		fmt.Println("что-то с датой")
+		log.Println("Ошибка конвертации даты начала")
 		return
 	}
 
@@ -93,6 +122,7 @@ func AddEntryHandler(w http.ResponseWriter, r *http.Request) {
 			"id":         nil,
 			"error_code": 444,
 		})
+		log.Println("Ошибка конвертации даты окончания")
 		return
 	}
 
@@ -107,7 +137,7 @@ func AddEntryHandler(w http.ResponseWriter, r *http.Request) {
 		durationHours = 0
 	}
 
-	// Парсим strength
+	// Парсинг интенсивности боли
 	strength, err := strconv.Atoi(strengthStr)
 	if err != nil || strength < 0 || strength > 10 {
 		json.NewEncoder(w).Encode(map[string]interface{}{
@@ -115,11 +145,11 @@ func AddEntryHandler(w http.ResponseWriter, r *http.Request) {
 			"id":         nil,
 			"error_code": 444,
 		})
-		fmt.Println("что-то с силой")
+		log.Println("Ошибка конвертации интенсивности боли")
 		return
 	}
 
-	// triggers — JSON массив
+	// Парсинг триггеров
 	var triggers []int
 	err = json.Unmarshal([]byte(triggersSlice), &triggers)
 	if err != nil {
@@ -128,11 +158,11 @@ func AddEntryHandler(w http.ResponseWriter, r *http.Request) {
 			"id":         nil,
 			"error_code": 444,
 		})
-		fmt.Println("что-то с триггерами")
+		log.Println("Ошибка парсинга триггеров")
 		return
 	}
 
-	// symptoms — JSON массив
+	// Парсинг симптомов
 	var symptoms []int
 	err = json.Unmarshal([]byte(symptomsSlice), &symptoms)
 	if err != nil {
@@ -141,11 +171,11 @@ func AddEntryHandler(w http.ResponseWriter, r *http.Request) {
 			"id":         nil,
 			"error_code": 444,
 		})
-		fmt.Println("что-то с симптомами")
+		log.Println("Ошибка парсинга симптомов")
 		return
 	}
 
-	// drugs — JSON объект (словарь)
+	// Парсинг лекарств
 	var drugs []string
 	err = json.Unmarshal([]byte(drugsSliceMap), &drugs)
 	if err != nil {
@@ -154,11 +184,11 @@ func AddEntryHandler(w http.ResponseWriter, r *http.Request) {
 			"id":         nil,
 			"error_code": 444,
 		})
-		fmt.Println("что-то с лекарствами")
+		log.Println("Ошибка парсинга лекарств")
 		return
 	}
 
-	// 1. Вставляем запись в Attacks
+	// Вставка записи в Attacks
 	var entryID int
 	err = global.DB.QueryRow(`
         INSERT INTO "Attacks" (acc_id, date, time, pain_level, duration, notes)
@@ -172,11 +202,11 @@ func AddEntryHandler(w http.ResponseWriter, r *http.Request) {
 			"id":         nil,
 			"error_code": 666,
 		})
-		fmt.Println("SQL Error:", err)
+		log.Println("SQL ошибка при добавлении записи:", err)
 		return
 	}
 
-	// 2. Вставляем триггеры
+	// Вставка триггеров
 	for _, trID := range triggers {
 		_, err = global.DB.Exec(`
         INSERT INTO "Attack-Trigger" (id_entry, id_trigger)
@@ -189,12 +219,12 @@ func AddEntryHandler(w http.ResponseWriter, r *http.Request) {
 				"id":         nil,
 				"error_code": 666,
 			})
-			fmt.Println("SQL Trigger Error:", err)
+			log.Println("SQL ошибка при добавлении триггеров:", err)
 			return
 		}
 	}
 
-	// 2. Вставляем симптомы
+	// Вставка симптомов
 	for _, symID := range symptoms {
 		_, err = global.DB.Exec(`
 		INSERT INTO "Attack-Symptom" (id_entry, id_sympt)
@@ -206,11 +236,11 @@ func AddEntryHandler(w http.ResponseWriter, r *http.Request) {
 				"id":         nil,
 				"error_code": 666,
 			})
-			fmt.Println("SQL Symptom Error:", err)
+			log.Println("SQL ошибка при вставке симптома:", err)
 			return
 		}
 	}
-	// 3. Вставляем лекарства
+	// Вставка лекарств
 	for _, drugName := range drugs {
 		fmt.Println(entryID, drugName)
 		_, err = global.DB.Exec(`
@@ -223,17 +253,17 @@ func AddEntryHandler(w http.ResponseWriter, r *http.Request) {
 				"id":         nil,
 				"error_code": 666,
 			})
-			fmt.Println("SQL Drug Error:", err)
+			log.Println("SQL ошибка при вставке лекарства:", err)
 			return
 		}
 	}
 
-	// Успех
+	// Отправка успешного ответа
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"success":    true,
 		"id":         entryID,
 		"error_code": 0,
 	})
-	log.Println("✅ Запись добавлена")
+	log.Printf("✅ Запись добавлена для пользователя: %s, id записи: %d\n", login, entryID)
 
 }

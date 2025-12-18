@@ -1,3 +1,5 @@
+// Package handlers содержит HTTP-обработчики API для веб-приложения «Мигренозник».
+// В данном файле реализован обработчик всех записей пользователя из БД.
 package handlers
 
 import (
@@ -9,6 +11,20 @@ import (
 	"time"
 )
 
+// EntriesHandler обрабатывает GET-запрос для получения всех записей пользователя.
+// Функция выполняет следующие действия:
+// 1. Проверяет наличие сессии по cookie.
+// 2. Получает логин пользователя из сессии.
+// 3. Определяет acc_id пользователя в базе.
+// 4. Получает все записи пользователя из таблицы "Attacks", сортируя по дате (новые первыми).
+// 5. Для каждой записи:
+//   - форматирует дату для отображения;
+//   - получает список триггеров, связанных с записью;
+//   - получает список симптомов, связанных с записью;
+//   - получает список лекарств, связанных с записью;
+//   - собирает все данные в структуру Entry.
+//
+// 6. Возвращает JSON с массивом всех записей.
 func EntriesHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -33,6 +49,7 @@ func EntriesHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Получение логина из массива сессий
 	var accID int
 	err = global.DB.QueryRow(`
         SELECT acc_id
@@ -48,7 +65,7 @@ func EntriesHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println("Аккаунт не найден")
 		return
 	}
-
+	// Получение всех записей пользователя из таблицы "Attacks"
 	rows, err := global.DB.Query(`
         SELECT id_entry, date, duration, pain_level
         FROM "Attacks"
@@ -65,6 +82,7 @@ func EntriesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer rows.Close()
 
+	// Структура одной записи
 	type Entry struct {
 		DT_Start string   `json:"DT_Start"`
 		Duration float64  `json:"Duration"` // в часах
@@ -77,6 +95,7 @@ func EntriesHandler(w http.ResponseWriter, r *http.Request) {
 
 	var entries []Entry
 
+	// Перебор всех записей пользователя
 	for rows.Next() {
 		var id int
 		var date time.Time
@@ -89,7 +108,7 @@ func EntriesHandler(w http.ResponseWriter, r *http.Request) {
 		// Форматируем дату: 27.11.25
 		dtDisplay := date.Format("02.01.06")
 
-		// Получаем триггеры для этой атаки
+		// Получение триггеров
 		trigRows, err := global.DB.Query(`
     		SELECT t.name
     		FROM "Attack-Trigger" at
@@ -114,7 +133,7 @@ func EntriesHandler(w http.ResponseWriter, r *http.Request) {
 			triggers = []string{}
 		}
 
-		// Получаем симптомы для этой атаки
+		// Получение симптомов
 		symptRows, err := global.DB.Query(`
 			SELECT s.name
 			FROM "Attack-Symptom" ast		
@@ -136,7 +155,7 @@ func EntriesHandler(w http.ResponseWriter, r *http.Request) {
 			symptoms = []string{}
 		}
 
-		// Получаем лекарства для этой атаки
+		// Получение лекарств
 		drugsRows, err := global.DB.Query(`
 			SELECT ad.drug_name
 			FROM "Attack-Drug" add
@@ -159,7 +178,7 @@ func EntriesHandler(w http.ResponseWriter, r *http.Request) {
 			drugs = []string{}
 		}
 
-		// Добавляем запись с нужными полями
+		// Добавляем запись в список
 		entries = append(entries, Entry{
 			DT_Start: dtDisplay,
 			Duration: duration,
@@ -170,10 +189,9 @@ func EntriesHandler(w http.ResponseWriter, r *http.Request) {
 			ID:       id,
 		})
 
-		// fmt.Println(dtDisplay, duration, strength, triggers, symptoms, drugs)
 	}
 
-	// Отправляем JSON
+	// Отправка ответа с записями
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"success": true,
 		"entries": entries,

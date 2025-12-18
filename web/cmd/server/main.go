@@ -1,3 +1,9 @@
+// package main является точкой входа веб-приложения «Мигренозник».
+// В данном пакете осуществляется:
+//  - инициализация подключения к базе данных PostgreSQL;
+//  - настройка HTTP/HTTPS серверов;
+//  - регистрация маршрутов страниц и API;
+//  - запуск Telegram-бота для напоминаний.
 package main
 
 import (
@@ -10,7 +16,7 @@ import (
 	"migrenoznik/cmd/server/global"
 	"migrenoznik/cmd/server/handlers"
 	"migrenoznik/cmd/server/pages"
-	"migrenoznik/cmd/server/telegram"
+	// "migrenoznik/cmd/server/telegram"
 
 	_ "github.com/lib/pq"
 )
@@ -18,6 +24,7 @@ import (
 func main() {
 	var err error
 
+	// Инициализация подключения к базе данных PostgreSQL
 	dbConfig := config.GetDBConfig()
 	connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=require", dbConfig.Host, dbConfig.Port,
 		dbConfig.User, dbConfig.Password, dbConfig.DBName)
@@ -33,6 +40,7 @@ func main() {
 	}
 	log.Println("✅ Подключение к БД установлено")
 
+	// Инициализация маршрутизатора
 	mux := http.NewServeMux()
 
 	// Раздача статики
@@ -56,26 +64,29 @@ func main() {
 	mux.HandleFunc("/api/delete_entry", handlers.DeleteEntryHandler)
 
 	// HTTPS сервер
-	go func() {
-		log.Println("🚀 HTTPS сервер запущен на https://migrenoznik.ru")
-		err := http.ListenAndServeTLS(
-			":443",
-			"/etc/letsencrypt/live/migrenoznik.ru/fullchain.pem",
-			"/etc/letsencrypt/live/migrenoznik.ru/privkey.pem",
-			mux,
-		)
-		if err != nil {
-			log.Fatal("Ошибка HTTPS сервера:", err)
-		}
-	}()
+	// go func() {
+	// 	log.Println("🚀 HTTPS сервер запущен на https://migrenoznik.ru")
+	// 	err := http.ListenAndServeTLS(
+	// 		":443",
+	// 		"/etc/letsencrypt/live/migrenoznik.ru/fullchain.pem",
+	// 		"/etc/letsencrypt/live/migrenoznik.ru/privkey.pem",
+	// 		mux,
+	// 	)
+	// 	if err != nil {
+	// 		log.Fatal("Ошибка HTTPS сервера:", err)
+	// 	}
+	// }()
 
-	go telegram.StartReminderBot("")
-	// HTTP → HTTPS редирект
-	log.Println("➡️ HTTP сервер запущен (редиректит на HTTPS)")
-	log.Fatal(http.ListenAndServe(":80", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "https://"+r.Host+r.RequestURI, http.StatusMovedPermanently)
-	})))
+	// // Запуск Telegram-бота
+	// go telegram.StartReminderBot()
 
-	// log.Println("🚀 Сервер запущен на http://localhost:8080")
-	// log.Fatal(http.ListenAndServe(":8080", mux))
+	// // HTTP → HTTPS редирект
+	// log.Println("➡️ HTTP сервер запущен (редиректит на HTTPS)")
+	// log.Fatal(http.ListenAndServe(":80", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	// 	http.Redirect(w, r, "https://"+r.Host+r.RequestURI, http.StatusMovedPermanently)
+	// })))
+
+	// Локальный HTTP сервер для разработки 
+	log.Println("🚀 Сервер запущен на http://localhost:8080")
+	log.Fatal(http.ListenAndServe(":8080", mux))
 }
