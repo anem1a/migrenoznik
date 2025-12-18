@@ -48,6 +48,9 @@ class MigrenoznikCore {
         }
     }
 
+    /**
+     * Fetches remote migraine attacks from server and adds new ones to local storage.
+     */
     async fetch_remote_migraine_attacks() {
         let response = await fetch('https://migrenoznik.ru/api/entries');
         if (!response.ok) {
@@ -110,6 +113,9 @@ class MigrenoznikCore {
         compose_migraine_diary();
     }
 
+    /**
+     * Clears local storage from entries that are already stored on remote server.
+     */
     clear_local_storage_from_remote_entries() {
         let attacks = this.get_migraine_attacks();
         let only_local = [];
@@ -121,6 +127,10 @@ class MigrenoznikCore {
         localStorage.setItem("migraine_attacks", JSON.stringify(only_local));
     }
 
+    /**
+     * Returns current migraine attack object if any.
+     * @returns 
+     */
     get_current_migraine_attack() {
         let current_migraine_attack = localStorage.getItem("current_migraine_attack");
         try {
@@ -132,6 +142,11 @@ class MigrenoznikCore {
         }
     }
 
+    /**
+     * Assigns remote ID from server to migraine attack with given local ID.
+     * @param {*} local_id - local ID of migraine attack
+     * @param {*} id - remote ID from server
+     */
     assign_id_to_migraine_attack(local_id, id) {
         let attacks = this.get_migraine_attacks();
         for (let i = 0; i < attacks.length; i++) {
@@ -151,6 +166,11 @@ class MigrenoznikCore {
         localStorage.setItem("current_migraine_attack", JSON.stringify(migraine_attack));
     }
 
+    /**
+     * Deletes migraine attack with given local ID from local storage.
+     * @param {*} local_id - local ID of migraine attack
+     * @returns 
+     */
     remove_migraine_attack(local_id) {
         let migraine_attacks = localStorage.getItem("migraine_attacks");
         if (migraine_attacks == undefined) {
@@ -172,6 +192,10 @@ class MigrenoznikCore {
         }
     }
 
+    /**
+     * Sends migraine attack to remote server.
+     * @param {*} current - migraine attack to send
+     */
     async send_migraine_attack(current) {
         /* Save to remote storage */
         let data = new FormData();
@@ -198,6 +222,9 @@ class MigrenoznikCore {
         }
     }
 
+    /**
+     * Closes (saves as ended) current migraine attack.
+     */
     async close_current_migraine_attack() {
         let attacks = this.get_migraine_attacks();
         let current = this.get_current_migraine_attack();
@@ -231,48 +258,80 @@ class MigrenoznikCore {
         }
     }
 
+    /**
+     * Changes strength of current migraine attack.
+     * @param {*} strength 
+     */
     edit_strength_of_current_migraine_attack(strength) {
         let current = this.get_current_migraine_attack();
         current.Strength = strength;
         localStorage.setItem("current_migraine_attack", JSON.stringify(current));
     }
 
+    /**
+     * Adds trigger to current migraine attack.
+     * @param {*} trigger 
+     */
     add_trigger_to_current_migraine_attack(trigger) {
         let current = this.get_current_migraine_attack();
         current.Triggers.push(trigger);
         localStorage.setItem("current_migraine_attack", JSON.stringify(current));
     }
 
+    /**
+     * Adds symptom to current migraine attack.
+     * @param {*} symptom 
+     */
     add_symptom_to_current_migraine_attack(symptom) {
         let current = this.get_current_migraine_attack();
         current.Symptoms.push(symptom);
         localStorage.setItem("current_migraine_attack", JSON.stringify(current));
     }
 
+    /**
+     * Adds drug to current migraine attack.
+     * @param {*} symptom 
+     */
     add_drug_to_current_migraine_attack(symptom) {
         let current = this.get_current_migraine_attack();
         current.Drugs.push(symptom);
         localStorage.setItem("current_migraine_attack", JSON.stringify(current));
     }
 
+    /**
+     * Deletes trigger from current migraine attack.
+     * @param {*} trigger 
+     */
     remove_trigger_from_current_migraine_attack(trigger) {
         let current = this.get_current_migraine_attack();
         current.Triggers = current.Triggers.filter(item => item !== trigger);
         localStorage.setItem("current_migraine_attack", JSON.stringify(current));
     }
 
+    /**
+     * Deletes symptom from current migraine attack.
+     * @param {*} symptom 
+     */
     remove_symptom_from_current_migraine_attack(symptom) {
         let current = this.get_current_migraine_attack();
         current.Symptoms = current.Symptoms.filter(item => item !== symptom);
         localStorage.setItem("current_migraine_attack", JSON.stringify(current));
     }
 
+    /**
+     * Deletes drug from current migraine attack.
+     * @param {*} symptom 
+     */
     remove_drug_from_current_migraine_attack(symptom) {
         let current = this.get_current_migraine_attack();
         current.Drugs = current.Drugs.filter(item => item !== symptom);
         localStorage.setItem("current_migraine_attack", JSON.stringify(current));
     }
 
+    /**
+     * This function returns next autoincrement value for migraine attacks and increments it in storage.
+     * @returns 
+     */
     next_autoincrement() {
         this.MigraineAttackAI++;
         localStorage.setItem("migraine_attack_ai", this.MigraineAttackAI);
@@ -326,6 +385,9 @@ function login_Clicked() {
     //window.history.pushState(null, null, "/login/");
 }
 
+/**
+ * Onclick event of pressing the "Logout" button
+ */
 async function logout_Clicked() {
     try {
         let data = new FormData();
@@ -362,6 +424,9 @@ function create_element(el_tag, el_class, el_id, el_html) {
     return elem;
 }
 
+/**
+ * Composes migraine diary on the main page.
+ */
 function compose_migraine_diary() {
     document.getElementById("migre-diary-wrapper").innerHTML = "";
     document.getElementById("migre-unspecified-diary-wrapper").innerHTML = "";
@@ -443,6 +508,11 @@ function compose_migraine_diary() {
     }
 }
 
+/**
+ * Onclick event of pressing the "Delete" button on diary entry
+ * @param {*} local_id 
+ * @returns 
+ */
 async function delete_entry_Clicked(local_id) {
     console.log(local_id);
     let attacks = Core.get_migraine_attacks();
@@ -458,17 +528,20 @@ async function delete_entry_Clicked(local_id) {
         return;
     }
     let response = await fetch(`https://migrenoznik.ru/api/delete_entry?id=${attack_to_delete}`);
-        if (!response.ok) {
-            throw new Error(`Ошибка HTTP: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        if (data["success"]) {
-            Core.remove_migraine_attack(local_id);
-            compose_migraine_diary();
-        }
+    if (!response.ok) {
+        throw new Error(`Ошибка HTTP: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    if (data["success"]) {
+        Core.remove_migraine_attack(local_id);
+        compose_migraine_diary();
+    }
 }
 
+/**
+ * Shows error box on logon/signup page or perform loggin/signup.
+ */
 async function login_button_Clicked() {
     const login = document.getElementsByName('login')[0].value;
     const password = document.getElementsByName('password')[0].value;
@@ -742,14 +815,27 @@ function play_animation_and_calm(element, animation, duration, func, delay = 0) 
     };
 }
 
+/**
+ * Oninput event of sliding current migraine strength input
+ * @param {*} value 
+ */
 function migraine_now_strength_Inputed(value) {
     document.getElementById("migre-current-strength-value").innerHTML = value;
 }
 
+/**
+ * Onchange event of changing current migraine strength input
+ * @param {*} value 
+ */
 function migraine_now_strength_Changed(value) {
     Core.edit_strength_of_current_migraine_attack(value);
 }
 
+/**
+ * Adds or removes trigger from current migraine attack
+ * @param {*} id 
+ * @param {*} item 
+ */
 function toggle_trigger_Clicked(id, item) {
     let selected = item.getAttribute("data-selected") == "true";
     if (selected) {
@@ -760,6 +846,11 @@ function toggle_trigger_Clicked(id, item) {
     item.setAttribute("data-selected", selected == false);
 }
 
+/**
+ * Adds or removes symptom from current migraine attack
+ * @param {*} id 
+ * @param {*} item 
+ */
 function toggle_symptom_Clicked(id, item) {
     let selected = item.getAttribute("data-selected") == "true";
     if (selected) {
@@ -770,6 +861,11 @@ function toggle_symptom_Clicked(id, item) {
     item.setAttribute("data-selected", selected == false);
 }
 
+/**
+ * Adds or removes drug from current migraine attack
+ * @param {*} id 
+ * @param {*} item 
+ */
 function toggle_drug_Clicked(id, item) {
     let selected = item.getAttribute("data-selected") == "true";
     if (selected) {
@@ -780,4 +876,7 @@ function toggle_drug_Clicked(id, item) {
     item.setAttribute("data-selected", selected == false);
 }
 
+/**
+ * Creating singleton instance of MigrenoznikCore
+ */
 const Core = new MigrenoznikCore();
