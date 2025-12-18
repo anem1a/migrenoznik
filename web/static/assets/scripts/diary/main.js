@@ -525,6 +525,7 @@ async function delete_entry_Clicked(local_id) {
     }
     console.log(attack_to_delete);
     if (attack_to_delete == null) {
+        Core.remove_migraine_attack(local_id);
         return;
     }
     let response = await fetch(`https://migrenoznik.ru/api/delete_entry?id=${attack_to_delete}`);
