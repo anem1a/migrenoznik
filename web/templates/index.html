@@ -24,14 +24,148 @@
 
             <div class="migre-v1-main">
                 <div class="migre-v1-main-diary">
-                    <div class="migre-v1-main-diary-wrapper" id="migre-diary-wrapper"></div>
+                    <div class="migre-v1-main-diary-wrapper" id="migre-now-wrapper" style="display: none;">
+                        <div class="migre-v1-main-card-titles-block">
+                            <h1>Мигрень сейчас</h1>
+                        </div>
+                        <div>
+                            <div class="migre-v1-main-now-item">
+                                <div class="migre-v1-main-now-item-suptitle">Начало мигрени</div>
+                                <div class="migre-v1-main-now-item-value">
+                                    <div class="migre-v1-main-now-item-value-const" id="migre-current-dt-start-value"></div>
+                                </div>
+                            </div>
+                            <div class="migre-v1-main-now-item">
+                                <div class="migre-v1-main-now-item-suptitle">Интенсивность</div>
+                                <div class="migre-v1-main-now-item-value">
+                                    <div class="migre-v1-main-now-item-value-scrollbar">
+                                        <div class="migre-v1-main-now-item-value-scrollbar-wrapper">
+                                            <input type="range" min="1" max="10" value="4" id="migre-current-strength-input" oninput="migraine_now_strength_Inputed(this.value)" onchange="migraine_now_strength_Changed(this.value)">
+                                        </div>
+                                        <div class="migre-v1-main-now-item-value-scrollbar-current" id="migre-current-strength-value">4</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="migre-v1-main-now-item">
+                                <div class="migre-v1-main-now-item-suptitle">Триггеры</div>
+                                <div class="migre-v1-main-now-item-value">
+                                    <div class="migre-v1-main-now-item-value-tags" id="migre-current-triggers">
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-trigger-0" onclick="toggle_trigger_Clicked(0, this)">Менструальный цикл</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-trigger-1" onclick="toggle_trigger_Clicked(1, this)">Стресс</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-trigger-2" onclick="toggle_trigger_Clicked(2, this)">Нарушение сна</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-trigger-3" onclick="toggle_trigger_Clicked(3, this)">Переутомление</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-trigger-4" onclick="toggle_trigger_Clicked(4, this)">Голод</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-trigger-5" onclick="toggle_trigger_Clicked(5, this)">Яркий свет</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-trigger-6" onclick="toggle_trigger_Clicked(6, this)">Громкие звуки</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-trigger-7" onclick="toggle_trigger_Clicked(7, this)">Сильные запахи</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-trigger-8" onclick="toggle_trigger_Clicked(8, this)">Кофеин</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-trigger-9" onclick="toggle_trigger_Clicked(9, this)">Алкоголь</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-trigger-10" onclick="toggle_trigger_Clicked(10, this)">Красное вино</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-trigger-11" onclick="toggle_trigger_Clicked(11, this)">Пиво</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-trigger-12" onclick="toggle_trigger_Clicked(12, this)">Темный шоколад</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-trigger-13" onclick="toggle_trigger_Clicked(13, this)">Твердый сыр</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-trigger-14" onclick="toggle_trigger_Clicked(14, this)">Цитрусы</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-trigger-15" onclick="toggle_trigger_Clicked(15, this)">Орехи</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-trigger-16" onclick="toggle_trigger_Clicked(16, this)">Консерванты</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-trigger-17" onclick="toggle_trigger_Clicked(17, this)">Погода</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-trigger-18" onclick="toggle_trigger_Clicked(18, this)">Препараты</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="migre-v1-main-now-item">
+                                <div class="migre-v1-main-now-item-suptitle">Симптомы</div>
+                                <div class="migre-v1-main-now-item-value">
+                                    <div class="migre-v1-main-now-item-value-tags" id="migre-current-symptoms">
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-symptom-0" onclick="toggle_symptom_Clicked(0, this)">чувствительность к свету</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-symptom-1" onclick="toggle_symptom_Clicked(1, this)">чувствительность к звуку</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-symptom-2" onclick="toggle_symptom_Clicked(2, this)">чувствительность к запаху</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-symptom-3" onclick="toggle_symptom_Clicked(3, this)">усталость</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-symptom-4" onclick="toggle_symptom_Clicked(4, this)">тяга к еде</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-symptom-5" onclick="toggle_symptom_Clicked(5, this)">отсутствие аппетита</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-symptom-6" onclick="toggle_symptom_Clicked(6, this)">перепады настроения</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-symptom-7" onclick="toggle_symptom_Clicked(7, this)">жажда</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-symptom-8" onclick="toggle_symptom_Clicked(8, this)">вздутие живота</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-symptom-9" onclick="toggle_symptom_Clicked(9, this)">тошнота</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-symptom-10" onclick="toggle_symptom_Clicked(10, this)">рвота</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-symptom-11" onclick="toggle_symptom_Clicked(11, this)">запор</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-symptom-12" onclick="toggle_symptom_Clicked(12, this)">диарея</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-symptom-13" onclick="toggle_symptom_Clicked(13, this)">черные точки перед глазами (аура)</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-symptom-14" onclick="toggle_symptom_Clicked(14, this)">волнистые линии перед глазами (аура)</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-symptom-15" onclick="toggle_symptom_Clicked(15, this)">вспышки света перед глазами (аура)</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-symptom-16" onclick="toggle_symptom_Clicked(16, this)">туннельное зрение (аура)</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-symptom-17" onclick="toggle_symptom_Clicked(17, this)">ухудшение зрения (аура)</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-symptom-18" onclick="toggle_symptom_Clicked(18, this)">покалывание некоторых частей тела (аура)</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-symptom-19" onclick="toggle_symptom_Clicked(19, this)">онемение некоторых частей тела (аура)</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-symptom-20" onclick="toggle_symptom_Clicked(20, this)">невозможность ясно выражать свои мысли (аура)</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-symptom-21" onclick="toggle_symptom_Clicked(21, this)">ощущение тяжести в конечностях (аура)</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-symptom-22" onclick="toggle_symptom_Clicked(22, this)">звон в ушах (аура)</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-symptom-23" onclick="toggle_symptom_Clicked(23, this)">изменения в обонянии (аура)</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-symptom-24" onclick="toggle_symptom_Clicked(24, this)">изменения во вкусе (аура)</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-symptom-25" onclick="toggle_symptom_Clicked(25, this)">изменения в осязании (аура)</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="migre-v1-main-now-item">
+                                <div class="migre-v1-main-now-item-suptitle">Принятые лекарства</div>
+                                <div class="migre-v1-main-now-item-value">
+                                    <div class="migre-v1-main-now-item-value-tags" id="migre-current-drugs">
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-drug-0" onclick="toggle_drug_Clicked(0, this)">Ацетилсалициловая кислота</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-drug-1" onclick="toggle_drug_Clicked(1, this)">Ибупрофен</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-drug-2" onclick="toggle_drug_Clicked(2, this)">Напроксен</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-drug-3" onclick="toggle_drug_Clicked(3, this)">Диклофенак</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-drug-4" onclick="toggle_drug_Clicked(4, this)">Парацетамол</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-drug-5" onclick="toggle_drug_Clicked(5, this)">Суматриптан</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-drug-6" onclick="toggle_drug_Clicked(6, this)">Декскетопрофен</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-drug-7" onclick="toggle_drug_Clicked(7, this)">Кеторолак</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-drug-8" onclick="toggle_drug_Clicked(8, this)">Магния сульфат</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-drug-9" onclick="toggle_drug_Clicked(9, this)">Дексаметазон</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-drug-10" onclick="toggle_drug_Clicked(10, this)">Метопролол</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-drug-11" onclick="toggle_drug_Clicked(11, this)">Пропранолол</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-drug-12" onclick="toggle_drug_Clicked(12, this)">Атенолол</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-drug-13" onclick="toggle_drug_Clicked(13, this)">Амитриптилин</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-drug-14" onclick="toggle_drug_Clicked(14, this)">Кандесартан</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-drug-15" onclick="toggle_drug_Clicked(15, this)">Метоклопрамид</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-drug-16" onclick="toggle_drug_Clicked(16, this)">Домперидон</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-drug-17" onclick="toggle_drug_Clicked(17, this)">Элетриптан</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-drug-18" onclick="toggle_drug_Clicked(18, this)">Золмитриптан</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-drug-19" onclick="toggle_drug_Clicked(19, this)">Хлорпромазин</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-drug-20" onclick="toggle_drug_Clicked(20, this)">Вальпроевая кислота</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-drug-21" onclick="toggle_drug_Clicked(21, this)">Топирамат</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-drug-22" onclick="toggle_drug_Clicked(22, this)">Фреманезумаб</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-drug-23" onclick="toggle_drug_Clicked(23, this)">Эренумаб</span>
+                                        <span class="migre-v1-main-now-item-value-tags-item" id="migre-drug-24" onclick="toggle_drug_Clicked(24, this)">Венлафаксин</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="migre-v1-main-diary-wrapper" id="migre-unspecified-entries-wrapper" style="display: none;">
+                        <div class="migre-v1-main-card-titles-block">
+                            <h1>У вас остались локальные данные</h1>
+                            <h2>Решите, что с ними сделать</h2>
+                        </div>
+                        <div id="migre-unspecified-diary-wrapper"></div>
+                    </div>
+
+                    <div class="migre-v1-main-diary-wrapper" id="migre-entries-wrapper">
+                        <div class="migre-v1-main-card-titles-block">
+                            <h1>Недавние записи</h1>
+                            <h2>Ваши последние записи мигрени</h2>
+                        </div>
+                        <div id="migre-diary-wrapper"></div>
+                    </div>
                 </div>
 
                 <div class="migre-v1-main-bottom">
                     <div class="migre-v1-main-bottom-row">
                         <div class="migre-v1-main-bottom-button-wrapper">
-                            <button class="migre-v1-main-bottom-button" id="migre-diary-main-bottom-button"
-                                onclick="migraine_now_button_Clicked()">Отметить мигрень сейчас</button>
+                            <button class="migre-v1-main-bottom-button" id="migre-diary-main-bottom-button-now"
+                                onclick="migraine_now_button_Clicked()">Отметить мигрень сейчас
+                            </button>
+                            <button class="migre-v1-main-bottom-button" data-square="true" id="migre-diary-main-bottom-button-add"
+                                onclick="migraine_now_button_Clicked()">+
+                            </button>
                         </div>
                     </div>
                 </div>

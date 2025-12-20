@@ -1,20 +1,3 @@
-
-class MigraineAttack {
-    constructor(local_id, dt_start, dt_end = null, id = null) {
-        this.LocalID = local_id;
-        this.DT_Start = dt_start;
-        this.DT_End = dt_end;
-    }
-
-    static from_json(obj) {
-        return new MigraineAttack(
-            obj["LocalID"] == null ? null : Number(obj["LocalID"]),
-            obj["DT_Start"] == null ? null : new Date(obj["DT_Start"]),
-            obj["DT_End"] == null ? null : new Date(obj["DT_End"]),
-        );
-    }
-}
-
 class MigrenoznikCore {
 
     /**
@@ -47,6 +30,7 @@ class MigrenoznikCore {
     get_migraine_attacks() {
         let migraine_attacks = localStorage.getItem("migraine_attacks");
         if (migraine_attacks == undefined) {
+            localStorage.setItem("migraine_attacks", JSON.stringify([]));
             return [];
         }
         try {
@@ -55,6 +39,9 @@ class MigrenoznikCore {
             for (const migraine_attack of migraine_attacks) {
                 migraine_attacks_obj.push(MigraineAttack.from_json(migraine_attack));
             }
+            migraine_attacks_obj.sort((a, b) => {
+                return new Date(b.DT_Start) - new Date(a.DT_Start);
+            });
             return migraine_attacks_obj;
         } catch (error) {
             return [];
@@ -62,24 +49,129 @@ class MigrenoznikCore {
     }
 
     /**
-     * Adds new migraine attack to the end of the list.
+     * Fetches remote migraine attacks from server and adds new ones to local storage.
      */
-    add_new_migraine_attack(migraine_attack) {
-        let migraine_attacks = localStorage.getItem("migraine_attacks");
-        if (migraine_attacks == undefined) {
-            localStorage.setItem("migraine_attacks", JSON.stringify([migraine_attack]));
+    async fetch_remote_migraine_attacks() {
+        let response = await fetch('https://migrenoznik.ru/api/entries');
+        if (!response.ok) {
+            throw new Error(`Ошибка HTTP: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        if (data["success"] == false) {
+            this.LoggedIn = false;
             return;
         }
+        this.LoggedIn = true;
+        let attacks = Core.get_migraine_attacks();
+        let new_attacks = [];
+        // костыль, пока Аня не переделала
+        for (let i = 0; i < data["entries"].length; i++) {
+            for (let j = 0; j < data["entries"][i]["Triggers"].length; j++) {
+                const element = data["entries"][i]["Triggers"][j];
+                for (let k = 0; k < MigraineTrigger.total_triggers(); k++) {
+                    if (MigraineTrigger.code_to_name(k) == element) {
+                        data["entries"][i]["Triggers"][j] = k;
+                    }
+                }
+            }
+            for (let j = 0; j < data["entries"][i]["Symptoms"].length; j++) {
+                const element = data["entries"][i]["Symptoms"][j];
+                for (let k = 0; k < MigraineSymptom.total_symptoms(); k++) {
+                    if (MigraineSymptom.code_to_name(k) == element) {
+                        data["entries"][i]["Symptoms"][j] = k;
+                    }
+                }
+            }
+            for (let j = 0; j < data["entries"][i]["Drugs"].length; j++) {
+                const element = data["entries"][i]["Drugs"][j];
+                for (let k = 0; k < MigraineDrug.total_drugs(); k++) {
+                    if (MigraineDrug.code_to_name(k) == element) {
+                        data["entries"][i]["Drugs"][j] = MigraineDrug.code_to_atx(k);
+                    }
+                }
+            }
+            
+            data["entries"][i]["DT_Start"] = `20${data["entries"][i]["DT_Start"].substring(6,8)}-${data["entries"][i]["DT_Start"].substring(3,5)}-${data["entries"][i]["DT_Start"].substring(0,2)}T00:00Z`;
+
+            // Конец костыля
+            let is_in_local_storage = false;
+            for (const attack of attacks) {
+                if (attack.ID == data["entries"][i]["ID"]) {
+                    is_in_local_storage = true;
+                    break;
+                }
+            }
+            if (!is_in_local_storage) {
+                console.log(data["entries"][i]);
+                console.log(MigraineAttack.from_json(data["entries"][i]));
+                new_attacks.push(MigraineAttack.from_json(data["entries"][i]));
+            }
+        }
+        attacks.push(...new_attacks);
+        localStorage.setItem("migraine_attacks", JSON.stringify(attacks));
+        compose_migraine_diary();
+    }
+
+    /**
+     * Clears local storage from entries that are already stored on remote server.
+     */
+    clear_local_storage_from_remote_entries() {
+        let attacks = this.get_migraine_attacks();
+        let only_local = [];
+        for (const attack of attacks) {
+            if (attack.ID == null) {
+                only_local.push(attack);
+            }
+        }
+        localStorage.setItem("migraine_attacks", JSON.stringify(only_local));
+    }
+
+    /**
+     * Returns current migraine attack object if any.
+     * @returns 
+     */
+    get_current_migraine_attack() {
+        let current_migraine_attack = localStorage.getItem("current_migraine_attack");
         try {
-            migraine_attacks = JSON.parse(migraine_attacks);
-            migraine_attacks.push(migraine_attack);
-            localStorage.setItem("migraine_attacks", JSON.stringify(migraine_attacks));
+            current_migraine_attack = JSON.parse(current_migraine_attack);
+            let current_migraine_attack_obj = MigraineAttack.from_json(current_migraine_attack);
+            return current_migraine_attack_obj;
         } catch (error) {
-            localStorage.setItem("migraine_attacks", JSON.stringify([migraine_attack]));
+            return undefined;
         }
     }
 
-    remove_migraine_attack(no) {
+    /**
+     * Assigns remote ID from server to migraine attack with given local ID.
+     * @param {*} local_id - local ID of migraine attack
+     * @param {*} id - remote ID from server
+     */
+    assign_id_to_migraine_attack(local_id, id) {
+        let attacks = this.get_migraine_attacks();
+        for (let i = 0; i < attacks.length; i++) {
+            if (attacks[i].LocalID == local_id) {
+                attacks[i].ID = id;
+                break;
+            }
+        }
+        localStorage.setItem("migraine_attacks", JSON.stringify(attacks));
+    }
+
+    /**
+     * Adds new migraine attack.
+     */
+    async add_new_migraine_attack(migraine_attack) {
+        /* Save to local storage */
+        localStorage.setItem("current_migraine_attack", JSON.stringify(migraine_attack));
+    }
+
+    /**
+     * Deletes migraine attack with given local ID from local storage.
+     * @param {*} local_id - local ID of migraine attack
+     * @returns 
+     */
+    remove_migraine_attack(local_id) {
         let migraine_attacks = localStorage.getItem("migraine_attacks");
         if (migraine_attacks == undefined) {
             localStorage.setItem("migraine_attacks", JSON.stringify([]));
@@ -87,13 +179,10 @@ class MigrenoznikCore {
         }
         try {
             migraine_attacks = JSON.parse(migraine_attacks);
-            if (migraine_attacks.length < no) {
-                return;
-            }
             let new_migraine_attacks = [];
             for (let i = 0; i < migraine_attacks.length; i++) {
-                const migraine_attack = migraine_attacks[i];
-                if (i != no) {
+                const migraine_attack = MigraineAttack.from_json(migraine_attacks[i]);
+                if (migraine_attack.LocalID != local_id) {
                     new_migraine_attacks.push(migraine_attack);
                 }
             }
@@ -103,25 +192,150 @@ class MigrenoznikCore {
         }
     }
 
-    close_last_migraine_attack() {
-        let migraine_attacks = localStorage.getItem("migraine_attacks");
-        if (migraine_attacks == undefined) {
-            return;
-        }
-        try {
-            migraine_attacks = JSON.parse(migraine_attacks);
-            let last_element = migraine_attacks.pop();
-            last_element["DT_End"] = new Date();
-            migraine_attacks.push(last_element);
-            localStorage.setItem("migraine_attacks", JSON.stringify(migraine_attacks));
-        } catch (error) {
-            return;
+    /**
+     * Sends migraine attack to remote server.
+     * @param {*} current - migraine attack to send
+     */
+    async send_migraine_attack(current) {
+        /* Save to remote storage */
+        let data = new FormData();
+        data.append("dt_start", current.DT_Start.getTime());
+        data.append("dt_end", current.DT_End.getTime());
+        data.append("strength", current.Strength);
+        data.append("triggers", JSON.stringify(current.Triggers));
+        data.append("symptoms", JSON.stringify(current.Symptoms));
+        data.append("drugs", JSON.stringify(current.Drugs.map(element => MigraineDrug.code_to_atx(element))));
+        
+        const response = await fetch('/api/add_entry', {
+            method: 'POST',
+            body: data,
+        });
+        
+        if (!response.ok) throw new Error(`Ошибка HTTP ${response.status}`);
+        
+        const result = await response.json();
+        if (result["success"]) {
+            this.assign_id_to_migraine_attack(current.LocalID, result["id"]);
+        } else if (result["error_code"] != 13) {
+            this.remove_migraine_attack(current.LocalID);
+            compose_migraine_diary();
         }
     }
 
+    /**
+     * Closes (saves as ended) current migraine attack.
+     */
+    async close_current_migraine_attack() {
+        let attacks = this.get_migraine_attacks();
+        let current = this.get_current_migraine_attack();
+        current.DT_End = new Date();
+        attacks.push(current);
+        localStorage.setItem("migraine_attacks", JSON.stringify(attacks));
+        localStorage.removeItem("current_migraine_attack");
+
+        /* Save to remote storage */
+        let data = new FormData();
+        data.append("dt_start", current.DT_Start.getTime());
+        data.append("dt_end", current.DT_End.getTime());
+        data.append("strength", current.Strength);
+        data.append("triggers", JSON.stringify(current.Triggers));
+        data.append("symptoms", JSON.stringify(current.Symptoms));
+        data.append("drugs", JSON.stringify(current.Drugs.map(element => MigraineDrug.code_to_atx(element))));
+        
+        const response = await fetch('/api/add_entry', {
+            method: 'POST',
+            body: data,
+        });
+        
+        if (!response.ok) throw new Error(`Ошибка HTTP ${response.status}`);
+        
+        const result = await response.json();
+        if (result["success"]) {
+            this.assign_id_to_migraine_attack(current.LocalID, result["id"]);
+        } else if (result["error_code"] != 13) {
+            this.remove_migraine_attack(current.LocalID);
+            compose_migraine_diary();
+        }
+    }
+
+    /**
+     * Changes strength of current migraine attack.
+     * @param {*} strength 
+     */
+    edit_strength_of_current_migraine_attack(strength) {
+        let current = this.get_current_migraine_attack();
+        current.Strength = strength;
+        localStorage.setItem("current_migraine_attack", JSON.stringify(current));
+    }
+
+    /**
+     * Adds trigger to current migraine attack.
+     * @param {*} trigger 
+     */
+    add_trigger_to_current_migraine_attack(trigger) {
+        let current = this.get_current_migraine_attack();
+        current.Triggers.push(trigger);
+        localStorage.setItem("current_migraine_attack", JSON.stringify(current));
+    }
+
+    /**
+     * Adds symptom to current migraine attack.
+     * @param {*} symptom 
+     */
+    add_symptom_to_current_migraine_attack(symptom) {
+        let current = this.get_current_migraine_attack();
+        current.Symptoms.push(symptom);
+        localStorage.setItem("current_migraine_attack", JSON.stringify(current));
+    }
+
+    /**
+     * Adds drug to current migraine attack.
+     * @param {*} symptom 
+     */
+    add_drug_to_current_migraine_attack(symptom) {
+        let current = this.get_current_migraine_attack();
+        current.Drugs.push(symptom);
+        localStorage.setItem("current_migraine_attack", JSON.stringify(current));
+    }
+
+    /**
+     * Deletes trigger from current migraine attack.
+     * @param {*} trigger 
+     */
+    remove_trigger_from_current_migraine_attack(trigger) {
+        let current = this.get_current_migraine_attack();
+        current.Triggers = current.Triggers.filter(item => item !== trigger);
+        localStorage.setItem("current_migraine_attack", JSON.stringify(current));
+    }
+
+    /**
+     * Deletes symptom from current migraine attack.
+     * @param {*} symptom 
+     */
+    remove_symptom_from_current_migraine_attack(symptom) {
+        let current = this.get_current_migraine_attack();
+        current.Symptoms = current.Symptoms.filter(item => item !== symptom);
+        localStorage.setItem("current_migraine_attack", JSON.stringify(current));
+    }
+
+    /**
+     * Deletes drug from current migraine attack.
+     * @param {*} symptom 
+     */
+    remove_drug_from_current_migraine_attack(symptom) {
+        let current = this.get_current_migraine_attack();
+        current.Drugs = current.Drugs.filter(item => item !== symptom);
+        localStorage.setItem("current_migraine_attack", JSON.stringify(current));
+    }
+
+    /**
+     * This function returns next autoincrement value for migraine attacks and increments it in storage.
+     * @returns 
+     */
     next_autoincrement() {
-        localStorage.setItem("migraine_attack_ai", this.MigraineAttackAI + 1);
-        return this.MigraineAttackAI++;
+        this.MigraineAttackAI++;
+        localStorage.setItem("migraine_attack_ai", this.MigraineAttackAI);
+        return this.MigraineAttackAI;
     }
 
     constructor() {
@@ -132,6 +346,7 @@ class MigrenoznikCore {
             this.MigraineAttackAI = 1;
             localStorage.setItem("migraine_attack_ai", 1);
         }
+        this.LoggedIn = false;
     }
 }
 
@@ -141,12 +356,26 @@ class MigrenoznikCore {
 function migraine_now_button_Clicked() {
     if (Core.is_migraine_now()) {
         Core.toggle_migraine_status();
-        Core.close_last_migraine_attack();
-        document.getElementById("migre-diary-main-bottom-button").innerText = "Отметить мигрень сейчас";
+        Core.close_current_migraine_attack();
+        configure_main_bottom_buttoms(false);
+        document.getElementById("migre-now-wrapper").style.display = 'none';
     } else {
         Core.toggle_migraine_status();
-        Core.add_new_migraine_attack(new MigraineAttack(Core.next_autoincrement(), new Date()));
-        document.getElementById("migre-diary-main-bottom-button").innerText = "Отметить конец мигрени";
+        for (let i = 0; i < MigraineTrigger.total_triggers(); i++) {
+            document.getElementById(`migre-trigger-${i}`).setAttribute("data-selected", false);
+        }
+        for (let i = 0; i < MigraineSymptom.total_symptoms(); i++) {
+            document.getElementById(`migre-symptom-${i}`).setAttribute("data-selected", false);
+        }
+        for (let i = 0; i < MigraineDrug.total_drugs(); i++) {
+            document.getElementById(`migre-drug-${i}`).setAttribute("data-selected", false);
+        }
+        let strength = document.getElementById("migre-current-strength-input").value;
+        Core.add_new_migraine_attack(new MigraineAttack(Core.next_autoincrement(), new Date(), strength));
+        configure_main_bottom_buttoms(true);
+        let now = new Date();
+        document.getElementById("migre-current-dt-start-value").innerHTML = `${now.getDate()} ${Calendar.month_number_to_name(now.getMonth())} ${now.getFullYear()} ${now.getHours() < 10 ? "0" : ""}${now.getHours()}:${now.getMinutes() < 10 ? "0" : ""}${now.getMinutes()}`;
+        display_migraine_now_block(true);
     }
     compose_migraine_diary();
 }
@@ -156,6 +385,9 @@ function login_Clicked() {
     //window.history.pushState(null, null, "/login/");
 }
 
+/**
+ * Onclick event of pressing the "Logout" button
+ */
 async function logout_Clicked() {
     try {
         let data = new FormData();
@@ -169,6 +401,7 @@ async function logout_Clicked() {
         
         const result = await response.json();
         if (result["success"]) {
+            Core.clear_local_storage_from_remote_entries();
             window.location.href = "/login/";
         }
 
@@ -191,30 +424,125 @@ function create_element(el_tag, el_class, el_id, el_html) {
     return elem;
 }
 
+/**
+ * Composes migraine diary on the main page.
+ */
 function compose_migraine_diary() {
     document.getElementById("migre-diary-wrapper").innerHTML = "";
+    document.getElementById("migre-unspecified-diary-wrapper").innerHTML = "";
     let migraine_attacks = Core.get_migraine_attacks();
     for (let i = 0; i < migraine_attacks.length; i++) {
         const migraine_attack = migraine_attacks[i];
+        let triggers = [];
+        for (const trigger of migraine_attack.Triggers) {
+            triggers.push(MigraineTrigger.code_to_name(trigger));
+        }
+        let symptoms = [];
+        for (const symptom of migraine_attack.Symptoms) {
+            symptoms.push(MigraineSymptom.code_to_name(symptom));
+        }
+        let drugs = [];
+        for (const drug of migraine_attack.Drugs) {
+            drugs.push(MigraineDrug.code_to_name(drug));
+        }
         let diary_item = create_element(
             "div",
-            "migre-v1-main-diary-item",
-            undefined,
-            `<b>Запись&nbsp;${i+1}.</b> ${migraine_attack.DT_Start.getDate()} ${Calendar.month_number_to_name(migraine_attack.DT_Start.getMonth())} ${migraine_attack.DT_Start.getFullYear()} ${migraine_attack.DT_Start.getHours() < 10 ? "0" : ""}${migraine_attack.DT_Start.getHours()}:${migraine_attack.DT_Start.getMinutes() < 10 ? "0" : ""}${migraine_attack.DT_Start.getMinutes()}`
+            "migre-v1-main-diary-item"
         );
-        if (migraine_attack.DT_End != null) {
-            diary_item.innerHTML += ` &ndash; ${migraine_attack.DT_End.getDate()} ${Calendar.month_number_to_name(migraine_attack.DT_End.getMonth())} ${migraine_attack.DT_End.getFullYear()} ${migraine_attack.DT_End.getHours() < 10 ? "0" : ""}${migraine_attack.DT_End.getHours()}:${migraine_attack.DT_End.getMinutes() < 10 ? "0" : ""}${migraine_attack.DT_End.getMinutes()}`;
-            diary_item.innerHTML += ` <a onclick=\"delete_entry_Clicked(${i})\">Удалить</a>`;
+        diary_item.appendChild(create_element(
+            "div",
+            "migre-v1-main-diary-item-basics",
+            undefined,
+            `<div class="migre-v1-main-diary-item-left"><img src="/static/assets/images/icons/calendar.svg">${Calendar.date_to_quick_format(migraine_attack.DT_Start)} &ndash; ${Calendar.date_to_quick_format(migraine_attack.DT_End)}</div>`
+        ));
+        diary_item.appendChild(create_element(
+            "div",
+            "migre-v1-main-diary-item-strength",
+            undefined,
+            `Интенсивность: <div class="migre-v1-main-diary-item-strength-visual" data-strength="${migraine_attack.Strength}"></div>${migraine_attack.Strength}/10`
+        ));
+        diary_item.appendChild(create_element(
+            "div",
+            "migre-v1-main-diary-item-triggers",
+            undefined,
+            `Триггеры: ${triggers.join(", ")}`
+        ));
+        diary_item.appendChild(create_element(
+            "div",
+            "migre-v1-main-diary-item-symptoms",
+            undefined,
+            `Симптомы: ${symptoms.join(", ")}`
+        ));
+        diary_item.appendChild(create_element(
+            "div",
+            "migre-v1-main-diary-item-drugs",
+            undefined,
+            `Препараты: ${drugs.join(", ")}`
+        ));
+        let delete_button = create_element(
+            "a",
+            undefined, undefined,
+            "Удалить"
+        );
+        delete_button.addEventListener("click", () => {
+            delete_entry_Clicked(migraine_attack.LocalID);
+        })
+        diary_item.appendChild(delete_button);
+        if (migraine_attack.ID == null && Core.LoggedIn == true) {
+            let save_button = create_element(
+                "a",
+                undefined, undefined,
+                "Сохранить"
+            );
+            save_button.addEventListener("click", () => {
+                Core.send_migraine_attack(migraine_attack);
+            })
+            diary_item.appendChild(save_button);
         }
-        document.getElementById("migre-diary-wrapper").appendChild(diary_item);
+        if (migraine_attack.ID != null || Core.LoggedIn == false) {
+            document.getElementById("migre-diary-wrapper").appendChild(diary_item);
+        } else {
+            document.getElementById("migre-unspecified-diary-wrapper").appendChild(diary_item);
+            document.getElementById("migre-unspecified-entries-wrapper").style.display = "block";
+        }
     }
 }
 
-function delete_entry_Clicked(no) {
-    Core.remove_migraine_attack(no);
-    compose_migraine_diary();
+/**
+ * Onclick event of pressing the "Delete" button on diary entry
+ * @param {*} local_id 
+ * @returns 
+ */
+async function delete_entry_Clicked(local_id) {
+    console.log(local_id);
+    let attacks = Core.get_migraine_attacks();
+    let attack_to_delete = null;
+    for (const attack of attacks) {
+        if (attack.LocalID == local_id) {
+            attack_to_delete = attack.ID;
+            break;
+        }
+    }
+    console.log(attack_to_delete);
+    if (attack_to_delete == null) {
+        Core.remove_migraine_attack(local_id);
+        return;
+    }
+    let response = await fetch(`https://migrenoznik.ru/api/delete_entry?id=${attack_to_delete}`);
+    if (!response.ok) {
+        throw new Error(`Ошибка HTTP: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    if (data["success"]) {
+        Core.remove_migraine_attack(local_id);
+        compose_migraine_diary();
+    }
 }
 
+/**
+ * Shows error box on logon/signup page or perform loggin/signup.
+ */
 async function login_button_Clicked() {
     const login = document.getElementsByName('login')[0].value;
     const password = document.getElementsByName('password')[0].value;
@@ -488,4 +816,68 @@ function play_animation_and_calm(element, animation, duration, func, delay = 0) 
     };
 }
 
+/**
+ * Oninput event of sliding current migraine strength input
+ * @param {*} value 
+ */
+function migraine_now_strength_Inputed(value) {
+    document.getElementById("migre-current-strength-value").innerHTML = value;
+}
+
+/**
+ * Onchange event of changing current migraine strength input
+ * @param {*} value 
+ */
+function migraine_now_strength_Changed(value) {
+    Core.edit_strength_of_current_migraine_attack(value);
+}
+
+/**
+ * Adds or removes trigger from current migraine attack
+ * @param {*} id 
+ * @param {*} item 
+ */
+function toggle_trigger_Clicked(id, item) {
+    let selected = item.getAttribute("data-selected") == "true";
+    if (selected) {
+        Core.remove_trigger_from_current_migraine_attack(id);
+    } else {
+        Core.add_trigger_to_current_migraine_attack(id);
+    }
+    item.setAttribute("data-selected", selected == false);
+}
+
+/**
+ * Adds or removes symptom from current migraine attack
+ * @param {*} id 
+ * @param {*} item 
+ */
+function toggle_symptom_Clicked(id, item) {
+    let selected = item.getAttribute("data-selected") == "true";
+    if (selected) {
+        Core.remove_symptom_from_current_migraine_attack(id);
+    } else {
+        Core.add_symptom_to_current_migraine_attack(id);
+    }
+    item.setAttribute("data-selected", selected == false);
+}
+
+/**
+ * Adds or removes drug from current migraine attack
+ * @param {*} id 
+ * @param {*} item 
+ */
+function toggle_drug_Clicked(id, item) {
+    let selected = item.getAttribute("data-selected") == "true";
+    if (selected) {
+        Core.remove_drug_from_current_migraine_attack(id);
+    } else {
+        Core.add_drug_to_current_migraine_attack(id);
+    }
+    item.setAttribute("data-selected", selected == false);
+}
+
+/**
+ * Creating singleton instance of MigrenoznikCore
+ */
 const Core = new MigrenoznikCore();
