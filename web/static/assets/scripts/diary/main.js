@@ -60,6 +60,7 @@ class MigrenoznikCore {
         const data = await response.json();
         if (data["success"] == false) {
             this.LoggedIn = false;
+            Core.clear_local_storage_from_remote_entries();
             return;
         }
         this.LoggedIn = true;
