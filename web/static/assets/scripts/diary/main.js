@@ -514,7 +514,6 @@ function compose_migraine_diary() {
  * @returns 
  */
 async function delete_entry_Clicked(local_id) {
-    console.log(local_id);
     let attacks = Core.get_migraine_attacks();
     let attack_to_delete = null;
     for (const attack of attacks) {
@@ -523,9 +522,9 @@ async function delete_entry_Clicked(local_id) {
             break;
         }
     }
-    console.log(attack_to_delete);
     if (attack_to_delete == null) {
         Core.remove_migraine_attack(local_id);
+        compose_migraine_diary();
         return;
     }
     let response = await fetch(`https://migrenoznik.ru/api/delete_entry?id=${attack_to_delete}`);
