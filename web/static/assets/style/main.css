@@ -377,3 +377,7 @@ body {
 .migre-v1-main-diary-item-strength-visual[data-strength="10"] {
     background-color: #FF0000;
 }
+
+.migre-v1-main-card-big-digit-digit {
+    font-size: 40px;
+}
