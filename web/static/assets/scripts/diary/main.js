@@ -433,18 +433,6 @@ function compose_migraine_diary() {
     let migraine_attacks = Core.get_migraine_attacks();
     for (let i = 0; i < migraine_attacks.length; i++) {
         const migraine_attack = migraine_attacks[i];
-        let triggers = [];
-        for (const trigger of migraine_attack.Triggers) {
-            triggers.push(MigraineTrigger.code_to_name(trigger));
-        }
-        let symptoms = [];
-        for (const symptom of migraine_attack.Symptoms) {
-            symptoms.push(MigraineSymptom.code_to_name(symptom));
-        }
-        let drugs = [];
-        for (const drug of migraine_attack.Drugs) {
-            drugs.push(MigraineDrug.code_to_name(drug));
-        }
         let diary_item = create_element(
             "div",
             "migre-v1-main-diary-item"
@@ -461,24 +449,9 @@ function compose_migraine_diary() {
             undefined,
             `Интенсивность: <div class="migre-v1-main-diary-item-strength-visual" data-strength="${migraine_attack.Strength}"></div>${migraine_attack.Strength}/10`
         ));
-        diary_item.appendChild(create_element(
-            "div",
-            "migre-v1-main-diary-item-triggers",
-            undefined,
-            `Триггеры: ${triggers.join(", ")}`
-        ));
-        diary_item.appendChild(create_element(
-            "div",
-            "migre-v1-main-diary-item-symptoms",
-            undefined,
-            `Симптомы: ${symptoms.join(", ")}`
-        ));
-        diary_item.appendChild(create_element(
-            "div",
-            "migre-v1-main-diary-item-drugs",
-            undefined,
-            `Препараты: ${drugs.join(", ")}`
-        ));
+        diary_item.appendChild(el_diary_triggers_block(migraine_attack.Triggers));
+        diary_item.appendChild(el_diary_symptoms_block(migraine_attack.Symptoms));
+        diary_item.appendChild(el_diary_drugs_block(migraine_attack.Drugs));
         let delete_button = create_element(
             "a",
             undefined, undefined,
