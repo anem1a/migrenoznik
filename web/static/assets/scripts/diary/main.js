@@ -159,6 +159,27 @@ class MigrenoznikCore {
         localStorage.setItem("migraine_attacks", JSON.stringify(attacks));
     }
 
+    set_attack_status(local_id, status) {
+        let attacks = this.get_migraine_attacks();
+        for (let i = 0; i < attacks.length; i++) {
+            if (attacks[i].LocalID == local_id) {
+                attacks[i].Status = status;
+                break;
+            }
+        }
+        localStorage.setItem("migraine_attacks", JSON.stringify(attacks));
+    }
+
+    updateAttack(local_id, updates) {
+        const attacks = this.get_migraine_attacks();
+        const index = attacks.findIndex(attack => attack.LocalID == local_id);
+        
+        if (index !== -1) {
+            attacks[index] = { ...attacks[index], ...updates };
+            localStorage.setItem("migraine_attacks", JSON.stringify(attacks));
+        }
+    }
+
     /**
      * Adds new migraine attack.
      */
@@ -230,6 +251,7 @@ class MigrenoznikCore {
         let attacks = this.get_migraine_attacks();
         let current = this.get_current_migraine_attack();
         current.DT_End = new Date();
+        current.Status = "PENDING_SERVER_CREATING";
         attacks.push(current);
         localStorage.setItem("migraine_attacks", JSON.stringify(attacks));
         localStorage.removeItem("current_migraine_attack");
@@ -252,9 +274,13 @@ class MigrenoznikCore {
         
         const result = await response.json();
         if (result["success"]) {
-            this.assign_id_to_migraine_attack(current.LocalID, result["id"]);
-        } else if (result["error_code"] != 13) {
+            this.updateAttack(current.LocalID, { ID: result["id"], Status: "BACKED_UP" });
+        } else if (result["error_code"] == 13) {
+            this.updateAttack(current.LocalID, { Status: "FAILED_SERVER_CREATING" });
+            compose_migraine_diary();
+        } else {
             this.remove_migraine_attack(current.LocalID);
+            //this.updateAttack(current.LocalID, { Status: "FAILED_SERVER_CREATING" });
             compose_migraine_diary();
         }
     }
@@ -462,7 +488,7 @@ function compose_migraine_diary() {
             delete_entry_Clicked(migraine_attack.LocalID);
         })
         diary_item.appendChild(delete_button);
-        if (migraine_attack.ID == null && Core.LoggedIn == true) {
+        if (migraine_attack.Status == "LOCAL_ONLY" && Core.LoggedIn == true) {
             let save_button = create_element(
                 "a",
                 undefined, undefined,
@@ -473,7 +499,7 @@ function compose_migraine_diary() {
             })
             diary_item.appendChild(save_button);
         }
-        if (migraine_attack.ID != null || Core.LoggedIn == false) {
+        if (migraine_attack.Status != "LOCAL_ONLY" || Core.LoggedIn == false) {
             document.getElementById("migre-diary-wrapper").appendChild(diary_item);
         } else {
             document.getElementById("migre-unspecified-diary-wrapper").appendChild(diary_item);
