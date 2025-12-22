@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded',
         document.getElementById("migre-statistics-wrapper").style.display = "block";
         document.getElementById("migre-currency-rub").innerHTML = conjugate_word(total_cost, "рубль", "рубля", "рублей");
         document.getElementById("migre-currency-usd").innerHTML = conjugate_word(total_cost, "доллар", "доллара", "долларов");
-        document.getElementById("migre-currency-dem").innerHTML = conjugate_word(total_cost, "нем. марка", "нем. марки", "нем. марок");
+        document.getElementById("migre-currency-dem").innerHTML = conjugate_word(new_currency, "фунт стерлингов", "фунта стерлингов", "фунтов стерлингов");
     }
 );
 
@@ -70,7 +70,7 @@ function random_cost(str) {
 /**
  * ЦБРФ
  */
-function currency_select() {
+async function currency_select() {
     let index = document.getElementById("migre-currency-select").selectedIndex;
     let currency = "null";
     switch (index) {
@@ -84,7 +84,7 @@ function currency_select() {
             currency = "eur";
             break;
         case 3:
-            currency = "dem";
+            currency = "gbp";
             break;
     }
     let attacks = Core.get_migraine_attacks();
@@ -94,24 +94,27 @@ function currency_select() {
             total_cost += random_cost(drug);
         }
     }
-    let new_currency = Math.round(convert_rub_to_another(total_cost, currency));
+    console.log(currency);
+    document.getElementById("migre-drugs-cost").innerHTML = "...";
+    let new_currency = await convert_rub_to_another(total_cost, currency);
+    new_currency = Math.round(Number(new_currency) * 100) / 100;
     document.getElementById("migre-drugs-cost").innerHTML = new_currency;
     document.getElementById("migre-statistics-wrapper").style.display = "block";
     document.getElementById("migre-currency-rub").innerHTML = conjugate_word(new_currency, "рубль", "рубля", "рублей");
     document.getElementById("migre-currency-usd").innerHTML = conjugate_word(new_currency, "доллар", "доллара", "долларов");
-    document.getElementById("migre-currency-dem").innerHTML = conjugate_word(new_currency, "нем. марка", "нем. марки", "нем. марок");
+    document.getElementById("migre-currency-dem").innerHTML = conjugate_word(new_currency, "фунт стерлингов", "фунта стерлингов", "фунтов стерлингов");
 
 }
 
-function convert_rub_to_another(cost, currency) {
-    switch (currency) {
-        case "rub":
-            return cost;
-        case "usd":
-            return cost / 90;
-        case "eur":
-            return cost / 80;
-        case "dem":
-            return cost / 12;
+async function convert_rub_to_another(cost, currency) {
+    if (currency == "rub") {
+        return cost;
     }
+    let response = await fetch(`https://migrenoznik.ru/api/convert?rub=${cost}&currency=${currency}`);
+    if (!response.ok) {
+        throw new Error(`Ошибка HTTP: ${response.status}`);
+    }
+    
+    const data = await response.text();
+    return data;
 }
