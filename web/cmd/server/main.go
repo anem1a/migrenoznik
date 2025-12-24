@@ -16,7 +16,7 @@ import (
 	"migrenoznik/cmd/server/global"
 	"migrenoznik/cmd/server/handlers"
 	"migrenoznik/cmd/server/pages"
-	"migrenoznik/cmd/server/telegram"
+	// "migrenoznik/cmd/server/telegram"
 
 	_ "github.com/lib/pq"
 )
@@ -64,31 +64,33 @@ func main() {
 	mux.HandleFunc("/api/delete_entry", handlers.DeleteEntryHandler)
 	mux.HandleFunc("/api/convert", handlers.ConvertHandler)
 	mux.HandleFunc("/api/address", handlers.AddressHandler)
+	mux.HandleFunc("/api/med", handlers.MedicalHandler)
+	
 
 	// HTTPS сервер
-	go func() {
-		log.Println("🚀 HTTPS сервер запущен на https://migrenoznik.ru")
-		err := http.ListenAndServeTLS(
-			":443",
-			"/etc/letsencrypt/live/migrenoznik.ru/fullchain.pem",
-			"/etc/letsencrypt/live/migrenoznik.ru/privkey.pem",
-			mux,
-		)
-		if err != nil {
-			log.Fatal("Ошибка HTTPS сервера:", err)
-		}
-	}()
+	// go func() {
+	// 	log.Println("🚀 HTTPS сервер запущен на https://migrenoznik.ru")
+	// 	err := http.ListenAndServeTLS(
+	// 		":443",
+	// 		"/etc/letsencrypt/live/migrenoznik.ru/fullchain.pem",
+	// 		"/etc/letsencrypt/live/migrenoznik.ru/privkey.pem",
+	// 		mux,
+	// 	)
+	// 	if err != nil {
+	// 		log.Fatal("Ошибка HTTPS сервера:", err)
+	// 	}
+	// }()
 
-	// Запуск Telegram-бота
-	go telegram.StartReminderBot()
+	// // Запуск Telegram-бота
+	// go telegram.StartReminderBot()
 
-	// HTTP → HTTPS редирект
-	log.Println("➡️ HTTP сервер запущен (редиректит на HTTPS)")
-	log.Fatal(http.ListenAndServe(":80", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "https://"+r.Host+r.RequestURI, http.StatusMovedPermanently)
-	})))
+	// // HTTP → HTTPS редирект
+	// log.Println("➡️ HTTP сервер запущен (редиректит на HTTPS)")
+	// log.Fatal(http.ListenAndServe(":80", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	// 	http.Redirect(w, r, "https://"+r.Host+r.RequestURI, http.StatusMovedPermanently)
+	// })))
 
 	// Локальный HTTP сервер для разработки
-	// log.Println("🚀 Сервер запущен на http://localhost:8080")
-	// log.Fatal(http.ListenAndServe(":8080", mux))
+	log.Println("🚀 Сервер запущен на http://localhost:8080")
+	log.Fatal(http.ListenAndServe(":8080", mux))
 }
