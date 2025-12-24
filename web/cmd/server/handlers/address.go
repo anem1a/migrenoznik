@@ -22,12 +22,14 @@ type dadataResponse struct {
 }
 
 func AddressHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
 	query := r.URL.Query().Get("query")
 	if query == "" {
 		log.Println("Пустой query в запросе к DaData")
-		w.Write([]byte("nil"))
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"values": nil,
+		})
 		return
 	}
 
@@ -40,7 +42,9 @@ func AddressHandler(w http.ResponseWriter, r *http.Request) {
 		strings.NewReader(string(reqBody)))
 	if err != nil {
 		log.Println("Ошибка создания запроса к DaData:", err)
-		w.Write([]byte("nil"))
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"values": nil,
+		})
 		return
 	}
 
@@ -52,7 +56,9 @@ func AddressHandler(w http.ResponseWriter, r *http.Request) {
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Println("Ошибка запроса к DaData:", err)
-		w.Write([]byte("nil"))
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"values": nil,
+		})
 		return
 	}
 
@@ -61,15 +67,26 @@ func AddressHandler(w http.ResponseWriter, r *http.Request) {
 	var data dadataResponse
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		log.Println("Dadata decode error:", err)
-		w.Write([]byte("nil"))
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"values": nil,
+		})
 		return
 	}
 
 	if len(data.Suggestions) == 0 {
-		w.Write([]byte("nil"))
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"values": nil,
+		})
 		return
 	}
 
-	w.Write([]byte(data.Suggestions[0].Value))
+	values := make([]string, 0, len(data.Suggestions))
+	for _, s := range data.Suggestions {
+		values = append(values, s.Value)
+	}
+
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"values":  values,
+	})
 
 }
