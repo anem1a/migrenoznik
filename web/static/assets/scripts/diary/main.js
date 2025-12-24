@@ -251,10 +251,19 @@ class MigrenoznikCore {
         let attacks = this.get_migraine_attacks();
         let current = this.get_current_migraine_attack();
         current.DT_End = new Date();
-        current.Status = "PENDING_SERVER_CREATING";
+        if (this.LoggedIn) {
+            current.Status = "PENDING_SERVER_CREATING";
+        } else {
+            current.Status = "LOCAL_ONLY";
+        }
         attacks.push(current);
         localStorage.setItem("migraine_attacks", JSON.stringify(attacks));
         localStorage.removeItem("current_migraine_attack");
+
+        if (!this.LoggedIn) {
+            compose_migraine_diary();
+            return;
+        }
 
         /* Save to remote storage */
         let data = new FormData();
@@ -498,6 +507,9 @@ function compose_migraine_diary() {
                 Core.send_migraine_attack(migraine_attack);
             })
             diary_item.appendChild(save_button);
+        } else {
+            console.log(migraine_attack.Status);
+            console.log(Core.LoggedIn);
         }
         if (migraine_attack.Status != "LOCAL_ONLY" || Core.LoggedIn == false) {
             document.getElementById("migre-diary-wrapper").appendChild(diary_item);
