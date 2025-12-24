@@ -23,6 +23,52 @@ function patient() {
             }
         })
         .catch(error => {
-            alert('Произошла ошибка: ' + error.message);
+            alert('Такого пользователя нет');
+        });
+}
+
+function address_input() {
+    const bracketIndex = document.getElementById("address").value.indexOf('[');
+    
+    if (bracketIndex != -1) {
+        document.getElementById("address").value = document.getElementById("address").value.substring(0, bracketIndex - 1);
+        return;
+    }
+    
+    fetch(`https://migrenoznik.ru/api/address?query=${document.getElementById("address").value}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Ошибка сети: ' + response.status);
+            }
+            return response.json();
+        })
+        .then(data => {
+            document.getElementById("address-suggestions").innerHTML = "";
+            for (const entry of data["values"]) {
+                document.getElementById("address-suggestions").innerHTML += `<option value="${entry} [${document.getElementById("address").value}]">`;
+            }
+        });
+}
+
+function med_input() {
+    const bracketIndex = document.getElementById("med").value.indexOf('[');
+    
+    if (bracketIndex != -1) {
+        document.getElementById("med").value = document.getElementById("med").value.substring(0, bracketIndex - 1);
+        return;
+    }
+    
+    fetch(`https://migrenoznik.ru/api/med?query=${document.getElementById("med").value}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Ошибка сети: ' + response.status);
+            }
+            return response.json();
+        })
+        .then(data => {
+            document.getElementById("med-suggestions").innerHTML = "";
+            for (const entry of data["values"]) {
+                document.getElementById("med-suggestions").innerHTML += `<option value="${entry} [${document.getElementById("med").value}]">`;
+            }
         });
 }
