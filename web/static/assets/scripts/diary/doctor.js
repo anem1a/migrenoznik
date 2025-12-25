@@ -8,18 +8,22 @@ function patient() {
         })
         .then(data => {
             document.getElementById("migre-table").innerHTML = `<tr>
-            <th>Дата</th>
-            <th>Длительность</th>
-            <th>Интенсивность</th>
-            <th>Триггеры</th>
-        </tr>`;
+                <th>Дата</th>
+                <th>Длительность</th>
+                <th>Интенсивность</th>
+                <th>Триггеры</th>
+                <th>Симптомы</th>
+                <th>Препараты</th>
+            </tr>`;
             for (const entry of data["entries"]) {
                 document.getElementById("migre-table").innerHTML += `<tr>
-                <td>${entry["DT_Start"]}</td>
-                <td>${entry["Duration"]} ч.</td>
-                <td>${entry["Strength"]}/10</td>
-                <td>${entry["Triggers"].join(", ")}</td>
-            </tr>`;
+                    <td>${entry["DT_Start"]}</td>
+                    <td>${entry["Duration"]} ч.</td>
+                    <td>${entry["Strength"]}/10</td>
+                    <td>${entry["Triggers"].join(", ")}</td>
+                    <td>${entry["Symptoms"].join(", ")}</td>
+                    <td>${entry["Drugs"].join(", ")}</td>
+                </tr>`;
             }
         })
         .catch(error => {
