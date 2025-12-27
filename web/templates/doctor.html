@@ -1,0 +1,79 @@
+{{ define "doctor.html" }}
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' http: data: https://fonts.googleapis.com https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline';">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Play:wght@400;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/static/assets/style/doctor.css">
+
+    <link rel="icon" type="image/png" sizes="120x120" href="/static/assets/images/favicons/favicon-120x120.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/assets/images/favicons/apple-180x180.png">
+
+    <script src="/static/assets/scripts/diary/doctor.js"></script>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0">
+    <meta name="keywords" content="дневник мигрени, мигренозник, дневник">
+    <meta name="description" content="Мигренозник — дневник мигрени">
+    <link rel="manifest" href="/static/manifest.json" crossorigin="use-credentials">
+
+    <title>Кабинет врача</title>
+</head>
+
+<body>
+    <div class="migre-v1-content">
+        <div class="migre-v1-container">
+
+            <div class="migre-doctor-search-wrapper">
+                <input type="text" id="migre-login" placeholder="Логин">
+                <button onclick="patient()">Посмотреть</button>
+            </div>
+
+            <div class="migre-doctor-table-wrapper">
+                <table>
+                    <caption></caption>
+                    <tbody id="migre-table">
+                    </tbody>
+                </table>
+
+            </div>
+
+            <div class="migre-doctor-appointment">
+                <h1>Вызов врача</h1>
+                <div>
+                    <input style="width: 500px" type="text" id="login" placeholder="Логин в телеграме">
+                </div>
+                <br>
+                <div>
+                    <input style="width: 500px" type="text" id="address" list="address-suggestions" placeholder="Адрес" oninput="address_input()">
+                    <datalist id="address-suggestions">
+                    </datalist>
+                </div>
+                <br>
+                <div>
+                    <input style="width: 500px" type="text" id="med" list="med-suggestions" placeholder="Врач" oninput="med_input()">
+                    <datalist id="med-suggestions">
+                    </datalist>
+                </div>
+                <br>
+                <div>
+                    <input type="date" id="date">
+                    <input type="time" id="time">
+                </div>
+                <br>
+                <div>
+                    <button onclick="enroll();">Записаться</button>
+                </div>
+            </div>
+ 
+        </div>
+    </div>
+</body>
+
+</html>
+{{ end }}

@@ -1,0 +1,36 @@
+.migre-v1-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    align-items: center;
+    flex-direction: column;
+}
+
+.migre-doctor-search-wrapper input {
+    font-family: "Play", sans-serif;
+    font-size: 24px;
+    outline: none;
+    border: none;
+    border-bottom: 1px solid black;
+}
+
+.migre-doctor-search-wrapper button {
+    font-family: "Play", sans-serif;
+    font-size: 18px;
+    padding: 5px 10px;
+    background-color: black;
+    color: white;
+    outline: none;
+    border: none;
+    border-radius: 8px;
+}
+
+.migre-doctor-search-wrapper {
+    margin-bottom: 25px;
+    margin-top: 25px;
+}
+
+.migre-doctor-table-wrapper table {
+    font-family: "Play", sans-serif;
+    font-size: 18px;
+}

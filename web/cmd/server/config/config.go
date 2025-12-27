@@ -15,7 +15,7 @@ func GetDBConfig() DBConfig {
 		Host:     "oferolefket.beget.app",
 		Port:     5432,
 		User:     "anna",
-		Password: "",
+		Password: "He%aim!Bu!l3",
 		DBName:   "migrenoznik",
 	}
 }
