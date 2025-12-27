@@ -78,21 +78,35 @@ function med_input() {
 }
 
 async function enroll() {
-    let data = new FormData();
-    data.append("address", document.getElementById("address").value);
-    data.append("med", document.getElementById("med").value);
-    data.append("date", document.getElementById("date").value);
-    data.append("time", document.getElementById("time").value);
-    data.append("login", document.getElementById("login").value);
+    // let data = new FormData();
+    // data.append("address", document.getElementById("address").value);
+    // data.append("med", document.getElementById("med").value);
+    // data.append("date", document.getElementById("date").value);
+    // data.append("time", document.getElementById("time").value);
+    // data.append("login", document.getElementById("login").value);
     
-    const response = await fetch('/api/enroll', {
-        method: 'POST',
-        body: data,
-    });
+    // const response = await fetch('/api/enroll', {
+    //     method: 'POST',
+    //     body: data,
+    // });
+
+    fetch("https://migrenoznik.ru/api/enroll", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            address: document.getElementById("address").value,
+            med: document.getElementById("med").value,
+            date: document.getElementById("date").value,
+            time: document.getElementById("time").value,
+            login: document.getElementById("login").value
+        })
+        });
     
-    if (!response.ok) throw new Error(`Ошибка HTTP ${response.status}`);
+    // if (!response.ok) throw new Error(`Ошибка HTTP ${response.status}`);
     
-    const result = await response.json();
+    // const result = await response.json();
     // if (result["success"]) {
     //     this.assign_id_to_migraine_attack(current.LocalID, result["id"]);
     // } else {
