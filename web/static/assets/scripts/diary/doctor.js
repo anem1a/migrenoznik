@@ -76,3 +76,27 @@ function med_input() {
             }
         });
 }
+
+async function enroll() {
+    let data = new FormData();
+    data.append("address", document.getElementById("address").value);
+    data.append("med", document.getElementById("med").value);
+    data.append("date", document.getElementById("date").value);
+    data.append("time", document.getElementById("time").value);
+    data.append("login", document.getElementById("login").value);
+    
+    const response = await fetch('/api/enroll', {
+        method: 'POST',
+        body: data,
+    });
+    
+    if (!response.ok) throw new Error(`Ошибка HTTP ${response.status}`);
+    
+    const result = await response.json();
+    // if (result["success"]) {
+    //     this.assign_id_to_migraine_attack(current.LocalID, result["id"]);
+    // } else {
+    //     this.remove_migraine_attack(current.LocalID);
+    //     compose_migraine_diary();
+    // }
+}

@@ -46,6 +46,10 @@
             <div class="migre-doctor-appointment">
                 <h1>Вызов врача</h1>
                 <div>
+                    <input style="width: 500px" type="text" id="login" placeholder="Логин в телеграме">
+                </div>
+                <br>
+                <div>
                     <input style="width: 500px" type="text" id="address" list="address-suggestions" placeholder="Адрес" oninput="address_input()">
                     <datalist id="address-suggestions">
                     </datalist>
@@ -55,6 +59,15 @@
                     <input style="width: 500px" type="text" id="med" list="med-suggestions" placeholder="Врач" oninput="med_input()">
                     <datalist id="med-suggestions">
                     </datalist>
+                </div>
+                <br>
+                <div>
+                    <input type="date" id="date">
+                    <input type="time" id="time">
+                </div>
+                <br>
+                <div>
+                    <button onclick="enroll();">Записаться</button>
                 </div>
             </div>
  
