@@ -17,7 +17,7 @@ class MigraineAttack {
             obj["DT_Start"] == null ? null : new Date(obj["DT_Start"]),
             obj["Strength"] == null ? null : Number(obj["Strength"]),
             obj["DT_End"] == null ? (obj["Duration"] == null ? null : new Date(obj["DT_Start"])) : new Date(obj["DT_End"]),
-            obj["Triggers"] == null ? [] : obj["Triggers"],
+            obj["Triggers"] == null ? [] : obj["Triggers"].map(code => new MigraineTrigger(code)),
             obj["Symptoms"] == null ? [] : obj["Symptoms"],
             obj["Drugs"] == null ? [] : obj["Drugs"],
             obj["ID"] == null ? null : Number(obj["ID"]),
