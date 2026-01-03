@@ -24,6 +24,23 @@
 
             <div class="migre-v1-main">
                 <div class="migre-v1-main-diary">
+                    <div class="migre-v1-main-diary-wrapper" id="migre-statistics-wrapper" style="display: none;">
+                        <div class="migre-v1-main-card-titles-block">
+                            <h1>Текущий месяц</h1>
+                        </div>
+                        <div class="migre-v1-main-card-big-digit">
+                            <div class="migre-v1-main-card-big-digit-digit" id="migre-drugs-cost">X</div>
+                            <div class="migre-v1-main-card-big-digit-sub">
+                                <select name="" id="migre-currency-select" oninput="currency_select()">
+                                    <option id="migre-currency-rub" selected value="rub">рублей</option>
+                                    <option id="migre-currency-usd" value="usd">долларов</option>
+                                    <option id="migre-currency-eur" value="eur">евро</option>
+                                    <option id="migre-currency-dem" value="gpb">фунтов стерлингов</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="migre-v1-main-diary-wrapper" id="migre-now-wrapper" style="display: none;">
                         <div class="migre-v1-main-card-titles-block">
                             <h1>Мигрень сейчас</h1>

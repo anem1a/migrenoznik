@@ -60,6 +60,7 @@ class MigrenoznikCore {
         const data = await response.json();
         if (data["success"] == false) {
             this.LoggedIn = false;
+            Core.clear_local_storage_from_remote_entries();
             return;
         }
         this.LoggedIn = true;
@@ -158,6 +159,27 @@ class MigrenoznikCore {
         localStorage.setItem("migraine_attacks", JSON.stringify(attacks));
     }
 
+    set_attack_status(local_id, status) {
+        let attacks = this.get_migraine_attacks();
+        for (let i = 0; i < attacks.length; i++) {
+            if (attacks[i].LocalID == local_id) {
+                attacks[i].Status = status;
+                break;
+            }
+        }
+        localStorage.setItem("migraine_attacks", JSON.stringify(attacks));
+    }
+
+    updateAttack(local_id, updates) {
+        const attacks = this.get_migraine_attacks();
+        const index = attacks.findIndex(attack => attack.LocalID == local_id);
+        
+        if (index !== -1) {
+            attacks[index] = { ...attacks[index], ...updates };
+            localStorage.setItem("migraine_attacks", JSON.stringify(attacks));
+        }
+    }
+
     /**
      * Adds new migraine attack.
      */
@@ -229,9 +251,19 @@ class MigrenoznikCore {
         let attacks = this.get_migraine_attacks();
         let current = this.get_current_migraine_attack();
         current.DT_End = new Date();
+        if (this.LoggedIn) {
+            current.Status = "PENDING_SERVER_CREATING";
+        } else {
+            current.Status = "LOCAL_ONLY";
+        }
         attacks.push(current);
         localStorage.setItem("migraine_attacks", JSON.stringify(attacks));
         localStorage.removeItem("current_migraine_attack");
+
+        if (!this.LoggedIn) {
+            compose_migraine_diary();
+            return;
+        }
 
         /* Save to remote storage */
         let data = new FormData();
@@ -251,9 +283,13 @@ class MigrenoznikCore {
         
         const result = await response.json();
         if (result["success"]) {
-            this.assign_id_to_migraine_attack(current.LocalID, result["id"]);
-        } else if (result["error_code"] != 13) {
+            this.updateAttack(current.LocalID, { ID: result["id"], Status: "BACKED_UP" });
+        } else if (result["error_code"] == 13) {
+            this.updateAttack(current.LocalID, { Status: "FAILED_SERVER_CREATING" });
+            compose_migraine_diary();
+        } else {
             this.remove_migraine_attack(current.LocalID);
+            //this.updateAttack(current.LocalID, { Status: "FAILED_SERVER_CREATING" });
             compose_migraine_diary();
         }
     }
@@ -492,18 +528,6 @@ function compose_migraine_diary() {
     let migraine_attacks = Core.get_migraine_attacks();
     for (let i = 0; i < migraine_attacks.length; i++) {
         const migraine_attack = migraine_attacks[i];
-        let triggers = [];
-        for (const trigger of migraine_attack.Triggers) {
-            triggers.push(MigraineTrigger.code_to_name(trigger));
-        }
-        let symptoms = [];
-        for (const symptom of migraine_attack.Symptoms) {
-            symptoms.push(MigraineSymptom.code_to_name(symptom));
-        }
-        let drugs = [];
-        for (const drug of migraine_attack.Drugs) {
-            drugs.push(MigraineDrug.code_to_name(drug));
-        }
         let diary_item = create_element(
             "div",
             "migre-v1-main-diary-item"
@@ -520,24 +544,9 @@ function compose_migraine_diary() {
             undefined,
             `Интенсивность: <div class="migre-v1-main-diary-item-strength-visual" data-strength="${migraine_attack.Strength}"></div>${migraine_attack.Strength}/10`
         ));
-        diary_item.appendChild(create_element(
-            "div",
-            "migre-v1-main-diary-item-triggers",
-            undefined,
-            `Триггеры: ${triggers.join(", ")}`
-        ));
-        diary_item.appendChild(create_element(
-            "div",
-            "migre-v1-main-diary-item-symptoms",
-            undefined,
-            `Симптомы: ${symptoms.join(", ")}`
-        ));
-        diary_item.appendChild(create_element(
-            "div",
-            "migre-v1-main-diary-item-drugs",
-            undefined,
-            `Препараты: ${drugs.join(", ")}`
-        ));
+        diary_item.appendChild(el_diary_triggers_block(migraine_attack.Triggers));
+        diary_item.appendChild(el_diary_symptoms_block(migraine_attack.Symptoms));
+        diary_item.appendChild(el_diary_drugs_block(migraine_attack.Drugs));
         let delete_button = create_element(
             "a",
             undefined, undefined,
@@ -547,7 +556,7 @@ function compose_migraine_diary() {
             delete_entry_Clicked(migraine_attack.LocalID);
         })
         diary_item.appendChild(delete_button);
-        if (migraine_attack.ID == null && Core.LoggedIn == true) {
+        if (migraine_attack.Status == "LOCAL_ONLY" && Core.LoggedIn == true) {
             let save_button = create_element(
                 "a",
                 undefined, undefined,
@@ -557,8 +566,11 @@ function compose_migraine_diary() {
                 Core.send_migraine_attack(migraine_attack);
             })
             diary_item.appendChild(save_button);
+        } else {
+            console.log(migraine_attack.Status);
+            console.log(Core.LoggedIn);
         }
-        if (migraine_attack.ID != null || Core.LoggedIn == false) {
+        if (migraine_attack.Status != "LOCAL_ONLY" || Core.LoggedIn == false) {
             document.getElementById("migre-diary-wrapper").appendChild(diary_item);
         } else {
             document.getElementById("migre-unspecified-diary-wrapper").appendChild(diary_item);
@@ -573,7 +585,6 @@ function compose_migraine_diary() {
  * @returns 
  */
 async function delete_entry_Clicked(local_id) {
-    console.log(local_id);
     let attacks = Core.get_migraine_attacks();
     let attack_to_delete = null;
     for (const attack of attacks) {
@@ -582,9 +593,9 @@ async function delete_entry_Clicked(local_id) {
             break;
         }
     }
-    console.log(attack_to_delete);
     if (attack_to_delete == null) {
         Core.remove_migraine_attack(local_id);
+        compose_migraine_diary();
         return;
     }
     let response = await fetch(`https://migrenoznik.ru/api/delete_entry?id=${attack_to_delete}`);

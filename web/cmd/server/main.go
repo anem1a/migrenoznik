@@ -1,9 +1,9 @@
 // package main является точкой входа веб-приложения «Мигренозник».
 // В данном пакете осуществляется:
-//  - инициализация подключения к базе данных PostgreSQL;
-//  - настройка HTTP/HTTPS серверов;
-//  - регистрация маршрутов страниц и API;
-//  - запуск Telegram-бота для напоминаний.
+//   - инициализация подключения к базе данных PostgreSQL;
+//   - настройка HTTP/HTTPS серверов;
+//   - регистрация маршрутов страниц и API;
+//   - запуск Telegram-бота для напоминаний.
 package main
 
 import (
@@ -62,6 +62,10 @@ func main() {
 	mux.HandleFunc("/api/entries", handlers.EntriesHandler)
 	mux.HandleFunc("/api/doctor-entries", handlers.DoctorEntriesHandler)
 	mux.HandleFunc("/api/delete_entry", handlers.DeleteEntryHandler)
+	mux.HandleFunc("/api/convert", handlers.ConvertHandler)
+	mux.HandleFunc("/api/address", handlers.AddressHandler)
+	mux.HandleFunc("/api/med", handlers.MedicalHandler)
+	
 
 	// HTTPS сервер
 	// go func() {
@@ -86,8 +90,7 @@ func main() {
 	// 	http.Redirect(w, r, "https://"+r.Host+r.RequestURI, http.StatusMovedPermanently)
 	// })))
 
-	// Локальный HTTP сервер для разработки 
+	// Локальный HTTP сервер для разработки
 	log.Println("🚀 Сервер запущен на http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", mux))
 }
-
