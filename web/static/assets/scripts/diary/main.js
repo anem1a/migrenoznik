@@ -320,7 +320,7 @@ class MigrenoznikCore {
      */
     add_symptom_to_current_migraine_attack(symptom) {
         let current = this.get_current_migraine_attack();
-        current.Symptoms.push(symptom);
+        current.add_symptom(symptom);
         localStorage.setItem("current_migraine_attack", JSON.stringify(current));
     }
 
@@ -350,7 +350,7 @@ class MigrenoznikCore {
      */
     remove_symptom_from_current_migraine_attack(symptom) {
         let current = this.get_current_migraine_attack();
-        current.Symptoms = current.Symptoms.filter(item => item !== symptom);
+        current.remove_symptom(symptom);
         localStorage.setItem("current_migraine_attack", JSON.stringify(current));
     }
 
@@ -442,6 +442,86 @@ class MigrenoznikCore {
                 "name": 'Препараты'
             },
         };
+        this.Symptoms = {
+            "0": {
+                "name": 'чувствительность к свету'
+            },
+            "1": {
+                "name": 'чувствительность к звуку'
+            },
+            "2": {
+                "name": 'чувствительность к запаху'
+            },
+            "3": {
+                "name": 'усталость'
+            },
+            "4": {
+                "name": 'тяга к еде'
+            },
+            "5": {
+                "name": 'отсутствие аппетита'
+            },
+            "6": {
+                "name": 'перепады настроения'
+            },
+            "7": {
+                "name": 'жажда'
+            },
+            "8": {
+                "name": 'вздутие живота'
+            },
+            "9": {
+                "name": 'тошнота'
+            },
+            "10": {
+                "name": 'рвота'
+            },
+            "11": {
+                "name": 'запор'
+            },
+            "12": {
+                "name": 'диарея'
+            },
+            "13": {
+                "name": 'черные точки перед глазами (аура)'
+            },
+            "14": {
+                "name": 'волнистые линии перед глазами (аура)'
+            },
+            "15": {
+                "name": 'вспышки света перед глазами (аура)'
+            },
+            "16": {
+                "name": 'туннельное зрение (аура)'
+            },
+            "17": {
+                "name": 'ухудшение зрения (аура)'
+            },
+            "18": {
+                "name": 'покалывание некоторых частей тела (аура)'
+            },
+            "19": {
+                "name": 'онемение некоторых частей тела (аура)'
+            },
+            "20": {
+                "name": 'невозможность ясно выражать свои мысли (аура)'
+            },
+            "21": {
+                "name": 'ощущение тяжести в конечностях (аура)'
+            },
+            "22": {
+                "name": 'звон в ушах (аура)'
+            },
+            "23": {
+                "name": 'изменения в обонянии (аура)'
+            },
+            "24": {
+                "name": 'изменения во вкусе (аура)'
+            },
+            "25": {
+                "name": 'изменения в осязании (аура)'
+            },
+        }
     }
 }
 

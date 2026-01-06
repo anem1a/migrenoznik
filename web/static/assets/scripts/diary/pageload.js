@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded',
                     document.getElementById(`migre-trigger-${trigger.Code}`).setAttribute("data-selected", true);
                 }
                 for (const symptom of current.Symptoms) {
-                    document.getElementById(`migre-symptom-${symptom}`).setAttribute("data-selected", true);
+                    document.getElementById(`migre-symptom-${symptom.Code}`).setAttribute("data-selected", true);
                 }
                 for (const drug of current.Drugs) {
                     document.getElementById(`migre-drug-${drug}`).setAttribute("data-selected", true);

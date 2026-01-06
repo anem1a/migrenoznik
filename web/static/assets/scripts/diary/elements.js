@@ -35,7 +35,7 @@ function el_diary_triggers_block(triggers) {
 function el_diary_symptoms_block(symptoms) {
     let _symptoms = [];
     for (const symptom of symptoms) {
-        _symptoms.push(MigraineSymptom.code_to_name(symptom));
+        _symptoms.push(symptom.Name);
     }
     return el_diary_enumeration_block(_symptoms, "symptoms", "Нет симптомов", "Симптомы");
 }
