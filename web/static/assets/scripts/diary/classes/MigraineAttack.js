@@ -40,11 +40,39 @@ class MigraineAttack {
         return attack;
     }
 
+    toJSON() {
+        return {
+            "LocalID": this.LocalID,
+            "DT_Start": this.DT_Start,
+            "DT_End": this.DT_End,
+            "Duration": this.Duration,
+            "Strength": this.Strength,
+            "Triggers": this.Triggers.map(obj => obj.Code),
+            "Symptoms": this.Symptoms,
+            "Drugs": this.Drugs,
+            "ID": this.ID
+        }
+    }
+
     backed_up() {
         return this.ID != null;
     }
 
     set_status(status) {
         this.Status = status;
+    }
+
+    add_trigger(code) {
+        if (!this.has_trigger(code)) {
+            this.Triggers.push(new MigraineTrigger(code));
+        }
+    }
+
+    remove_trigger(code) {
+        this.Triggers = this.Triggers.filter(element => element.Code !== code);
+    }
+
+    has_trigger(code) {
+        return this.Triggers.some(element => element.Code === code);
     }
 }

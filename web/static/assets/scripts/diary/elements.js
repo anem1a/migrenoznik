@@ -27,7 +27,7 @@ function configure_main_bottom_buttoms(migraine_now) {
 function el_diary_triggers_block(triggers) {
     let _triggers = [];
     for (const trigger of triggers) {
-        _triggers.push(MigraineTrigger.code_to_name(trigger));
+        _triggers.push(trigger.Name);
     }
     return el_diary_enumeration_block(_triggers, "triggers", "Нет триггеров", "Триггеры");
 }

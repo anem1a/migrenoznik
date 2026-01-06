@@ -310,7 +310,7 @@ class MigrenoznikCore {
      */
     add_trigger_to_current_migraine_attack(trigger) {
         let current = this.get_current_migraine_attack();
-        current.Triggers.push(trigger);
+        current.add_trigger(trigger);
         localStorage.setItem("current_migraine_attack", JSON.stringify(current));
     }
 
@@ -340,7 +340,7 @@ class MigrenoznikCore {
      */
     remove_trigger_from_current_migraine_attack(trigger) {
         let current = this.get_current_migraine_attack();
-        current.Triggers = current.Triggers.filter(item => item !== trigger);
+        current.remove_trigger(trigger);
         localStorage.setItem("current_migraine_attack", JSON.stringify(current));
     }
 

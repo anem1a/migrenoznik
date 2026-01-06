@@ -14,6 +14,6 @@ class MigraineTrigger {
     }
 
     get Name() {
-        return Core.Triggers[String(this.Code)];
+        return Core.Triggers[String(this.Code)]["name"];
     }
 }
