@@ -1,4 +1,4 @@
-class MigraineConfigItem {
+class MigraineAttackEntity {
     static get Config() {
         return {};
     }
@@ -16,14 +16,24 @@ class MigraineConfigItem {
     }
 }
 
-class MigraineTrigger extends MigraineConfigItem {
+class MigraineTrigger extends MigraineAttackEntity {
     static get Config() {
         return Core.Triggers;
     }
 }
 
-class MigraineSymptom extends MigraineConfigItem {
+class MigraineSymptom extends MigraineAttackEntity {
     static get Config() {
         return Core.Symptoms;
+    }
+}
+
+class MigraineDrug extends MigraineAttackEntity {
+    static get Config() {
+        return Core.Drugs;
+    }
+
+    get ATX() {
+        return this.constructor.Config[String(this.Code)]?.atx || '';
     }
 }

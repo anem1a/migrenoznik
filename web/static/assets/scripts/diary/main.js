@@ -70,7 +70,7 @@ class MigrenoznikCore {
         for (let i = 0; i < data["entries"].length; i++) {
             for (let j = 0; j < data["entries"][i]["Triggers"].length; j++) {
                 const element = data["entries"][i]["Triggers"][j];
-                for (let k = 0; k < MigraineTrigger.total_triggers(); k++) {
+                for (let k = 0; k < MigraineTrigger.total(); k++) {
                     if (MigraineTrigger.code_to_name(k) == element) {
                         data["entries"][i]["Triggers"][j] = k;
                     }
@@ -78,7 +78,7 @@ class MigrenoznikCore {
             }
             for (let j = 0; j < data["entries"][i]["Symptoms"].length; j++) {
                 const element = data["entries"][i]["Symptoms"][j];
-                for (let k = 0; k < MigraineSymptom.total_symptoms(); k++) {
+                for (let k = 0; k < MigraineSymptom.total(); k++) {
                     if (MigraineSymptom.code_to_name(k) == element) {
                         data["entries"][i]["Symptoms"][j] = k;
                     }
@@ -86,7 +86,7 @@ class MigrenoznikCore {
             }
             for (let j = 0; j < data["entries"][i]["Drugs"].length; j++) {
                 const element = data["entries"][i]["Drugs"][j];
-                for (let k = 0; k < MigraineDrug.total_drugs(); k++) {
+                for (let k = 0; k < MigraineDrug.total(); k++) {
                     if (MigraineDrug.code_to_name(k) == element) {
                         data["entries"][i]["Drugs"][j] = MigraineDrug.code_to_atx(k);
                     }
@@ -638,13 +638,13 @@ function migraine_now_button_Clicked() {
         document.getElementById("migre-now-wrapper").style.display = 'none';
     } else {
         Core.toggle_migraine_status();
-        for (let i = 0; i < MigraineTrigger.total_triggers(); i++) {
+        for (let i = 0; i < MigraineTrigger.total(); i++) {
             document.getElementById(`migre-trigger-${i}`).setAttribute("data-selected", false);
         }
-        for (let i = 0; i < MigraineSymptom.total_symptoms(); i++) {
+        for (let i = 0; i < MigraineSymptom.total(); i++) {
             document.getElementById(`migre-symptom-${i}`).setAttribute("data-selected", false);
         }
-        for (let i = 0; i < MigraineDrug.total_drugs(); i++) {
+        for (let i = 0; i < MigraineDrug.total(); i++) {
             document.getElementById(`migre-drug-${i}`).setAttribute("data-selected", false);
         }
         let strength = document.getElementById("migre-current-strength-input").value;
