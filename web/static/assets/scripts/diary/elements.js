@@ -43,7 +43,7 @@ function el_diary_symptoms_block(symptoms) {
 function el_diary_drugs_block(drugs) {
     let _drugs = [];
     for (const drug of drugs) {
-        _drugs.push(MigraineDrug.code_to_name(drug));
+        _drugs.push(drug.Name);
     }
     return el_diary_enumeration_block(_drugs, "drugs", "Нет препаратов", "Препараты");
 }

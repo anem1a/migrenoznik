@@ -33,7 +33,7 @@ class MigraineAttack {
             obj["DT_End"] == null ? (obj["Duration"] == null ? null : new Date(obj["DT_Start"])) : new Date(obj["DT_End"]),
             obj["Triggers"] == null ? [] : obj["Triggers"].map(code => new MigraineTrigger(code)),
             obj["Symptoms"] == null ? [] : obj["Symptoms"].map(code => new MigraineSymptom(code)),
-            obj["Drugs"] == null ? [] : obj["Drugs"],
+            obj["Drugs"] == null ? [] : obj["Drugs"].map(code => new MigraineDrug(code)),
             obj["ID"] == null ? null : Number(obj["ID"]),
         );
         attack.set_status(obj["Status"]);
@@ -49,7 +49,7 @@ class MigraineAttack {
             "Strength": this.Strength,
             "Triggers": this.Triggers.map(obj => obj.Code),
             "Symptoms": this.Symptoms.map(obj => obj.Code),
-            "Drugs": this.Drugs,
+            "Drugs": this.Drugs.map(obj => obj.Code),
             "ID": this.ID
         }
     }
@@ -74,6 +74,12 @@ class MigraineAttack {
         }
     }
 
+    add_drug(code) {
+        if (!this.has_drug(code)) {
+            this.Drugs.push(new MigraineDrug(code));
+        }
+    }
+
     remove_trigger(code) {
         this.Triggers = this.Triggers.filter(element => element.Code !== code);
     }
@@ -82,11 +88,19 @@ class MigraineAttack {
         this.Symptoms = this.Symptoms.filter(element => element.Code !== code);
     }
 
+    remove_drug(code) {
+        this.Drugs = this.Drugs.filter(element => element.Code !== code);
+    }
+
     has_trigger(code) {
         return this.Triggers.some(element => element.Code === code);
     }
 
     has_symptom(code) {
         return this.Symptoms.some(element => element.Code === code);
+    }
+
+    has_drug(code) {
+        return this.Drugs.some(element => element.Code === code);
     }
 }

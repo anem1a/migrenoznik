@@ -326,11 +326,11 @@ class MigrenoznikCore {
 
     /**
      * Adds drug to current migraine attack.
-     * @param {*} symptom 
+     * @param {*} drug 
      */
-    add_drug_to_current_migraine_attack(symptom) {
+    add_drug_to_current_migraine_attack(drug) {
         let current = this.get_current_migraine_attack();
-        current.Drugs.push(symptom);
+        current.add_drug(drug);
         localStorage.setItem("current_migraine_attack", JSON.stringify(current));
     }
 
@@ -356,11 +356,11 @@ class MigrenoznikCore {
 
     /**
      * Deletes drug from current migraine attack.
-     * @param {*} symptom 
+     * @param {*} drug 
      */
-    remove_drug_from_current_migraine_attack(symptom) {
+    remove_drug_from_current_migraine_attack(drug) {
         let current = this.get_current_migraine_attack();
-        current.Drugs = current.Drugs.filter(item => item !== symptom);
+        current.remove_drug(drug);
         localStorage.setItem("current_migraine_attack", JSON.stringify(current));
     }
 
@@ -520,6 +520,108 @@ class MigrenoznikCore {
             },
             "25": {
                 "name": 'изменения в осязании (аура)'
+            },
+        }
+        this.Drugs = {
+            "0": {
+                "name": 'Ацетилсалициловая кислота',
+                "atx": 'N02BA01'
+            },
+            "1": {
+                "name": 'Ибупрофен',
+                "atx": 'M01AE01'
+            },
+            "2": {
+                "name": 'Напроксен',
+                "atx": 'M01AE02'
+            },
+            "3": {
+                "name": 'Диклофенак',
+                "atx": 'M01AB05'
+            },
+            "4": {
+                "name": 'Парацетамол',
+                "atx": 'N02BE01'
+            },
+            "5": {
+                "name": 'Суматриптан',
+                "atx": 'N02CC01'
+            },
+            "6": {
+                "name": 'Декскетопрофен',
+                "atx": 'M01AE17'
+            },
+            "7": {
+                "name": 'Кеторолак',
+                "atx": 'M01AB15'
+            },
+            "8": {
+                "name": 'Магния сульфат',
+                "atx": 'A12CC02'
+            },
+            "9": {
+                "name": 'Дексаметазон',
+                "atx": 'H02AB02'
+            },
+            "10": {
+                "name": 'Метопролол',
+                "atx": 'C07AB02'
+            },
+            "11": {
+                "name": 'Пропранолол',
+                "atx": 'C07AA05'
+            },
+            "12": {
+                "name": 'Атенолол',
+                "atx": 'C07AB03'
+            },
+            "13": {
+                "name": 'Амитриптилин',
+                "atx": 'N06AA09'
+            },
+            "14": {
+                "name": 'Кандесартан',
+                "atx": 'C09CA06'
+            },
+            "15": {
+                "name": 'Метоклопрамид',
+                "atx": 'A03FA01'
+            },
+            "16": {
+                "name": 'Домперидон',
+                "atx": 'A03FA03'
+            },
+            "17": {
+                "name": 'Элетриптан',
+                "atx": 'N02CC06'
+            },
+            "18": {
+                "name": 'Золмитриптан',
+                "atx": 'N02CC03'
+            },
+            "19": {
+                "name": 'Хлорпромазин',
+                "atx": 'N05AA01'
+            },
+            "20": {
+                "name": 'Вальпроевая кислота',
+                "atx": 'N03AG01'
+            },
+            "21": {
+                "name": 'Топирамат',
+                "atx": 'N03AX11'
+            },
+            "22": {
+                "name": 'Фреманезумаб',
+                "atx": 'N02CD03'
+            },
+            "23": {
+                "name": 'Эренумаб',
+                "atx": 'N02CD01'
+            },
+            "24": {
+                "name": 'Венлафаксин',
+                "atx": 'N06AX16'
             },
         }
     }
