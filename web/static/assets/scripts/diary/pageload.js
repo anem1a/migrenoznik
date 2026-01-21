@@ -17,13 +17,13 @@ document.addEventListener('DOMContentLoaded',
                 document.getElementById("migre-current-strength-value").innerHTML = current.Strength;
                 document.getElementById("migre-current-strength-value").innerHTML = current.Strength;
                 for (const trigger of current.Triggers) {
-                    document.getElementById(`migre-trigger-${trigger}`).setAttribute("data-selected", true);
+                    document.getElementById(`migre-trigger-${trigger.Code}`).setAttribute("data-selected", true);
                 }
                 for (const symptom of current.Symptoms) {
-                    document.getElementById(`migre-symptom-${symptom}`).setAttribute("data-selected", true);
+                    document.getElementById(`migre-symptom-${symptom.Code}`).setAttribute("data-selected", true);
                 }
                 for (const drug of current.Drugs) {
-                    document.getElementById(`migre-drug-${drug}`).setAttribute("data-selected", true);
+                    document.getElementById(`migre-drug-${drug.Code}`).setAttribute("data-selected", true);
                 }
             }
             document.getElementById("migre-current-dt-start-value").innerHTML = `${current.DT_Start.getDate()} ${Calendar.month_number_to_name(current.DT_Start.getMonth())} ${current.DT_Start.getFullYear()} ${current.DT_Start.getHours() < 10 ? "0" : ""}${current.DT_Start.getHours()}:${current.DT_Start.getMinutes() < 10 ? "0" : ""}${current.DT_Start.getMinutes()}`;

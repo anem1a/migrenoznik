@@ -60,6 +60,7 @@ class MigrenoznikCore {
         const data = await response.json();
         if (data["success"] == false) {
             this.LoggedIn = false;
+            Core.clear_local_storage_from_remote_entries();
             return;
         }
         this.LoggedIn = true;
@@ -69,7 +70,7 @@ class MigrenoznikCore {
         for (let i = 0; i < data["entries"].length; i++) {
             for (let j = 0; j < data["entries"][i]["Triggers"].length; j++) {
                 const element = data["entries"][i]["Triggers"][j];
-                for (let k = 0; k < MigraineTrigger.total_triggers(); k++) {
+                for (let k = 0; k < MigraineTrigger.total(); k++) {
                     if (MigraineTrigger.code_to_name(k) == element) {
                         data["entries"][i]["Triggers"][j] = k;
                     }
@@ -77,7 +78,7 @@ class MigrenoznikCore {
             }
             for (let j = 0; j < data["entries"][i]["Symptoms"].length; j++) {
                 const element = data["entries"][i]["Symptoms"][j];
-                for (let k = 0; k < MigraineSymptom.total_symptoms(); k++) {
+                for (let k = 0; k < MigraineSymptom.total(); k++) {
                     if (MigraineSymptom.code_to_name(k) == element) {
                         data["entries"][i]["Symptoms"][j] = k;
                     }
@@ -85,7 +86,7 @@ class MigrenoznikCore {
             }
             for (let j = 0; j < data["entries"][i]["Drugs"].length; j++) {
                 const element = data["entries"][i]["Drugs"][j];
-                for (let k = 0; k < MigraineDrug.total_drugs(); k++) {
+                for (let k = 0; k < MigraineDrug.total(); k++) {
                     if (MigraineDrug.code_to_name(k) == element) {
                         data["entries"][i]["Drugs"][j] = MigraineDrug.code_to_atx(k);
                     }
@@ -156,6 +157,27 @@ class MigrenoznikCore {
             }
         }
         localStorage.setItem("migraine_attacks", JSON.stringify(attacks));
+    }
+
+    set_attack_status(local_id, status) {
+        let attacks = this.get_migraine_attacks();
+        for (let i = 0; i < attacks.length; i++) {
+            if (attacks[i].LocalID == local_id) {
+                attacks[i].Status = status;
+                break;
+            }
+        }
+        localStorage.setItem("migraine_attacks", JSON.stringify(attacks));
+    }
+
+    updateAttack(local_id, updates) {
+        const attacks = this.get_migraine_attacks();
+        const index = attacks.findIndex(attack => attack.LocalID == local_id);
+        
+        if (index !== -1) {
+            attacks[index] = { ...attacks[index], ...updates };
+            localStorage.setItem("migraine_attacks", JSON.stringify(attacks));
+        }
     }
 
     /**
@@ -229,9 +251,19 @@ class MigrenoznikCore {
         let attacks = this.get_migraine_attacks();
         let current = this.get_current_migraine_attack();
         current.DT_End = new Date();
+        if (this.LoggedIn) {
+            current.Status = "PENDING_SERVER_CREATING";
+        } else {
+            current.Status = "LOCAL_ONLY";
+        }
         attacks.push(current);
         localStorage.setItem("migraine_attacks", JSON.stringify(attacks));
         localStorage.removeItem("current_migraine_attack");
+
+        if (!this.LoggedIn) {
+            compose_migraine_diary();
+            return;
+        }
 
         /* Save to remote storage */
         let data = new FormData();
@@ -251,9 +283,13 @@ class MigrenoznikCore {
         
         const result = await response.json();
         if (result["success"]) {
-            this.assign_id_to_migraine_attack(current.LocalID, result["id"]);
-        } else if (result["error_code"] != 13) {
+            this.updateAttack(current.LocalID, { ID: result["id"], Status: "BACKED_UP" });
+        } else if (result["error_code"] == 13) {
+            this.updateAttack(current.LocalID, { Status: "FAILED_SERVER_CREATING" });
+            compose_migraine_diary();
+        } else {
             this.remove_migraine_attack(current.LocalID);
+            //this.updateAttack(current.LocalID, { Status: "FAILED_SERVER_CREATING" });
             compose_migraine_diary();
         }
     }
@@ -274,7 +310,7 @@ class MigrenoznikCore {
      */
     add_trigger_to_current_migraine_attack(trigger) {
         let current = this.get_current_migraine_attack();
-        current.Triggers.push(trigger);
+        current.add_trigger(trigger);
         localStorage.setItem("current_migraine_attack", JSON.stringify(current));
     }
 
@@ -284,17 +320,17 @@ class MigrenoznikCore {
      */
     add_symptom_to_current_migraine_attack(symptom) {
         let current = this.get_current_migraine_attack();
-        current.Symptoms.push(symptom);
+        current.add_symptom(symptom);
         localStorage.setItem("current_migraine_attack", JSON.stringify(current));
     }
 
     /**
      * Adds drug to current migraine attack.
-     * @param {*} symptom 
+     * @param {*} drug 
      */
-    add_drug_to_current_migraine_attack(symptom) {
+    add_drug_to_current_migraine_attack(drug) {
         let current = this.get_current_migraine_attack();
-        current.Drugs.push(symptom);
+        current.add_drug(drug);
         localStorage.setItem("current_migraine_attack", JSON.stringify(current));
     }
 
@@ -304,7 +340,7 @@ class MigrenoznikCore {
      */
     remove_trigger_from_current_migraine_attack(trigger) {
         let current = this.get_current_migraine_attack();
-        current.Triggers = current.Triggers.filter(item => item !== trigger);
+        current.remove_trigger(trigger);
         localStorage.setItem("current_migraine_attack", JSON.stringify(current));
     }
 
@@ -314,17 +350,17 @@ class MigrenoznikCore {
      */
     remove_symptom_from_current_migraine_attack(symptom) {
         let current = this.get_current_migraine_attack();
-        current.Symptoms = current.Symptoms.filter(item => item !== symptom);
+        current.remove_symptom(symptom);
         localStorage.setItem("current_migraine_attack", JSON.stringify(current));
     }
 
     /**
      * Deletes drug from current migraine attack.
-     * @param {*} symptom 
+     * @param {*} drug 
      */
-    remove_drug_from_current_migraine_attack(symptom) {
+    remove_drug_from_current_migraine_attack(drug) {
         let current = this.get_current_migraine_attack();
-        current.Drugs = current.Drugs.filter(item => item !== symptom);
+        current.remove_drug(drug);
         localStorage.setItem("current_migraine_attack", JSON.stringify(current));
     }
 
@@ -347,6 +383,247 @@ class MigrenoznikCore {
             localStorage.setItem("migraine_attack_ai", 1);
         }
         this.LoggedIn = false;
+        this.Triggers = {
+            "0": {
+                "name": 'Менструальный цикл'
+            },
+            "1": {
+                "name": 'Стресс'
+            },
+            "2": {
+                "name": 'Нарушение сна'
+            },
+            "3": {
+                "name": 'Переутомление'
+            },
+            "4": {
+                "name": 'Голод'
+            },
+            "5": {
+                "name": 'Яркий свет'
+            },
+            "6": {
+                "name": 'Громкие звуки'
+            },
+            "7": {
+                "name": 'Сильные запахи'
+            },
+            "8": {
+                "name": 'Кофеин'
+            },
+            "9": {
+                "name": 'Алкоголь'
+            },
+            "10": {
+                "name": 'Красное вино'
+            },
+            "11": {
+                "name": 'Пиво'
+            },
+            "12": {
+                "name": 'Темный шоколад'
+            },
+            "13": {
+                "name": 'Твердый сыр'
+            },
+            "14": {
+                "name": 'Цитрусы'
+            },
+            "15": {
+                "name": 'Орехи'
+            },
+            "16": {
+                "name": 'Консерванты'
+            },
+            "17": {
+                "name": 'Погода'
+            },
+            "18": {
+                "name": 'Препараты'
+            },
+        };
+        this.Symptoms = {
+            "0": {
+                "name": 'чувствительность к свету'
+            },
+            "1": {
+                "name": 'чувствительность к звуку'
+            },
+            "2": {
+                "name": 'чувствительность к запаху'
+            },
+            "3": {
+                "name": 'усталость'
+            },
+            "4": {
+                "name": 'тяга к еде'
+            },
+            "5": {
+                "name": 'отсутствие аппетита'
+            },
+            "6": {
+                "name": 'перепады настроения'
+            },
+            "7": {
+                "name": 'жажда'
+            },
+            "8": {
+                "name": 'вздутие живота'
+            },
+            "9": {
+                "name": 'тошнота'
+            },
+            "10": {
+                "name": 'рвота'
+            },
+            "11": {
+                "name": 'запор'
+            },
+            "12": {
+                "name": 'диарея'
+            },
+            "13": {
+                "name": 'черные точки перед глазами (аура)'
+            },
+            "14": {
+                "name": 'волнистые линии перед глазами (аура)'
+            },
+            "15": {
+                "name": 'вспышки света перед глазами (аура)'
+            },
+            "16": {
+                "name": 'туннельное зрение (аура)'
+            },
+            "17": {
+                "name": 'ухудшение зрения (аура)'
+            },
+            "18": {
+                "name": 'покалывание некоторых частей тела (аура)'
+            },
+            "19": {
+                "name": 'онемение некоторых частей тела (аура)'
+            },
+            "20": {
+                "name": 'невозможность ясно выражать свои мысли (аура)'
+            },
+            "21": {
+                "name": 'ощущение тяжести в конечностях (аура)'
+            },
+            "22": {
+                "name": 'звон в ушах (аура)'
+            },
+            "23": {
+                "name": 'изменения в обонянии (аура)'
+            },
+            "24": {
+                "name": 'изменения во вкусе (аура)'
+            },
+            "25": {
+                "name": 'изменения в осязании (аура)'
+            },
+        }
+        this.Drugs = {
+            "0": {
+                "name": 'Ацетилсалициловая кислота',
+                "atx": 'N02BA01'
+            },
+            "1": {
+                "name": 'Ибупрофен',
+                "atx": 'M01AE01'
+            },
+            "2": {
+                "name": 'Напроксен',
+                "atx": 'M01AE02'
+            },
+            "3": {
+                "name": 'Диклофенак',
+                "atx": 'M01AB05'
+            },
+            "4": {
+                "name": 'Парацетамол',
+                "atx": 'N02BE01'
+            },
+            "5": {
+                "name": 'Суматриптан',
+                "atx": 'N02CC01'
+            },
+            "6": {
+                "name": 'Декскетопрофен',
+                "atx": 'M01AE17'
+            },
+            "7": {
+                "name": 'Кеторолак',
+                "atx": 'M01AB15'
+            },
+            "8": {
+                "name": 'Магния сульфат',
+                "atx": 'A12CC02'
+            },
+            "9": {
+                "name": 'Дексаметазон',
+                "atx": 'H02AB02'
+            },
+            "10": {
+                "name": 'Метопролол',
+                "atx": 'C07AB02'
+            },
+            "11": {
+                "name": 'Пропранолол',
+                "atx": 'C07AA05'
+            },
+            "12": {
+                "name": 'Атенолол',
+                "atx": 'C07AB03'
+            },
+            "13": {
+                "name": 'Амитриптилин',
+                "atx": 'N06AA09'
+            },
+            "14": {
+                "name": 'Кандесартан',
+                "atx": 'C09CA06'
+            },
+            "15": {
+                "name": 'Метоклопрамид',
+                "atx": 'A03FA01'
+            },
+            "16": {
+                "name": 'Домперидон',
+                "atx": 'A03FA03'
+            },
+            "17": {
+                "name": 'Элетриптан',
+                "atx": 'N02CC06'
+            },
+            "18": {
+                "name": 'Золмитриптан',
+                "atx": 'N02CC03'
+            },
+            "19": {
+                "name": 'Хлорпромазин',
+                "atx": 'N05AA01'
+            },
+            "20": {
+                "name": 'Вальпроевая кислота',
+                "atx": 'N03AG01'
+            },
+            "21": {
+                "name": 'Топирамат',
+                "atx": 'N03AX11'
+            },
+            "22": {
+                "name": 'Фреманезумаб',
+                "atx": 'N02CD03'
+            },
+            "23": {
+                "name": 'Эренумаб',
+                "atx": 'N02CD01'
+            },
+            "24": {
+                "name": 'Венлафаксин',
+                "atx": 'N06AX16'
+            },
+        }
     }
 }
 
@@ -361,13 +638,13 @@ function migraine_now_button_Clicked() {
         document.getElementById("migre-now-wrapper").style.display = 'none';
     } else {
         Core.toggle_migraine_status();
-        for (let i = 0; i < MigraineTrigger.total_triggers(); i++) {
+        for (let i = 0; i < MigraineTrigger.total(); i++) {
             document.getElementById(`migre-trigger-${i}`).setAttribute("data-selected", false);
         }
-        for (let i = 0; i < MigraineSymptom.total_symptoms(); i++) {
+        for (let i = 0; i < MigraineSymptom.total(); i++) {
             document.getElementById(`migre-symptom-${i}`).setAttribute("data-selected", false);
         }
-        for (let i = 0; i < MigraineDrug.total_drugs(); i++) {
+        for (let i = 0; i < MigraineDrug.total(); i++) {
             document.getElementById(`migre-drug-${i}`).setAttribute("data-selected", false);
         }
         let strength = document.getElementById("migre-current-strength-input").value;
@@ -433,18 +710,6 @@ function compose_migraine_diary() {
     let migraine_attacks = Core.get_migraine_attacks();
     for (let i = 0; i < migraine_attacks.length; i++) {
         const migraine_attack = migraine_attacks[i];
-        let triggers = [];
-        for (const trigger of migraine_attack.Triggers) {
-            triggers.push(MigraineTrigger.code_to_name(trigger));
-        }
-        let symptoms = [];
-        for (const symptom of migraine_attack.Symptoms) {
-            symptoms.push(MigraineSymptom.code_to_name(symptom));
-        }
-        let drugs = [];
-        for (const drug of migraine_attack.Drugs) {
-            drugs.push(MigraineDrug.code_to_name(drug));
-        }
         let diary_item = create_element(
             "div",
             "migre-v1-main-diary-item"
@@ -461,24 +726,9 @@ function compose_migraine_diary() {
             undefined,
             `Интенсивность: <div class="migre-v1-main-diary-item-strength-visual" data-strength="${migraine_attack.Strength}"></div>${migraine_attack.Strength}/10`
         ));
-        diary_item.appendChild(create_element(
-            "div",
-            "migre-v1-main-diary-item-triggers",
-            undefined,
-            `Триггеры: ${triggers.join(", ")}`
-        ));
-        diary_item.appendChild(create_element(
-            "div",
-            "migre-v1-main-diary-item-symptoms",
-            undefined,
-            `Симптомы: ${symptoms.join(", ")}`
-        ));
-        diary_item.appendChild(create_element(
-            "div",
-            "migre-v1-main-diary-item-drugs",
-            undefined,
-            `Препараты: ${drugs.join(", ")}`
-        ));
+        diary_item.appendChild(el_diary_triggers_block(migraine_attack.Triggers));
+        diary_item.appendChild(el_diary_symptoms_block(migraine_attack.Symptoms));
+        diary_item.appendChild(el_diary_drugs_block(migraine_attack.Drugs));
         let delete_button = create_element(
             "a",
             undefined, undefined,
@@ -488,7 +738,7 @@ function compose_migraine_diary() {
             delete_entry_Clicked(migraine_attack.LocalID);
         })
         diary_item.appendChild(delete_button);
-        if (migraine_attack.ID == null && Core.LoggedIn == true) {
+        if (migraine_attack.Status == "LOCAL_ONLY" && Core.LoggedIn == true) {
             let save_button = create_element(
                 "a",
                 undefined, undefined,
@@ -498,8 +748,11 @@ function compose_migraine_diary() {
                 Core.send_migraine_attack(migraine_attack);
             })
             diary_item.appendChild(save_button);
+        } else {
+            console.log(migraine_attack.Status);
+            console.log(Core.LoggedIn);
         }
-        if (migraine_attack.ID != null || Core.LoggedIn == false) {
+        if (migraine_attack.Status != "LOCAL_ONLY" || Core.LoggedIn == false) {
             document.getElementById("migre-diary-wrapper").appendChild(diary_item);
         } else {
             document.getElementById("migre-unspecified-diary-wrapper").appendChild(diary_item);
@@ -514,7 +767,6 @@ function compose_migraine_diary() {
  * @returns 
  */
 async function delete_entry_Clicked(local_id) {
-    console.log(local_id);
     let attacks = Core.get_migraine_attacks();
     let attack_to_delete = null;
     for (const attack of attacks) {
@@ -523,9 +775,9 @@ async function delete_entry_Clicked(local_id) {
             break;
         }
     }
-    console.log(attack_to_delete);
     if (attack_to_delete == null) {
         Core.remove_migraine_attack(local_id);
+        compose_migraine_diary();
         return;
     }
     let response = await fetch(`https://migrenoznik.ru/api/delete_entry?id=${attack_to_delete}`);
