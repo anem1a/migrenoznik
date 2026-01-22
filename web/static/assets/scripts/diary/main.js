@@ -7,8 +7,16 @@ class MigrenoznikCore {
     is_migraine_now() {
         let migraine_now = localStorage.getItem("migraine_now");
         if (migraine_now == undefined) {
-            localStorage.setItem("migraine_now", "false");
-            return false;
+            let current_migraine_attack = localStorage.getItem("current_migraine_attack");
+            try {
+                current_migraine_attack = JSON.parse(current_migraine_attack);
+                MigraineAttack.from_json(current_migraine_attack);
+                localStorage.setItem("migraine_now", "true");
+                return true;
+            } catch (error) {
+                localStorage.setItem("migraine_now", "false");
+                return false;
+            }
         }
         return migraine_now == "true";
     }
