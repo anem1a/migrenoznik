@@ -71,7 +71,10 @@ class MigrenoznikCore {
             Core.clear_local_storage_from_remote_entries();
             return;
         }
-        this.LoggedIn = true;
+        if (this.LoggedIn == false) {
+            this.LoggedIn = true;
+            compose_migraine_diary();
+        }
         let attacks = Core.get_migraine_attacks();
         let new_attacks = [];
         // костыль, пока Аня не переделала
@@ -529,7 +532,7 @@ class MigrenoznikCore {
             "25": {
                 "name": 'изменения в осязании (аура)'
             },
-        }
+        };
         this.Drugs = {
             "0": {
                 "name": 'Ацетилсалициловая кислота',
@@ -631,7 +634,7 @@ class MigrenoznikCore {
                 "name": 'Венлафаксин',
                 "atx": 'N06AX16'
             },
-        }
+        };
     }
 }
 
