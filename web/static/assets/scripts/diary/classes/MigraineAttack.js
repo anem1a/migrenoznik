@@ -47,6 +47,7 @@ class MigraineAttack {
             "DT_End": this.DT_End,
             "Duration": this.Duration,
             "Strength": this.Strength,
+            "Status": MigraineAttack.is_valid_status(this.Status) ? this.Status : "LOCAL_ONLY",
             "Triggers": this.Triggers.map(obj => obj.Code),
             "Symptoms": this.Symptoms.map(obj => obj.Code),
             "Drugs": this.Drugs.map(obj => obj.Code),
@@ -102,5 +103,19 @@ class MigraineAttack {
 
     has_drug(code) {
         return this.Drugs.some(element => element.Code === code);
+    }
+
+    static is_valid_status(status) {
+        return [
+            "LOCAL_ONLY",
+            "LOCAL_CREATED",
+            "PENDING_SERVER_CREATING",
+            "FAILED_SERVER_CREATING",
+            "BACKED_UP",
+            "LOCAL_DELETED",
+            "PENDING_SERVER_DELETING",
+            "FAILED_SERVER_DELETING",
+            "DELETED"
+        ].includes(status);
     }
 }
