@@ -60,15 +60,12 @@ class MigrenoznikCore {
      * Fetches remote migraine attacks from server and adds new ones to local storage.
      */
     async fetch_remote_migraine_attacks() {
-        let response = await fetch('https://migrenoznik.ru/api/entries');
-        if (!response.ok) {
-            throw new Error(`Ошибка HTTP: ${response.status}`);
-        }
-        
-        const data = await response.json();
+        const data = JSON.parse(await ServerAPI.get("entries"));
         if (data["success"] == false) {
-            this.LoggedIn = false;
-            Core.clear_local_storage_from_remote_entries();
+            if (this.LoggedIn == true) {
+                this.LoggedIn = false;
+                Core.clear_local_storage_from_remote_entries();
+            }
             return;
         }
         if (this.LoggedIn == false) {
@@ -394,6 +391,7 @@ class MigrenoznikCore {
             localStorage.setItem("migraine_attack_ai", 1);
         }
         this.LoggedIn = false;
+        this.DM = new DownloadManager(3);
         this.Triggers = {
             "0": {
                 "name": 'Менструальный цикл'
