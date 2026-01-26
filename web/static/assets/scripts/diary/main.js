@@ -183,7 +183,16 @@ class MigrenoznikCore {
         const index = attacks.findIndex(attack => attack.LocalID == local_id);
         
         if (index !== -1) {
-            attacks[index] = { ...attacks[index], ...updates };
+            console.log(attacks);
+            
+            const attack = attacks[index];
+            for (const [key, value] of Object.entries(updates)) {
+                if (attack.hasOwnProperty(key)) {
+                    attack[key] = value;
+                }
+            }
+            
+            console.log(attacks);
             localStorage.setItem("migraine_attacks", JSON.stringify(attacks));
         }
     }
@@ -278,8 +287,8 @@ class MigrenoznikCore {
         data.append("dt_start", current.DT_Start.getTime());
         data.append("dt_end", current.DT_End.getTime());
         data.append("strength", current.Strength);
-        data.append("triggers", JSON.stringify(current.Triggers));
-        data.append("symptoms", JSON.stringify(current.Symptoms));
+        data.append("triggers", JSON.stringify(current.Triggers.map(element => element.Code)));
+        data.append("symptoms", JSON.stringify(current.Symptoms.map(element => element.Code)));
         data.append("drugs", JSON.stringify(current.Drugs.map(element => element.ATX)));
         
         const response = await fetch('/api/add_entry', {
