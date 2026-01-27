@@ -139,6 +139,9 @@ body {
 
 .migre-v1-main-header-inner {
     padding: 6px 10px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
 }
 
 .migre-v1-main-header-login-button,
@@ -380,4 +383,31 @@ body {
 
 .migre-v1-main-card-big-digit-digit {
     font-size: 40px;
+}
+
+.migre-v1-main-header-logo-wrapper {
+    width: 50px;
+    height: 50px;
+    background-image: url(https://migrenoznik.ru/static/assets/images/icons/header-logo.png);
+    background-position: center;
+    background-size: cover;
+    border-radius: 10px;
+}
+
+.migre-v1-main-header-hello {
+    margin-left: 10px;
+}
+
+.migre-v1-main-header-hello h1 {
+    font-size: var(--migre-font-size-xl);
+    font-weight: 200;
+    line-height: 1;
+    margin: 0;
+}
+
+.migre-v1-main-header-hello h2 {
+    font-size: var(--migre-font-size-m);
+    font-weight: 200;
+    line-height: 1;
+    margin: 0;
 }
