@@ -134,7 +134,7 @@ body {
 }
 
 .migre-v1-main-header {
-    background-color: var(--migre-color-main);
+    border-bottom: 1px solid black;
 }
 
 .migre-v1-main-header-inner {
