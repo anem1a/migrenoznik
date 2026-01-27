@@ -79,7 +79,7 @@ class MigrenoznikCore {
             for (let j = 0; j < data["entries"][i]["Triggers"].length; j++) {
                 const element = data["entries"][i]["Triggers"][j];
                 for (let k = 0; k < MigraineTrigger.total(); k++) {
-                    if (MigraineTrigger.code_to_name(k) == element) {
+                    if (new MigraineTrigger(k).Name == element) {
                         data["entries"][i]["Triggers"][j] = k;
                     }
                 }
@@ -87,7 +87,7 @@ class MigrenoznikCore {
             for (let j = 0; j < data["entries"][i]["Symptoms"].length; j++) {
                 const element = data["entries"][i]["Symptoms"][j];
                 for (let k = 0; k < MigraineSymptom.total(); k++) {
-                    if (MigraineSymptom.code_to_name(k) == element) {
+                    if (new MigraineSymptom(k).Name == element) {
                         data["entries"][i]["Symptoms"][j] = k;
                     }
                 }
@@ -95,8 +95,8 @@ class MigrenoznikCore {
             for (let j = 0; j < data["entries"][i]["Drugs"].length; j++) {
                 const element = data["entries"][i]["Drugs"][j];
                 for (let k = 0; k < MigraineDrug.total(); k++) {
-                    if (MigraineDrug.code_to_name(k) == element) {
-                        data["entries"][i]["Drugs"][j] = MigraineDrug.code_to_atx(k);
+                    if (new MigraineDrug(k).Name == element) {
+                        data["entries"][i]["Drugs"][j] = new MigraineDrug(k).ATX;
                     }
                 }
             }
