@@ -75,6 +75,9 @@ class MigrenoznikCore {
         let attacks = Core.get_migraine_attacks();
         let new_attacks = [];
         // костыль, пока Аня не переделала
+        if (data["entries"] === null) {
+            return;
+        }
         for (let i = 0; i < data["entries"].length; i++) {
             for (let j = 0; j < data["entries"][i]["Triggers"].length; j++) {
                 const element = data["entries"][i]["Triggers"][j];
