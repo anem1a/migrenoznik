@@ -10,13 +10,18 @@
             <header class="migre-v1-main-header">
                 <div class="migre-v1-main-header-container">
                     <div class="migre-v1-main-header-inner">
-                        <div class="migre-v1-main-header-logo-wrapper"></div>
-                        <div class="migre-v1-main-header-hello">
-                            <h1>Мигренозник</h1>
+                        <div class="migre-v1-main-header-inner-left">
+                            <div class="migre-v1-main-header-logo-wrapper"></div>
+                            <div class="migre-v1-main-header-hello">
+                                <h1>Мигренозник</h1>
+                                <h2>Держи свою боль под контроем</h2>
+                            </div>
+                        </div>
+                        <div class="migre-v1-main-header-inner-right">
                             {{ if .Username }}
-                                <h2>{{ .Username }}, держи свою боль под контроем <button class="migre-v1-main-header-login-button" onclick="logout_Clicked()">Выйти</button></h2>
+                                <button class="migre-v1-main-header-login-button" onclick="logout_Clicked()">Выйти</button>
                             {{ else }}
-                                <h2>Держи свою боль под контроем <button class="migre-v1-main-header-login-button" onclick="login_Clicked()">Войти</button></h2>
+                                <button class="migre-v1-main-header-login-button" onclick="login_Clicked()">Вход/регистрация</button>
                             {{ end }}
                         </div>
                     </div>

@@ -142,6 +142,7 @@ body {
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: space-between;
 }
 
 .migre-v1-main-header-login-button,
@@ -410,4 +411,9 @@ body {
     font-weight: 200;
     line-height: 1;
     margin: 0;
+}
+
+.migre-v1-main-header-inner-left {
+    display: flex;
+    align-items: center;
 }
