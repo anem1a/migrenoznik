@@ -148,17 +148,18 @@ body {
 .migre-v1-main-header-login-button,
 .migre-v1-main-header-login-buttonlink {
     border: none;
-    background-color: white;
+    background-color: #BFA3FF;
     font-size: 14px;
     font-family: var(--migre-sans-font-family);
     border-radius: 4px;
     padding: 4px 10px;
     cursor: pointer;
+    color: white;
 }
 @media (hover: hover) {
     .migre-v1-main-header-login-button:hover,
     .migre-v1-main-header-login-buttonlink:hover {
-        background-color: #eee;
+        background-color: #9569fd;
     }
 }
 @media (hover: none) {
