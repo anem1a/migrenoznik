@@ -227,7 +227,7 @@ body {
 }
 
 .migre-v1-main-diary-item div {
-    margin-bottom: .15em;
+    margin-bottom: .4em;
 }
 
 .migre-v1-main-diary-item a {
@@ -351,6 +351,7 @@ body {
     border-radius: 10px;
     margin-right: .5em;
     margin-left: .5em;
+    margin-bottom: 0!important;
 }
 .migre-v1-main-diary-item-strength-visual[data-strength="1"] {
     background-color: #00FF00;
