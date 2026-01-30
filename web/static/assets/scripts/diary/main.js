@@ -116,8 +116,10 @@ class MigrenoznikCore {
             }
             if (!is_in_local_storage) {
                 console.log(data["entries"][i]);
-                console.log(MigraineAttack.from_json(data["entries"][i]));
-                new_attacks.push(MigraineAttack.from_json(data["entries"][i]));
+                let new_obj = MigraineAttack.from_json(data["entries"][i]);
+                new_obj.set_status("BACKED_UP");
+                console.log(new_obj);
+                new_attacks.push(new_obj);
             }
         }
         attacks.push(...new_attacks);
