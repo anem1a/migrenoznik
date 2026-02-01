@@ -99,7 +99,7 @@ class MigrenoznikCore {
                 const element = data["entries"][i]["Drugs"][j];
                 for (let k = 0; k < MigraineDrug.total(); k++) {
                     if (new MigraineDrug(k).Name == element) {
-                        data["entries"][i]["Drugs"][j] = new MigraineDrug(k).ATX;
+                        data["entries"][i]["Drugs"][j] = new MigraineDrug(k).Code;
                     }
                 }
             }
