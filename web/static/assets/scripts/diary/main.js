@@ -250,15 +250,38 @@ class MigrenoznikCore {
             method: 'POST',
             body: data,
         });
+
+        let migraine_attacks = Core.get_migraine_attacks();
+        for (let i = 0; i < migraine_attacks.length; i++) {
+            if (migraine_attacks[i].LocalID == current.LocalID) {
+                migraine_attacks[i].set_status("PENDING_SERVER_CREATING");
+            }
+        }
+        localStorage.setItem("migraine_attacks", JSON.stringify(migraine_attacks));
         
         if (!response.ok) throw new Error(`Ошибка HTTP ${response.status}`);
         
         const result = await response.json();
         if (result["success"]) {
             this.assign_id_to_migraine_attack(current.LocalID, result["id"]);
+            let migraine_attacks = Core.get_migraine_attacks();
+            for (let i = 0; i < migraine_attacks.length; i++) {
+                if (migraine_attacks[i].LocalID == current.LocalID) {
+                    migraine_attacks[i].set_status("BACKED_UP");
+                }
+            }
+            localStorage.setItem("migraine_attacks", JSON.stringify(migraine_attacks));
         } else if (result["error_code"] != 13) {
             this.remove_migraine_attack(current.LocalID);
             compose_migraine_diary();
+        } else {
+            let migraine_attacks = Core.get_migraine_attacks();
+            for (let i = 0; i < migraine_attacks.length; i++) {
+                if (migraine_attacks[i].LocalID == current.LocalID) {
+                    migraine_attacks[i].set_status("FAILED_SERVER_CREATING");
+                }
+            }
+            localStorage.setItem("migraine_attacks", JSON.stringify(migraine_attacks));
         }
     }
 
