@@ -282,6 +282,7 @@ class MigrenoznikCore {
                 }
             }
             localStorage.setItem("migraine_attacks", JSON.stringify(migraine_attacks));
+            compose_migraine_diary();
         }
     }
 
