@@ -115,9 +115,9 @@ class MigrenoznikCore {
                 }
             }
             if (!is_in_local_storage) {
-                console.log(data["entries"][i]);
-                console.log(MigraineAttack.from_json(data["entries"][i]));
-                new_attacks.push(MigraineAttack.from_json(data["entries"][i]));
+                let new_obj = MigraineAttack.from_json(data["entries"][i]);
+                new_obj.set_status("BACKED_UP");
+                new_attacks.push(new_obj);
             }
         }
         attacks.push(...new_attacks);
@@ -186,7 +186,6 @@ class MigrenoznikCore {
         const index = attacks.findIndex(attack => attack.LocalID == local_id);
         
         if (index !== -1) {
-            console.log(attacks);
             
             const attack = attacks[index];
             for (const [key, value] of Object.entries(updates)) {
@@ -195,7 +194,6 @@ class MigrenoznikCore {
                 }
             }
             
-            console.log(attacks);
             localStorage.setItem("migraine_attacks", JSON.stringify(attacks));
         }
     }
@@ -769,9 +767,6 @@ function compose_migraine_diary() {
                 Core.send_migraine_attack(migraine_attack);
             })
             diary_item.appendChild(save_button);
-        } else {
-            console.log(migraine_attack.Status);
-            console.log(Core.LoggedIn);
         }
         if (migraine_attack.Status != "LOCAL_ONLY" || Core.LoggedIn == false) {
             document.getElementById("migre-diary-wrapper").appendChild(diary_item);
