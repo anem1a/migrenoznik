@@ -729,6 +729,12 @@ function compose_migraine_diary() {
     let migraine_attacks = Core.get_migraine_attacks();
     for (let i = 0; i < migraine_attacks.length; i++) {
         const migraine_attack = migraine_attacks[i];
+        if (migraine_attack.Status == "LOCAL_DELETED" ||
+            migraine_attack.Status == "PENDING_SERVER_DELETING" ||
+            migraine_attack.Status == "FAILED_SERVER_DELETING"
+        ) {
+            continue;
+        }
         let diary_item = create_element(
             "div",
             "migre-v1-main-diary-item"
@@ -785,25 +791,53 @@ function compose_migraine_diary() {
 async function delete_entry_Clicked(local_id) {
     let attacks = Core.get_migraine_attacks();
     let attack_to_delete = null;
-    for (const attack of attacks) {
-        if (attack.LocalID == local_id) {
-            attack_to_delete = attack.ID;
+    for (let i = 0; i < attacks.length; i++) {
+        //const attack = attacks[i];
+        if (attacks[i].LocalID == local_id) {
+            if (attacks[i].Status == "LOCAL_ONLY") {
+                Core.remove_migraine_attack(local_id);
+                compose_migraine_diary();
+                return;
+            } else {
+                attack_to_delete = attacks[i].ID;
+                attacks[i].set_status("LOCAL_DELETED");
+                localStorage.setItem("migraine_attacks", JSON.stringify(attacks));
+            }
             break;
         }
     }
-    if (attack_to_delete == null) {
-        Core.remove_migraine_attack(local_id);
-        compose_migraine_diary();
-        return;
-    }
+
+    attacks = Core.get_migraine_attacks();
     let response = await fetch(`https://migrenoznik.ru/api/delete_entry?id=${attack_to_delete}`);
     if (!response.ok) {
         throw new Error(`Ошибка HTTP: ${response.status}`);
     }
+
+    for (let i = 0; i < attacks.length; i++) {
+        const attack = attacks[i];
+        if (attack.LocalID == local_id) {
+            attacks[i].set_status("PENDING_SERVER_DELETING");
+            localStorage.setItem("migraine_attacks", JSON.stringify(attacks));
+            break;
+        }
+    }
     
     const data = await response.json();
+
+    attacks = Core.get_migraine_attacks();
     if (data["success"]) {
         Core.remove_migraine_attack(local_id);
+        compose_migraine_diary();
+    } else {
+        // Здесь надо будет добавить обработку ошибки сервера (почему именно запись не удалилась) MIG-165
+        for (let i = 0; i < attacks.length; i++) {
+            const attack = attacks[i];
+            if (attack.LocalID == local_id) {
+                attacks[i].set_status("FAILED_SERVER_DELETING");
+                localStorage.setItem("migraine_attacks", JSON.stringify(attacks));
+                break;
+            }
+        }
         compose_migraine_diary();
     }
 }
