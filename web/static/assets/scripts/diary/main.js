@@ -700,6 +700,15 @@ function migraine_now_button_Clicked() {
     compose_migraine_diary();
 }
 
+function cancel_migraine_now() {
+    if (Core.is_migraine_now()) {
+        Core.toggle_migraine_status();
+        localStorage.removeItem("current_migraine_attack");
+        configure_main_bottom_buttoms(false);
+        document.getElementById("migre-now-wrapper").style.display = 'none';
+    }
+}
+
 function login_Clicked() {
     window.location.href = "/login/";
     //window.history.pushState(null, null, "/login/");

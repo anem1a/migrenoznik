@@ -388,6 +388,22 @@ body {
     font-size: 40px;
 }
 
+.migre-v1-main-now-item a {
+    color: rgb(18, 126, 255);
+    border-bottom: 1px solid rgb(18, 126, 255);
+    cursor: pointer;
+}
+@media (hover: hover) {
+    .migre-v1-main-now-item a:hover {
+        color: rgb(255, 126, 18);
+        border-bottom: 1px solid rgb(255, 126, 18);
+    }
+}
+@media (hover: none) {
+    .migre-v1-main-now-item a:active {
+        color: rgb(255, 126, 18);
+        border-bottom: 1px solid rgb(255, 126, 18);
+    }
 .migre-v1-main-header-logo-wrapper {
     width: 50px;
     height: 50px;
