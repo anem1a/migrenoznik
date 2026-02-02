@@ -10,37 +10,26 @@
             <header class="migre-v1-main-header">
                 <div class="migre-v1-main-header-container">
                     <div class="migre-v1-main-header-inner">
-                        {{ if .Username }}
-                        <div class="col-md-3 text-end">
-                            <span>Привет, {{ .Username }}</span>
-                            <button class="migre-v1-main-header-login-button" onclick="logout_Clicked()">Выйти</button>
+                        <div class="migre-v1-main-header-inner-left">
+                            <div class="migre-v1-main-header-logo-wrapper"></div>
+                            <div class="migre-v1-main-header-hello">
+                                <h1>Мигренозник</h1>
+                                <h2>Держи свою боль под контролем</h2>
+                            </div>
                         </div>
-                        {{ else }}
-                        <button class="migre-v1-main-header-login-button" onclick="login_Clicked()">Войти</button>
-                        {{ end }}
+                        <div class="migre-v1-main-header-inner-right">
+                            {{ if .Username }}
+                                <button class="migre-v1-main-header-login-button" onclick="logout_Clicked()">Выйти</button>
+                            {{ else }}
+                                <button class="migre-v1-main-header-login-button" onclick="login_Clicked()">Вход/регистрация</button>
+                            {{ end }}
+                        </div>
                     </div>
                 </div>
             </header>
 
             <div class="migre-v1-main">
                 <div class="migre-v1-main-diary">
-                    <div class="migre-v1-main-diary-wrapper" id="migre-statistics-wrapper" style="display: none;">
-                        <div class="migre-v1-main-card-titles-block">
-                            <h1>Текущий месяц</h1>
-                        </div>
-                        <div class="migre-v1-main-card-big-digit">
-                            <div class="migre-v1-main-card-big-digit-digit" id="migre-drugs-cost">X</div>
-                            <div class="migre-v1-main-card-big-digit-sub">
-                                <select name="" id="migre-currency-select" oninput="currency_select()">
-                                    <option id="migre-currency-rub" selected value="rub">рублей</option>
-                                    <option id="migre-currency-usd" value="usd">долларов</option>
-                                    <option id="migre-currency-eur" value="eur">евро</option>
-                                    <option id="migre-currency-dem" value="gpb">фунтов стерлингов</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
                     <div class="migre-v1-main-diary-wrapper" id="migre-now-wrapper" style="display: none;">
                         <div class="migre-v1-main-card-titles-block">
                             <h1>Мигрень сейчас</h1>
@@ -183,7 +172,7 @@
                             <button class="migre-v1-main-bottom-button" id="migre-diary-main-bottom-button-now"
                                 onclick="migraine_now_button_Clicked()">Отметить мигрень сейчас
                             </button>
-                            <button class="migre-v1-main-bottom-button" data-square="true" id="migre-diary-main-bottom-button-add"
+                            <button style="display: none;" class="migre-v1-main-bottom-button" data-square="true" id="migre-diary-main-bottom-button-add"
                                 onclick="migraine_now_button_Clicked()">+
                             </button>
                         </div>

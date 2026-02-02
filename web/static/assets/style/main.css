@@ -134,27 +134,32 @@ body {
 }
 
 .migre-v1-main-header {
-    background-color: var(--migre-color-main);
+    border-bottom: 1px solid black;
 }
 
 .migre-v1-main-header-inner {
     padding: 6px 10px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .migre-v1-main-header-login-button,
 .migre-v1-main-header-login-buttonlink {
     border: none;
-    background-color: white;
+    background-color: #BFA3FF;
     font-size: 14px;
     font-family: var(--migre-sans-font-family);
     border-radius: 4px;
     padding: 4px 10px;
     cursor: pointer;
+    color: white;
 }
 @media (hover: hover) {
     .migre-v1-main-header-login-button:hover,
     .migre-v1-main-header-login-buttonlink:hover {
-        background-color: #eee;
+        background-color: #9569fd;
     }
 }
 @media (hover: none) {
@@ -222,7 +227,7 @@ body {
 }
 
 .migre-v1-main-diary-item div {
-    margin-bottom: .15em;
+    margin-bottom: .4em;
 }
 
 .migre-v1-main-diary-item a {
@@ -346,6 +351,7 @@ body {
     border-radius: 10px;
     margin-right: .5em;
     margin-left: .5em;
+    margin-bottom: 0!important;
 }
 .migre-v1-main-diary-item-strength-visual[data-strength="1"] {
     background-color: #00FF00;
@@ -398,4 +404,34 @@ body {
         color: rgb(255, 126, 18);
         border-bottom: 1px solid rgb(255, 126, 18);
     }
+.migre-v1-main-header-logo-wrapper {
+    width: 50px;
+    height: 50px;
+    background-image: url(https://migrenoznik.ru/static/assets/images/icons/header-logo.png);
+    background-position: center;
+    background-size: cover;
+    border-radius: 10px;
+}
+
+.migre-v1-main-header-hello {
+    margin-left: 10px;
+}
+
+.migre-v1-main-header-hello h1 {
+    font-size: var(--migre-font-size-xl);
+    font-weight: 200;
+    line-height: 1;
+    margin: 0;
+}
+
+.migre-v1-main-header-hello h2 {
+    font-size: var(--migre-font-size-m);
+    font-weight: 200;
+    line-height: 1;
+    margin: 0;
+}
+
+.migre-v1-main-header-inner-left {
+    display: flex;
+    align-items: center;
 }

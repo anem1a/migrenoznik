@@ -99,7 +99,7 @@ class MigrenoznikCore {
                 const element = data["entries"][i]["Drugs"][j];
                 for (let k = 0; k < MigraineDrug.total(); k++) {
                     if (new MigraineDrug(k).Name == element) {
-                        data["entries"][i]["Drugs"][j] = new MigraineDrug(k).ATX;
+                        data["entries"][i]["Drugs"][j] = new MigraineDrug(k).Code;
                     }
                 }
             }
@@ -115,9 +115,9 @@ class MigrenoznikCore {
                 }
             }
             if (!is_in_local_storage) {
-                console.log(data["entries"][i]);
-                console.log(MigraineAttack.from_json(data["entries"][i]));
-                new_attacks.push(MigraineAttack.from_json(data["entries"][i]));
+                let new_obj = MigraineAttack.from_json(data["entries"][i]);
+                new_obj.set_status("BACKED_UP");
+                new_attacks.push(new_obj);
             }
         }
         attacks.push(...new_attacks);
@@ -186,7 +186,6 @@ class MigrenoznikCore {
         const index = attacks.findIndex(attack => attack.LocalID == local_id);
         
         if (index !== -1) {
-            console.log(attacks);
             
             const attack = attacks[index];
             for (const [key, value] of Object.entries(updates)) {
@@ -195,7 +194,6 @@ class MigrenoznikCore {
                 }
             }
             
-            console.log(attacks);
             localStorage.setItem("migraine_attacks", JSON.stringify(attacks));
         }
     }
@@ -244,22 +242,46 @@ class MigrenoznikCore {
         data.append("dt_start", current.DT_Start.getTime());
         data.append("dt_end", current.DT_End.getTime());
         data.append("strength", current.Strength);
-        data.append("triggers", JSON.stringify(current.Triggers));
-        data.append("symptoms", JSON.stringify(current.Symptoms));
-        data.append("drugs", JSON.stringify(current.Drugs.map(element => MigraineDrug.code_to_atx(element))));
+        data.append("triggers", JSON.stringify(current.Triggers.map(element => element.Code)));
+        data.append("symptoms", JSON.stringify(current.Symptoms.map(element => element.Code)));
+        data.append("drugs", JSON.stringify(current.Drugs.map(element => element.ATX)));
         
         const response = await fetch('/api/add_entry', {
             method: 'POST',
             body: data,
         });
+
+        let migraine_attacks = Core.get_migraine_attacks();
+        for (let i = 0; i < migraine_attacks.length; i++) {
+            if (migraine_attacks[i].LocalID == current.LocalID) {
+                migraine_attacks[i].set_status("PENDING_SERVER_CREATING");
+            }
+        }
+        localStorage.setItem("migraine_attacks", JSON.stringify(migraine_attacks));
         
         if (!response.ok) throw new Error(`Ошибка HTTP ${response.status}`);
         
         const result = await response.json();
         if (result["success"]) {
             this.assign_id_to_migraine_attack(current.LocalID, result["id"]);
+            let migraine_attacks = Core.get_migraine_attacks();
+            for (let i = 0; i < migraine_attacks.length; i++) {
+                if (migraine_attacks[i].LocalID == current.LocalID) {
+                    migraine_attacks[i].set_status("BACKED_UP");
+                }
+            }
+            localStorage.setItem("migraine_attacks", JSON.stringify(migraine_attacks));
         } else if (result["error_code"] != 13) {
             this.remove_migraine_attack(current.LocalID);
+            compose_migraine_diary();
+        } else {
+            let migraine_attacks = Core.get_migraine_attacks();
+            for (let i = 0; i < migraine_attacks.length; i++) {
+                if (migraine_attacks[i].LocalID == current.LocalID) {
+                    migraine_attacks[i].set_status("FAILED_SERVER_CREATING");
+                }
+            }
+            localStorage.setItem("migraine_attacks", JSON.stringify(migraine_attacks));
             compose_migraine_diary();
         }
     }
@@ -740,6 +762,12 @@ function compose_migraine_diary() {
     let migraine_attacks = Core.get_migraine_attacks();
     for (let i = 0; i < migraine_attacks.length; i++) {
         const migraine_attack = migraine_attacks[i];
+        if (migraine_attack.Status == "LOCAL_DELETED" ||
+            migraine_attack.Status == "PENDING_SERVER_DELETING" ||
+            migraine_attack.Status == "FAILED_SERVER_DELETING"
+        ) {
+            continue;
+        }
         let diary_item = create_element(
             "div",
             "migre-v1-main-diary-item"
@@ -778,9 +806,6 @@ function compose_migraine_diary() {
                 Core.send_migraine_attack(migraine_attack);
             })
             diary_item.appendChild(save_button);
-        } else {
-            console.log(migraine_attack.Status);
-            console.log(Core.LoggedIn);
         }
         if (migraine_attack.Status != "LOCAL_ONLY" || Core.LoggedIn == false) {
             document.getElementById("migre-diary-wrapper").appendChild(diary_item);
@@ -799,25 +824,53 @@ function compose_migraine_diary() {
 async function delete_entry_Clicked(local_id) {
     let attacks = Core.get_migraine_attacks();
     let attack_to_delete = null;
-    for (const attack of attacks) {
-        if (attack.LocalID == local_id) {
-            attack_to_delete = attack.ID;
+    for (let i = 0; i < attacks.length; i++) {
+        //const attack = attacks[i];
+        if (attacks[i].LocalID == local_id) {
+            if (attacks[i].Status == "LOCAL_ONLY") {
+                Core.remove_migraine_attack(local_id);
+                compose_migraine_diary();
+                return;
+            } else {
+                attack_to_delete = attacks[i].ID;
+                attacks[i].set_status("LOCAL_DELETED");
+                localStorage.setItem("migraine_attacks", JSON.stringify(attacks));
+            }
             break;
         }
     }
-    if (attack_to_delete == null) {
-        Core.remove_migraine_attack(local_id);
-        compose_migraine_diary();
-        return;
-    }
+
+    attacks = Core.get_migraine_attacks();
     let response = await fetch(`https://migrenoznik.ru/api/delete_entry?id=${attack_to_delete}`);
     if (!response.ok) {
         throw new Error(`Ошибка HTTP: ${response.status}`);
     }
+
+    for (let i = 0; i < attacks.length; i++) {
+        const attack = attacks[i];
+        if (attack.LocalID == local_id) {
+            attacks[i].set_status("PENDING_SERVER_DELETING");
+            localStorage.setItem("migraine_attacks", JSON.stringify(attacks));
+            break;
+        }
+    }
     
     const data = await response.json();
+
+    attacks = Core.get_migraine_attacks();
     if (data["success"]) {
         Core.remove_migraine_attack(local_id);
+        compose_migraine_diary();
+    } else {
+        // Здесь надо будет добавить обработку ошибки сервера (почему именно запись не удалилась) MIG-165
+        for (let i = 0; i < attacks.length; i++) {
+            const attack = attacks[i];
+            if (attack.LocalID == local_id) {
+                attacks[i].set_status("FAILED_SERVER_DELETING");
+                localStorage.setItem("migraine_attacks", JSON.stringify(attacks));
+                break;
+            }
+        }
         compose_migraine_diary();
     }
 }
