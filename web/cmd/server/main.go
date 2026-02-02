@@ -18,66 +18,67 @@ import (
 	"migrenoznik/cmd/server/pages"
 	"migrenoznik/cmd/server/telegram"
 
+	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 )
 
 func main() {
 	var err error
 
-	// Инициализация подключения к базе данных PostgreSQL
 	dbConfig := config.GetDBConfig()
-	connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=require", dbConfig.Host, dbConfig.Port,
-		dbConfig.User, dbConfig.Password, dbConfig.DBName)
+	connStr := fmt.Sprintf(
+		"host=%s port=%d user=%s password=%s dbname=%s sslmode=require",
+		dbConfig.Host,
+		dbConfig.Port,
+		dbConfig.User,
+		dbConfig.Password,
+		dbConfig.DBName,
+	)
+
 	global.DB, err = sql.Open("postgres", connStr)
 	if err != nil {
 		log.Fatal("Ошибка подключения к БД:", err)
 	}
 	defer global.DB.Close()
 
-	err = global.DB.Ping()
-	if err != nil {
+	if err = global.DB.Ping(); err != nil {
 		log.Fatal("БД недоступна:", err)
 	}
 	log.Println("✅ Подключение к БД установлено")
 
-	// Инициализация маршрутизатора
-	mux := http.NewServeMux()
+	gin.SetMode(gin.ReleaseMode)
+	router := gin.Default()
 
-	// Раздача статики
-	fs := http.FileServer(http.Dir("./static"))
-	mux.Handle("/static/", http.StripPrefix("/static/", fs))
+	router.Static("/static", "./static")
 
-	// Страницы
-	mux.HandleFunc("/", pages.IndexHandler)
-	mux.HandleFunc("/login/", pages.LoginPageHandler)
-	mux.HandleFunc("/sign-up/", pages.SignupPageHandler)
-	mux.HandleFunc("/doctor/", pages.DoctorPageHandler)
+	router.GET("/", pages.IndexHandler)
+	router.GET("/login/", pages.LoginPageHandler)
+	router.GET("/sign-up/", pages.SignupPageHandler)
 
-	// API
-	mux.HandleFunc("/api/login", handlers.LoginHandler)
-	mux.HandleFunc("/api/check-session", handlers.CheckSessionHandler)
-	mux.HandleFunc("/api/logout", handlers.LogoutHandler)
-	mux.HandleFunc("/api/signup", handlers.SignupHandler)
-	mux.HandleFunc("/api/add_entry", handlers.AddEntryHandler)
-	mux.HandleFunc("/api/entries", handlers.EntriesHandler)
-	mux.HandleFunc("/api/delete_entry", handlers.DeleteEntryHandler)
+	api := router.Group("/api")
+	{
+		api.POST("/login", handlers.LoginHandler)
+		api.GET("/check-session", handlers.CheckSessionHandler)
+		api.POST("/logout", handlers.LogoutHandler)
+		api.POST("/signup", handlers.SignupHandler)
+		api.POST("/add_entry", handlers.AddEntryHandler)
+		api.GET("/entries", handlers.EntriesHandler)
+		api.GET("/delete_entry", handlers.DeleteEntryHandler)
+	}
 
-	// HTTPS сервер
+	go telegram.StartReminderBot()
+
 	go func() {
 		log.Println("🚀 HTTPS сервер запущен на https://migrenoznik.ru")
-		err := http.ListenAndServeTLS(
+		err := router.RunTLS(
 			":443",
 			"/etc/letsencrypt/live/migrenoznik.ru/fullchain.pem",
 			"/etc/letsencrypt/live/migrenoznik.ru/privkey.pem",
-			mux,
 		)
 		if err != nil {
 			log.Fatal("Ошибка HTTPS сервера:", err)
 		}
 	}()
-
-	// Запуск Telegram-бота
-	go telegram.StartReminderBot()
 
 	// HTTP → HTTPS редирект
 	log.Println("➡️ HTTP сервер запущен (редиректит на HTTPS)")
@@ -85,7 +86,6 @@ func main() {
 		http.Redirect(w, r, "https://"+r.Host+r.RequestURI, http.StatusMovedPermanently)
 	})))
 
-	// Локальный HTTP сервер для разработки
-	// log.Println("🚀 Сервер запущен на http://localhost:8080")
-	// log.Fatal(http.ListenAndServe(":8080", mux))
+	// log.Println("➡️ HTTP сервер запущен (редиректит на HTTPS)")
+	// log.Fatal(gin.RedirectHTTPToHTTPS(":8080"))
 }

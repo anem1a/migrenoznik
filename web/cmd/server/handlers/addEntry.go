@@ -5,12 +5,12 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"migrenoznik/cmd/server/global"
-	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 // AddEntryHandler обрабатывает POST-запрос на добавление новой записи о приступе мигрени.
@@ -36,154 +36,96 @@ import (
 // 8. Добавляет связи с симптомами в таблицу "Attack-Symptom".
 // 9. Добавляет лекарства в таблицу "Attack-Drug".
 // 10. Возвращает JSON-ответ с результатом операции.
-func AddEntryHandler(w http.ResponseWriter, r *http.Request) {
-	// Разрешён только POST-метод
-	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
+func AddEntryHandler(c *gin.Context) {
 	// Проверка сессии
-	cookie, err := r.Cookie("session_id")
+	sessionID, err := c.Cookie("session_id")
 	if err != nil {
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success":    false,
-			"id":         nil,
-			"error_code": 13,
-		})
+		c.JSON(200, gin.H{"success": false, "id": nil, "error_code": 13})
 		log.Println("Ошибка сессии")
 		return
 	}
 
-	// Получение логина из массива сессий
-	login, ok := global.Sessions[cookie.Value]
+	login, ok := global.Sessions[sessionID]
 	if !ok {
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success":    false,
-			"id":         nil,
-			"error_code": 13,
-		})
+		c.JSON(200, gin.H{"success": false, "id": nil, "error_code": 13})
 		log.Println("Сессия не найдена")
 		return
 	}
 
-	// Нахождение acc_id по логину в БД
+	// Получение acc_id пользователя
 	var accID int
-	err = global.DB.QueryRow(
-		`SELECT acc_id FROM "Accounts" WHERE acc_login = $1`,
-		login,
-	).Scan(&accID)
-
+	err = global.DB.QueryRow(`SELECT acc_id FROM "Accounts" WHERE acc_login=$1`, login).Scan(&accID)
 	if err != nil {
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success":    false,
-			"id":         nil,
-			"error_code": 666,
-		})
+		c.JSON(200, gin.H{"success": false, "id": nil, "error_code": 666})
 		log.Println("Аккаунт не найден")
 		return
 	}
 
-	// Получение POST-полей
-	dtStartStr := r.FormValue("dt_start")
-	dtEndStr := r.FormValue("dt_end")
-	strengthStr := r.FormValue("strength")
-	triggersSlice := r.FormValue("triggers")
-	symptomsSlice := r.FormValue("symptoms")
-	drugsSliceMap := r.FormValue("drugs")
+	// Получение полей из POST
+	dtStartStr := c.PostForm("dt_start")
+	dtEndStr := c.PostForm("dt_end")
+	strengthStr := c.PostForm("strength")
+	triggersJSON := c.PostForm("triggers")
+	symptomsJSON := c.PostForm("symptoms")
+	drugsJSON := c.PostForm("drugs")
 
-	if dtStartStr == "" || dtEndStr == "" || strengthStr == "" || triggersSlice == "" || symptomsSlice == "" || drugsSliceMap == "" {
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success":    false,
-			"id":         nil,
-			"error_code": 444,
-		})
+	if dtStartStr == "" || dtEndStr == "" || strengthStr == "" ||
+		triggersJSON == "" || symptomsJSON == "" || drugsJSON == "" {
+		c.JSON(200, gin.H{"success": false, "id": nil, "error_code": 444})
 		return
 	}
 
-	// Парсинг и конвертация дат
+	// Конвертация дат
 	dtStartUnix, err := strconv.ParseInt(dtStartStr, 10, 64)
-	dtStartUnix /= 1000
 	if err != nil {
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success":    false,
-			"id":         nil,
-			"error_code": 444,
-		})
+		c.JSON(200, gin.H{"success": false, "id": nil, "error_code": 444})
 		log.Println("Ошибка конвертации даты начала")
 		return
 	}
-
 	dtEndUnix, err := strconv.ParseInt(dtEndStr, 10, 64)
-	dtEndUnix /= 1000
 	if err != nil || dtEndUnix < dtStartUnix {
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success":    false,
-			"id":         nil,
-			"error_code": 444,
-		})
+		c.JSON(200, gin.H{"success": false, "id": nil, "error_code": 444})
 		log.Println("Ошибка конвертации даты окончания")
 		return
 	}
 
-	tStart := time.Unix(dtStartUnix, 0)
-	tEnd := time.Unix(dtEndUnix, 0)
-
+	tStart := time.Unix(dtStartUnix/1000, 0)
+	tEnd := time.Unix(dtEndUnix/1000, 0)
 	date := tStart.Format("2006-01-02")
 	timeValue := tStart.Format("15:04:05")
-
 	durationHours := int(tEnd.Sub(tStart).Hours())
 	if durationHours < 0 {
 		durationHours = 0
 	}
 
-	// Парсинг интенсивности боли
+	// Конвертация интенсивности боли
 	strength, err := strconv.Atoi(strengthStr)
 	if err != nil || strength < 0 || strength > 10 {
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success":    false,
-			"id":         nil,
-			"error_code": 444,
-		})
+		c.JSON(200, gin.H{"success": false, "id": nil, "error_code": 444})
 		log.Println("Ошибка конвертации интенсивности боли")
 		return
 	}
 
 	// Парсинг триггеров
 	var triggers []int
-	err = json.Unmarshal([]byte(triggersSlice), &triggers)
-	if err != nil {
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success":    false,
-			"id":         nil,
-			"error_code": 444,
-		})
+	if err := json.Unmarshal([]byte(triggersJSON), &triggers); err != nil {
+		c.JSON(200, gin.H{"success": false, "id": nil, "error_code": 444})
 		log.Println("Ошибка парсинга триггеров")
 		return
 	}
 
 	// Парсинг симптомов
 	var symptoms []int
-	err = json.Unmarshal([]byte(symptomsSlice), &symptoms)
-	if err != nil {
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success":    false,
-			"id":         nil,
-			"error_code": 444,
-		})
+	if err := json.Unmarshal([]byte(symptomsJSON), &symptoms); err != nil {
+		c.JSON(200, gin.H{"success": false, "id": nil, "error_code": 444})
 		log.Println("Ошибка парсинга симптомов")
 		return
 	}
 
 	// Парсинг лекарств
 	var drugs []string
-	err = json.Unmarshal([]byte(drugsSliceMap), &drugs)
-	if err != nil {
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success":    false,
-			"id":         nil,
-			"error_code": 444,
-		})
+	if err := json.Unmarshal([]byte(drugsJSON), &drugs); err != nil {
+		c.JSON(200, gin.H{"success": false, "id": nil, "error_code": 444})
 		log.Println("Ошибка парсинга лекарств")
 		return
 	}
@@ -195,30 +137,17 @@ func AddEntryHandler(w http.ResponseWriter, r *http.Request) {
         VALUES ($1, $2, $3, $4, $5, '')
         RETURNING id_entry
     `, accID, date, timeValue, strength, durationHours).Scan(&entryID)
-
 	if err != nil {
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success":    false,
-			"id":         nil,
-			"error_code": 666,
-		})
+		c.JSON(200, gin.H{"success": false, "id": nil, "error_code": 666})
 		log.Println("SQL ошибка при добавлении записи:", err)
 		return
 	}
 
 	// Вставка триггеров
 	for _, trID := range triggers {
-		_, err = global.DB.Exec(`
-        INSERT INTO "Attack-Trigger" (id_entry, id_trigger)
-        VALUES ($1, $2)
-    `, entryID, trID)
-
+		_, err = global.DB.Exec(`INSERT INTO "Attack-Trigger" (id_entry, id_trigger) VALUES ($1, $2)`, entryID, trID)
 		if err != nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"success":    false,
-				"id":         nil,
-				"error_code": 666,
-			})
+			c.JSON(200, gin.H{"success": false, "id": nil, "error_code": 666})
 			log.Println("SQL ошибка при добавлении триггеров:", err)
 			return
 		}
@@ -226,44 +155,25 @@ func AddEntryHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Вставка симптомов
 	for _, symID := range symptoms {
-		_, err = global.DB.Exec(`
-		INSERT INTO "Attack-Symptom" (id_entry, id_sympt)
-		VALUES ($1, $2)
-	`, entryID, symID)
+		_, err = global.DB.Exec(`INSERT INTO "Attack-Symptom" (id_entry, id_sympt) VALUES ($1, $2)`, entryID, symID)
 		if err != nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"success":    false,
-				"id":         nil,
-				"error_code": 666,
-			})
+			c.JSON(200, gin.H{"success": false, "id": nil, "error_code": 666})
 			log.Println("SQL ошибка при вставке симптома:", err)
 			return
 		}
 	}
+
 	// Вставка лекарств
 	for _, drugName := range drugs {
-		fmt.Println(entryID, drugName)
-		_, err = global.DB.Exec(`
-		INSERT INTO "Attack-Drug" (id_entry, atx_code, dosage)	
-		VALUES ($1, $2, '')
-	`, entryID, drugName)
+		_, err = global.DB.Exec(`INSERT INTO "Attack-Drug" (id_entry, atx_code, dosage) VALUES ($1, $2, '')`, entryID, drugName)
 		if err != nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"success":    false,
-				"id":         nil,
-				"error_code": 666,
-			})
+			c.JSON(200, gin.H{"success": false, "id": nil, "error_code": 666})
 			log.Println("SQL ошибка при вставке лекарства:", err)
 			return
 		}
 	}
 
-	// Отправка успешного ответа
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success":    true,
-		"id":         entryID,
-		"error_code": 0,
-	})
+	// Успешный ответ
+	c.JSON(200, gin.H{"success": true, "id": entryID, "error_code": 0})
 	log.Printf("✅ Запись добавлена для пользователя: %s, id записи: %d\n", login, entryID)
-
 }
