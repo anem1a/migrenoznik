@@ -24,11 +24,10 @@ import (
 //
 // В ответ клиенту возвращается JSON-объект с кодом результата.
 func SignupHandler(c *gin.Context) {
-	// Получаем данные из формы
+
 	login := c.PostForm("login")
 	password := c.PostForm("password")
 
-	// Проверка на пустые поля
 	if login == "" || password == "" {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
@@ -109,7 +108,6 @@ func SignupHandler(c *gin.Context) {
 		true, // HttpOnly
 	)
 
-	// Успешный ответ
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"code":    0,

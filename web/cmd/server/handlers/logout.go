@@ -16,10 +16,9 @@ import (
 //   - сбрасывает cookie с идентификатором сессии на клиенте;
 //   - возвращает JSON с результатом операции.
 func LogoutHandler(c *gin.Context) {
-	// Получаем cookie с идентификатором сессии
+
 	sessionID, err := c.Cookie("session_id")
 	if err == nil {
-		// Удаляем сессию из памяти
 		delete(global.Sessions, sessionID)
 
 		// Удаляем cookie у клиента
@@ -34,7 +33,6 @@ func LogoutHandler(c *gin.Context) {
 		)
 	}
 
-	// Отправляем успешный ответ
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 	})

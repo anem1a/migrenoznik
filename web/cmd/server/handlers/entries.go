@@ -27,25 +27,23 @@ import (
 // 6. Возвращает JSON с массивом всех записей.
 func EntriesHandler(c *gin.Context) {
 
-	// 🔐 Проверка сессии
 	cookie, err := c.Cookie("session_id")
 	if err != nil {
-		log.Println("Ошибка сессии")
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"success": false,
 			"entries": nil,
 		})
+		log.Println("Сессия не найдена в cookie")
 		return
 	}
 
-	// 👤 Получение логина
 	login, ok := global.Sessions[cookie]
 	if !ok {
-		log.Println("Сессия не найдена")
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"success": false,
 			"entries": nil,
 		})
+		log.Println("Сессия не найдена в хранилище")
 		return
 	}
 
@@ -58,11 +56,11 @@ func EntriesHandler(c *gin.Context) {
 	`, login).Scan(&accID)
 
 	if err != nil {
-		log.Println("Аккаунт не найден")
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
 			"entries": nil,
 		})
+		log.Println("Аккаунт не найден в БД")
 		return
 	}
 
@@ -75,11 +73,11 @@ func EntriesHandler(c *gin.Context) {
 	`, accID)
 
 	if err != nil {
-		log.Println("Ошибка запроса записей:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
 			"entries": nil,
 		})
+		log.Println("Ошибка запроса записей с БД:", err)
 		return
 	}
 	defer rows.Close()
@@ -146,8 +144,7 @@ func EntriesHandler(c *gin.Context) {
 			ID:       id,
 		})
 	}
-
-	// ✅ Ответ
+	
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"entries": entries,

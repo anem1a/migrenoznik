@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"log"
 	"migrenoznik/cmd/server/global"
+	"net/http"
 	"strconv"
 	"time"
 
@@ -37,18 +38,24 @@ import (
 // 9. Добавляет лекарства в таблицу "Attack-Drug".
 // 10. Возвращает JSON-ответ с результатом операции.
 func AddEntryHandler(c *gin.Context) {
-	// Проверка сессии
+
 	sessionID, err := c.Cookie("session_id")
 	if err != nil {
-		c.JSON(200, gin.H{"success": false, "id": nil, "error_code": 13})
-		log.Println("Ошибка сессии")
+		c.JSON(http.StatusOK, gin.H{
+			"success":    false,
+			"id":         nil,
+			"error_code": 13})
+		log.Println("Сессия не найдена в cookie")
 		return
 	}
 
 	login, ok := global.Sessions[sessionID]
 	if !ok {
-		c.JSON(200, gin.H{"success": false, "id": nil, "error_code": 13})
-		log.Println("Сессия не найдена")
+		c.JSON(http.StatusOK, gin.H{
+			"success":    false,
+			"id":         nil,
+			"error_code": 13})
+		log.Println("Сессия не найдена в хранилище")
 		return
 	}
 
@@ -56,8 +63,11 @@ func AddEntryHandler(c *gin.Context) {
 	var accID int
 	err = global.DB.QueryRow(`SELECT acc_id FROM "Accounts" WHERE acc_login=$1`, login).Scan(&accID)
 	if err != nil {
-		c.JSON(200, gin.H{"success": false, "id": nil, "error_code": 666})
-		log.Println("Аккаунт не найден")
+		c.JSON(http.StatusOK, gin.H{
+			"success":    false,
+			"id":         nil,
+			"error_code": 666})
+		log.Println("Аккаунт не найден в БД")
 		return
 	}
 
@@ -71,28 +81,39 @@ func AddEntryHandler(c *gin.Context) {
 
 	if dtStartStr == "" || dtEndStr == "" || strengthStr == "" ||
 		triggersJSON == "" || symptomsJSON == "" || drugsJSON == "" {
-		c.JSON(200, gin.H{"success": false, "id": nil, "error_code": 444})
+		c.JSON(http.StatusOK, gin.H{
+			"success":    false,
+			"id":         nil,
+			"error_code": 444})
 		return
 	}
 
 	// Конвертация дат
 	dtStartUnix, err := strconv.ParseInt(dtStartStr, 10, 64)
 	if err != nil {
-		c.JSON(200, gin.H{"success": false, "id": nil, "error_code": 444})
+		c.JSON(http.StatusOK, gin.H{
+			"success":    false,
+			"id":         nil,
+			"error_code": 444})
 		log.Println("Ошибка конвертации даты начала")
 		return
 	}
 	dtEndUnix, err := strconv.ParseInt(dtEndStr, 10, 64)
 	if err != nil || dtEndUnix < dtStartUnix {
-		c.JSON(200, gin.H{"success": false, "id": nil, "error_code": 444})
+		c.JSON(http.StatusOK, gin.H{
+			"success":    false,
+			"id":         nil,
+			"error_code": 444})
 		log.Println("Ошибка конвертации даты окончания")
 		return
 	}
 
 	tStart := time.Unix(dtStartUnix/1000, 0)
 	tEnd := time.Unix(dtEndUnix/1000, 0)
+
 	date := tStart.Format("2006-01-02")
 	timeValue := tStart.Format("15:04:05")
+
 	durationHours := int(tEnd.Sub(tStart).Hours())
 	if durationHours < 0 {
 		durationHours = 0
@@ -101,7 +122,7 @@ func AddEntryHandler(c *gin.Context) {
 	// Конвертация интенсивности боли
 	strength, err := strconv.Atoi(strengthStr)
 	if err != nil || strength < 0 || strength > 10 {
-		c.JSON(200, gin.H{"success": false, "id": nil, "error_code": 444})
+		c.JSON(http.StatusOK, gin.H{"success": false, "id": nil, "error_code": 444})
 		log.Println("Ошибка конвертации интенсивности боли")
 		return
 	}
@@ -109,7 +130,10 @@ func AddEntryHandler(c *gin.Context) {
 	// Парсинг триггеров
 	var triggers []int
 	if err := json.Unmarshal([]byte(triggersJSON), &triggers); err != nil {
-		c.JSON(200, gin.H{"success": false, "id": nil, "error_code": 444})
+		c.JSON(http.StatusOK, gin.H{
+			"success":    false,
+			"id":         nil,
+			"error_code": 444})
 		log.Println("Ошибка парсинга триггеров")
 		return
 	}
@@ -117,7 +141,10 @@ func AddEntryHandler(c *gin.Context) {
 	// Парсинг симптомов
 	var symptoms []int
 	if err := json.Unmarshal([]byte(symptomsJSON), &symptoms); err != nil {
-		c.JSON(200, gin.H{"success": false, "id": nil, "error_code": 444})
+		c.JSON(http.StatusOK, gin.H{
+			"success":    false,
+			"id":         nil,
+			"error_code": 444})
 		log.Println("Ошибка парсинга симптомов")
 		return
 	}
@@ -125,7 +152,10 @@ func AddEntryHandler(c *gin.Context) {
 	// Парсинг лекарств
 	var drugs []string
 	if err := json.Unmarshal([]byte(drugsJSON), &drugs); err != nil {
-		c.JSON(200, gin.H{"success": false, "id": nil, "error_code": 444})
+		c.JSON(http.StatusOK, gin.H{
+			"success":    false,
+			"id":         nil,
+			"error_code": 444})
 		log.Println("Ошибка парсинга лекарств")
 		return
 	}
@@ -138,7 +168,10 @@ func AddEntryHandler(c *gin.Context) {
         RETURNING id_entry
     `, accID, date, timeValue, strength, durationHours).Scan(&entryID)
 	if err != nil {
-		c.JSON(200, gin.H{"success": false, "id": nil, "error_code": 666})
+		c.JSON(http.StatusOK, gin.H{
+			"success":    false,
+			"id":         nil,
+			"error_code": 666})
 		log.Println("SQL ошибка при добавлении записи:", err)
 		return
 	}
@@ -147,7 +180,10 @@ func AddEntryHandler(c *gin.Context) {
 	for _, trID := range triggers {
 		_, err = global.DB.Exec(`INSERT INTO "Attack-Trigger" (id_entry, id_trigger) VALUES ($1, $2)`, entryID, trID)
 		if err != nil {
-			c.JSON(200, gin.H{"success": false, "id": nil, "error_code": 666})
+			c.JSON(http.StatusOK, gin.H{
+				"success":    false,
+				"id":         nil,
+				"error_code": 666})
 			log.Println("SQL ошибка при добавлении триггеров:", err)
 			return
 		}
@@ -157,7 +193,10 @@ func AddEntryHandler(c *gin.Context) {
 	for _, symID := range symptoms {
 		_, err = global.DB.Exec(`INSERT INTO "Attack-Symptom" (id_entry, id_sympt) VALUES ($1, $2)`, entryID, symID)
 		if err != nil {
-			c.JSON(200, gin.H{"success": false, "id": nil, "error_code": 666})
+			c.JSON(http.StatusOK, gin.H{
+				"success":    false,
+				"id":         nil,
+				"error_code": 666})
 			log.Println("SQL ошибка при вставке симптома:", err)
 			return
 		}
@@ -167,13 +206,15 @@ func AddEntryHandler(c *gin.Context) {
 	for _, drugName := range drugs {
 		_, err = global.DB.Exec(`INSERT INTO "Attack-Drug" (id_entry, atx_code, dosage) VALUES ($1, $2, '')`, entryID, drugName)
 		if err != nil {
-			c.JSON(200, gin.H{"success": false, "id": nil, "error_code": 666})
+			c.JSON(http.StatusOK, gin.H{
+				"success":    false,
+				"id":         nil,
+				"error_code": 666})
 			log.Println("SQL ошибка при вставке лекарства:", err)
 			return
 		}
 	}
 
-	// Успешный ответ
-	c.JSON(200, gin.H{"success": true, "id": entryID, "error_code": 0})
+	c.JSON(http.StatusOK, gin.H{"success": true, "id": entryID, "error_code": 0})
 	log.Printf("✅ Запись добавлена для пользователя: %s, id записи: %d\n", login, entryID)
 }

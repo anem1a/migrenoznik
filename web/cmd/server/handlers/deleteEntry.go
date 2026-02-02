@@ -26,19 +26,18 @@ import (
 // 6. Удаляет саму запись в таблице "Attacks".
 // 7. Возвращает JSON с результатом операции.
 func DeleteEntryHandler(c *gin.Context) {
-	// 🔐 Проверка сессии (cookie)
+
 	cookie, err := c.Cookie("session_id")
 	if err != nil {
-		log.Println("Ошибка сессии")
 		c.JSON(http.StatusUnauthorized, gin.H{"success": false})
+		log.Println("Сессия не найдена в cookie")
 		return
 	}
 
-	// 👤 Получение логина из сессий
 	login, ok := global.Sessions[cookie]
 	if !ok {
-		log.Println("Сессия не найдена")
 		c.JSON(http.StatusUnauthorized, gin.H{"success": false})
+		log.Println("Сессия не найдена в хранилище")
 		return
 	}
 
@@ -46,8 +45,8 @@ func DeleteEntryHandler(c *gin.Context) {
 	entryIDStr := c.Query("id")
 	entryID, err := strconv.Atoi(entryIDStr)
 	if err != nil {
-		log.Println("Некорректный ID записи:", err)
 		c.JSON(http.StatusBadRequest, gin.H{"success": false})
+		log.Println("Некорректный ID записи:", err)
 		return
 	}
 
@@ -59,8 +58,8 @@ func DeleteEntryHandler(c *gin.Context) {
 	`, entryID).Scan(&accID)
 
 	if err != nil {
-		log.Println("Запись не найдена:", err)
 		c.JSON(http.StatusNotFound, gin.H{"success": false})
+		log.Println("Запись не найдена в БД:", err)
 		return
 	}
 
@@ -72,15 +71,15 @@ func DeleteEntryHandler(c *gin.Context) {
 	`, login).Scan(&accIDUser)
 
 	if err != nil {
-		log.Println("Аккаунт пользователя не найден:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false})
+		log.Println("Аккаунт пользователя не найден в БД:", err)
 		return
 	}
 
 	// 🚫 Проверка принадлежности записи
 	if accID != accIDUser {
-		log.Printf("⚠️ Пользователь %s попытался удалить чужую запись (id_entry=%d)\n", login, entryID)
 		c.JSON(http.StatusForbidden, gin.H{"success": false})
+		log.Printf("⚠️ Пользователь %s попытался удалить чужую запись (id_entry=%d)\n", login, entryID)
 		return
 	}
 
@@ -92,11 +91,10 @@ func DeleteEntryHandler(c *gin.Context) {
 	// ❌ Удаление самой записи
 	_, err = global.DB.Exec(`DELETE FROM "Attacks" WHERE id_entry = $1`, entryID)
 	if err != nil {
-		log.Println("Ошибка удаления записи:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false})
+		log.Println("Ошибка удаления записи:", err)
 		return
 	}
 
-	// ✅ Успех
 	c.JSON(http.StatusOK, gin.H{"success": true})
 }
