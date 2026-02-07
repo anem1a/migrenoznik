@@ -8,6 +8,7 @@
     --migre-color-font-gray: #aaa;
     --migre-bg-color-black: #fff;
     --migre-bg-color-dark: #333;
+    --migre-bg-color-dark-gray: #666;
 
     --migre-diary-max-width: 420px;
 
@@ -301,7 +302,7 @@ body {
 }
 
 .migre-v1-main-now-item-value-tags-item {
-    background-color: #ddd;
+    background-color: var(--migre-bg-color-dark-gray);
     color: black;
     padding: .2em .75em;
     border-radius: 6px;
