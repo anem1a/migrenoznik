@@ -14,7 +14,35 @@
 
 ## Машина состояний записей
 
-![alt text](entry-state-machine.drawio.png)
+```mermaid
+stateDiagram-v2
+    [*] --> LOCAL_CREATED: Создана запись, когда совершен вход
+    [*] --> LOCAL_ONLY: Создана запись без входа
+
+    LOCAL_ONLY --> LOCAL_CREATED: После входа нажато "Сохранить"
+    LOCAL_ONLY --> DELETED: Нажато "Удалить"
+
+    LOCAL_CREATED --> PENDING_SERVER_CREATING: Сразу после создания, если есть соединение
+
+    PENDING_SERVER_CREATING --> BACKED_UP: Сервер вернул success
+    PENDING_SERVER_CREATING --> FAILED_SERVER_CREATING: Сервер вернул ошибку
+
+    FAILED_SERVER_CREATING --> LOCAL_DELETED: Нажато "Удалить"
+    FAILED_SERVER_CREATING --> LOCAL_CREATED: Сервер отвечает
+
+    BACKED_UP --> LOCAL_DELETED: Нажато "Удалить"
+
+    LOCAL_DELETED --> PENDING_SERVER_DELETING: Сразу после удаления, если есть соединение
+
+    PENDING_SERVER_DELETING --> DELETED: Сервер вернул success
+    PENDING_SERVER_DELETING --> FAILED_SERVER_DELETING: Сервер вернул ошибку
+
+    FAILED_SERVER_DELETING --> LOCAL_DELETED: При повторной попытке
+
+    DELETED --> [*]
+```
+
+## Создание записи о приступе мигрени
 
 ```mermaid
 sequenceDiagram
