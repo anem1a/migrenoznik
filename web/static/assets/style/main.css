@@ -5,6 +5,7 @@
     --migre-color-main: #bfa3ff;
     --migre-color-font-black: #fff;
     --migre-color-font-white: #000;
+    --migre-color-font-gray: #aaa;
     --migre-bg-color-black: #fff;
     --migre-bg-color-dark: #333;
 
@@ -83,7 +84,7 @@ body {
 .migre-v1-main-diary-wrapper h2 {
     font-size: var(--migre-font-size-m);
     font-weight: 400;
-    color: #666;
+    color: var(--migre-color-font-gray);
     margin: 0;
 }
 
