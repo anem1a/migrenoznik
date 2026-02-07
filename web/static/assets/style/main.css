@@ -3,9 +3,10 @@
 
     --migre-sans-font-family: "Play", sans-serif;
     --migre-color-main: #bfa3ff;
-    --migre-color-font-black: #000;
-    --migre-color-font-white: #fff;
-    --migre-bg-color-black: #000;
+    --migre-color-font-black: #fff;
+    --migre-color-font-white: #000;
+    --migre-bg-color-black: #fff;
+    --migre-bg-color-dark: #333;
 
     --migre-diary-max-width: 420px;
 
@@ -27,6 +28,8 @@ body {
 	display: flex;
 	flex-direction: column;
 	height: 100dvh;
+
+    background-color: var(--migre-bg-color-dark);
 }
 
 *,
