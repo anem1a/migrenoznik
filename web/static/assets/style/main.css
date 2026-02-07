@@ -16,6 +16,8 @@
     --migre-font-size-m: 16px;
     --migre-font-size-l: 18px;
     --migre-font-size-xl: 24px;
+
+    --migre-line-height-para: 1.2;
 }
 
 
@@ -24,7 +26,7 @@ body {
 	font-family: var(--migre-sans-font-family);
 
 	font-size: var(--migre-font-size-m);
-	line-height: 1.2;
+	line-height: var(--migre-line-height-para);
 	color: var(--migre-color-font-black);
 
 	display: flex;
@@ -109,9 +111,9 @@ body {
 }
 .migre-v1-main-bottom-button[data-square="true"] {
     width: 54px;
-    background-color: white;
+    background-color: var(--migre-bg-color-black);
     border: 1px solid black;
-    color: black;
+    color: var(--migre-color-font-white);
     font-size: 30px;
     line-height: 0;
 }
@@ -139,7 +141,7 @@ body {
 }
 
 .migre-v1-main-header {
-    border-bottom: 1px solid black;
+    border-bottom: 1px solid var(--migre-bg-color-dark-gray);
 }
 
 .migre-v1-main-header-inner {
