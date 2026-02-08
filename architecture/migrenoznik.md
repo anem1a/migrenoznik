@@ -20,7 +20,6 @@ stateDiagram-v2
     [*] --> LOCAL_ONLY: Создана запись без входа
 
     LOCAL_ONLY --> LOCAL_CREATED: После входа нажато "Сохранить"
-    LOCAL_ONLY --> DELETED: Нажато "Удалить"
 
     LOCAL_CREATED --> PENDING_SERVER_CREATING: Сразу после создания, если есть соединение
 
@@ -38,6 +37,7 @@ stateDiagram-v2
     PENDING_SERVER_DELETING --> FAILED_SERVER_DELETING: Сервер вернул ошибку
 
     FAILED_SERVER_DELETING --> LOCAL_DELETED: При повторной попытке
+    LOCAL_ONLY --> DELETED: Нажато "Удалить"
 
     DELETED --> [*]
 ```
@@ -72,7 +72,7 @@ sequenceDiagram
     Приложение->>Локальное Хранилище: Очистить current_attack
     Приложение-->>Пользователь: Скрыть карточку с текущей записью
     Приложение-->>Пользователь: Обновить дневник
-    Приложение->>Сервер: Сохранить запись
+    Приложение->>Сервер: GET api/add_entry
     alt Сервер вернул ID
     Сервер-->>Приложение: 200 OK, ID
     Приложение->>Локальное Хранилище: Запросить migraine_attacks
