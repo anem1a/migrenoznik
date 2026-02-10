@@ -437,3 +437,7 @@ body {
     display: flex;
     align-items: center;
 }
+
+.migre-v1-align-center {
+    text-align: center;
+}
