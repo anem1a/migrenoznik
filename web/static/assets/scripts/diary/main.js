@@ -240,7 +240,7 @@ class MigrenoznikCore {
         /* Save to remote storage */
         let data = new FormData();
         data.append("dt_start", current.DT_Start.getTime());
-        data.append("dt_end", current.DT_End.getTime());
+        data.append("duration", current.Duration);
         data.append("strength", current.Strength);
         data.append("triggers", JSON.stringify(current.Triggers.map(element => element.Code)));
         data.append("symptoms", JSON.stringify(current.Symptoms.map(element => element.Code)));
@@ -310,7 +310,7 @@ class MigrenoznikCore {
         /* Save to remote storage */
         let data = new FormData();
         data.append("dt_start", current.DT_Start.getTime());
-        data.append("dt_end", current.DT_End.getTime());
+        data.append("duration", current.Duration);
         data.append("strength", current.Strength);
         data.append("triggers", JSON.stringify(current.Triggers.map(element => element.Code)));
         data.append("symptoms", JSON.stringify(current.Symptoms.map(element => element.Code)));
