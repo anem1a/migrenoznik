@@ -45,7 +45,6 @@ class MigraineAttack {
         return {
             "LocalID": this.LocalID,
             "DT_Start": this.DT_Start,
-            "DT_End": this.DT_End,
             "Duration": this.Duration,
             "Strength": this.Strength,
             "Status": MigraineAttack.is_valid_status(this.Status) ? this.Status : "LOCAL_ONLY",

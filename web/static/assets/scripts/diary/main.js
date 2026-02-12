@@ -292,7 +292,7 @@ class MigrenoznikCore {
     async close_current_migraine_attack() {
         let attacks = this.get_migraine_attacks();
         let current = this.get_current_migraine_attack();
-        current.DT_End = new Date();
+        current.Duration = (new Date() - current.DT_Start) / 3600000;
         if (this.LoggedIn) {
             current.Status = "PENDING_SERVER_CREATING";
         } else {
@@ -776,7 +776,7 @@ function compose_migraine_diary() {
             "div",
             "migre-v1-main-diary-item-basics",
             undefined,
-            `<div class="migre-v1-main-diary-item-left"><img src="/static/assets/images/icons/calendar.svg">${Calendar.date_to_quick_format(migraine_attack.DT_Start)} &ndash; ${Calendar.date_to_quick_format(migraine_attack.DT_End)}</div>`
+            `<div class="migre-v1-main-diary-item-left"><img src="/static/assets/images/icons/calendar.svg">${Calendar.date_to_quick_format(migraine_attack.DT_Start)}, длительность: ${Calendar.date_to_quick_format(migraine_attack.Duration)}</div>`
         ));
         diary_item.appendChild(create_element(
             "div",
