@@ -10,6 +10,9 @@
     --migre-bg-color-dark: #333;
     --migre-bg-color-dark-gray: #666;
 
+    --migre-color-font-link-blue: rgb(131, 187, 254);
+    --migre-color-font-link-hover: rgb(255, 126, 18);
+
     --migre-diary-max-width: 420px;
 
     --migre-font-size-s: 14px;
@@ -396,20 +399,20 @@ body {
 }
 
 .migre-v1-main-now-item a {
-    color: rgb(18, 126, 255);
-    border-bottom: 1px solid rgb(18, 126, 255);
+    color: var(--migre-color-font-link-blue);
+    border-bottom: 1px solid var(--migre-color-font-link-blue);
     cursor: pointer;
 }
 @media (hover: hover) {
     .migre-v1-main-now-item a:hover {
-        color: rgb(255, 126, 18);
-        border-bottom: 1px solid rgb(255, 126, 18);
+        color: var(--migre-color-font-link-hover);
+        border-bottom: 1px solid var(--migre-color-font-link-hover);
     }
 }
 @media (hover: none) {
     .migre-v1-main-now-item a:active {
-        color: rgb(255, 126, 18);
-        border-bottom: 1px solid rgb(255, 126, 18);
+        color: var(--migre-color-font-link-hover);
+        border-bottom: 1px solid var(--migre-color-font-link-hover);
     }
 }
 
