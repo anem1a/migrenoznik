@@ -1,8 +1,7 @@
 class MigraineAttack {
-    constructor(local_id, dt_start, strength, duration = null, dt_end = null, triggers = [], symptoms = [], drugs = [], id = null) {
+    constructor(local_id, dt_start, strength, duration = null, triggers = [], symptoms = [], drugs = [], id = null) {
         this.LocalID = local_id;
         this.DT_Start = dt_start;
-        this.DT_End = dt_end;
         this.Duration = (dt_end - dt_start) / 3600000;
         this.Strength = strength;
         this.Triggers = triggers;
@@ -31,7 +30,6 @@ class MigraineAttack {
             obj["DT_Start"] == null ? null : new Date(obj["DT_Start"]),
             obj["Strength"] == null ? null : Number(obj["Strength"]),
             obj["Duration"] == null ? null : Number(obj["Duration"]),
-            obj["DT_End"] == null ? (obj["Duration"] == null ? null : new Date(obj["DT_Start"])) : new Date(obj["DT_End"]),
             obj["Triggers"] == null ? [] : obj["Triggers"].map(code => new MigraineTrigger(code)),
             obj["Symptoms"] == null ? [] : obj["Symptoms"].map(code => new MigraineSymptom(code)),
             obj["Drugs"] == null ? [] : obj["Drugs"].map(code => new MigraineDrug(code)),
