@@ -228,6 +228,25 @@ body {
     margin-bottom: 15px;
 }
 
+.migre-v1-main-login-field-wrapper a {
+    text-decoration: none;
+    color: var(--migre-color-font-link-blue);
+    border-bottom: 1px solid var(--migre-color-font-link-blue);
+    cursor: pointer;
+}
+@media (hover: hover) {
+    .migre-v1-main-login-field-wrapper a:hover {
+        color: var(--migre-color-font-link-hover);
+        border-bottom: 1px solid var(--migre-color-font-link-hover);
+    }
+}
+@media (hover: none) {
+    .migre-v1-main-login-field-wrapper a:active {
+        color: var(--migre-color-font-link-hover);
+        border-bottom: 1px solid var(--migre-color-font-link-hover);
+    }
+}
+
 .migre-v1-main-diary-item {
     padding-bottom: 1em;
     padding-top: 1em;
