@@ -1,5 +1,5 @@
 class MigraineAttack {
-    constructor(local_id, dt_start, strength, dt_end = null, triggers = [], symptoms = [], drugs = [], id = null) {
+    constructor(local_id, dt_start, strength, duration = null, dt_end = null, triggers = [], symptoms = [], drugs = [], id = null) {
         this.LocalID = local_id;
         this.DT_Start = dt_start;
         this.DT_End = dt_end;
@@ -30,6 +30,7 @@ class MigraineAttack {
             obj["LocalID"] == null ? Core.next_autoincrement() : Number(obj["LocalID"]),
             obj["DT_Start"] == null ? null : new Date(obj["DT_Start"]),
             obj["Strength"] == null ? null : Number(obj["Strength"]),
+            obj["Duration"] == null ? null : Number(obj["Duration"]),
             obj["DT_End"] == null ? (obj["Duration"] == null ? null : new Date(obj["DT_Start"])) : new Date(obj["DT_End"]),
             obj["Triggers"] == null ? [] : obj["Triggers"].map(code => new MigraineTrigger(code)),
             obj["Symptoms"] == null ? [] : obj["Symptoms"].map(code => new MigraineSymptom(code)),
