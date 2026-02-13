@@ -69,6 +69,7 @@ body {
     border: 1px solid #bbb;
     border-radius: 10px;
     padding: 15px 10px;
+    position: relative;
 }
 
 .migre-v1-main-diary-wrapper h1 {
@@ -436,4 +437,9 @@ body {
 .migre-v1-main-header-inner-left {
     display: flex;
     align-items: center;
+}
+
+.migre-v1-main-now-cancel {
+    position: absolute;
+    right: .5em;
 }
