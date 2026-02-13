@@ -92,7 +92,7 @@ body {
 
 .migre-v1-main-bottom-button {
     width: 100%;
-    background-color: var(--migre-bg-color-black);
+    background-color: var(--migre-color-main);
     font-family: var(--migre-sans-font-family);
     color: var(--migre-color-font-white);
     padding: 12px 0px;
@@ -118,18 +118,18 @@ body {
 }
 @media (hover: hover) {
     .migre-v1-main-bottom-button:hover {
-        background-color: #444;
+        background-color: var(--migre-bg-color-dark-gray);
     }
     .migre-v1-main-bottom-button[data-square="true"]:hover {
-        background-color: #ddd;
+        background-color: var(--migre-bg-color-dark-gray);
     }
 }
 @media (hover: none) {
     .migre-v1-main-bottom-button:active {
-        background-color: #444;
+        background-color: var(--migre-bg-color-dark-gray);
     }
     .migre-v1-main-bottom-button[data-square="true"]:active {
-        background-color: #ddd;
+        background-color: var(--migre-bg-color-dark-gray);
     }
 }
 
