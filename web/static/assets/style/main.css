@@ -69,6 +69,7 @@ body {
     border: 1px solid #bbb;
     border-radius: 10px;
     padding: 15px 10px;
+    position: relative;
 }
 
 .migre-v1-main-diary-wrapper h1 {
@@ -138,7 +139,7 @@ body {
 }
 
 .migre-v1-main-header-inner {
-    padding: 6px 10px;
+    padding: 15px 25px;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -147,14 +148,14 @@ body {
 
 .migre-v1-main-header-login-button,
 .migre-v1-main-header-login-buttonlink {
-    border: none;
-    background-color: #BFA3FF;
-    font-size: 14px;
+    border: medium;
+    background-color: rgb(191, 163, 255);
+    font-size: var(--migre-font-size-m);
     font-family: var(--migre-sans-font-family);
-    border-radius: 4px;
-    padding: 4px 10px;
     cursor: pointer;
     color: white;
+    padding: 8px 2em;
+    border-radius: 10px;
 }
 @media (hover: hover) {
     .migre-v1-main-header-login-button:hover,
@@ -407,8 +408,8 @@ body {
 }
 
 .migre-v1-main-header-logo-wrapper {
-    width: 50px;
-    height: 50px;
+    width: 70px;
+    height: 70px;
     background-image: url(https://migrenoznik.ru/static/assets/images/icons/header-logo.png);
     background-position: center;
     background-size: cover;
@@ -436,4 +437,9 @@ body {
 .migre-v1-main-header-inner-left {
     display: flex;
     align-items: center;
+}
+
+.migre-v1-main-now-cancel {
+    position: absolute;
+    right: .5em;
 }
