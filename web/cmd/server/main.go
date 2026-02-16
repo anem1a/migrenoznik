@@ -46,7 +46,7 @@ func main() {
 	}
 	log.Println("✅ Подключение к БД установлено")
 
-	gin.SetMode(gin.ReleaseMode)
+	// gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
 
 	router.Static("/static", "./static")
@@ -86,6 +86,9 @@ func main() {
 		http.Redirect(w, r, "https://"+r.Host+r.RequestURI, http.StatusMovedPermanently)
 	})))
 
-	// log.Println("➡️ HTTP сервер запущен (редиректит на HTTPS)")
-	// log.Fatal(gin.RedirectHTTPToHTTPS(":8080"))
+	// log.Println("🚀 Сервер запущен на http://localhost:8080")
+
+	// if err := router.Run(":8080"); err != nil {
+	// 	log.Fatal(err)
+	// }
 }
