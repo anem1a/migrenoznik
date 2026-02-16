@@ -31,33 +31,35 @@
                     <div class="migre-v1-main-login-header">
                         <h1>Зарегистрироваться</h1>
                     </div>
-                    <div class="migre-v1-main-login-fields">
-                        <div class="migre-v1-main-login-field-wrapper">
-                            <div>Логин</div>
-                            <div class="migre-v1-main-login-field-container">
-                                <input oninput="login_fields_Oninput()" name="login" type="text" placeholder="Логин">
+                    <form onsubmit="signup_button_Clicked(); return false;">
+                        <div class="migre-v1-main-login-fields">
+                            <div class="migre-v1-main-login-field-wrapper">
+                                <div>Логин</div>
+                                <div class="migre-v1-main-login-field-container">
+                                    <input oninput="login_fields_Oninput()" name="login" type="text" placeholder="Логин">
+                                </div>
                             </div>
-                        </div>
-                        <div class="migre-v1-main-login-field-wrapper">
-                            <div>Пароль</div>
-                            <div class="migre-v1-main-login-field-container">
-                                <input id="migre-signup-password" oninput="signup_password_fields_Oninput()" name="password" type="password" placeholder="Пароль">
+                            <div class="migre-v1-main-login-field-wrapper">
+                                <div>Пароль</div>
+                                <div class="migre-v1-main-login-field-container">
+                                    <input id="migre-signup-password" oninput="signup_password_fields_Oninput()" name="password" type="password" placeholder="Пароль">
+                                </div>
                             </div>
-                        </div>
-                        <div class="migre-v1-main-login-field-wrapper">
-                            <div>Повторите пароль</div>
-                            <div class="migre-v1-main-login-field-container">
-                                <input id="migre-signup-password2" oninput="signup_password2_fields_Oninput()" name="password_repeat" type="password" placeholder="Пароль">
+                            <div class="migre-v1-main-login-field-wrapper">
+                                <div>Повторите пароль</div>
+                                <div class="migre-v1-main-login-field-container">
+                                    <input id="migre-signup-password2" oninput="signup_password2_fields_Oninput()" name="password_repeat" type="password" placeholder="Пароль">
+                                </div>
                             </div>
-                        </div>
-                        <div class="migre-v1-main-login-field-wrapper">
-                            <div id="migre-id-main-login-errorbox" class="migre-v1-main-login-field-error-container">
-                                <p>Неверный логин или пароль.</p>
+                            <div class="migre-v1-main-login-field-wrapper">
+                                <div id="migre-id-main-login-errorbox" class="migre-v1-main-login-field-error-container">
+                                    <p>Неверный логин или пароль.</p>
+                                </div>
                             </div>
-                        </div>
-                        <div class="migre-v1-main-login-field-wrapper">
-                            <div class="migre-v1-main-login-field-container">
-                                <button onclick="signup_button_Clicked()">Зарегистрироваться</button>
+                            <div class="migre-v1-main-login-field-wrapper">
+                                <div class="migre-v1-main-login-field-container">
+                                    <button type="submit">Зарегистрироваться</button>
+                                </div>
                             </div>
                         </div>
                         <div class="migre-v1-main-login-field-wrapper migre-v1-align-center">
