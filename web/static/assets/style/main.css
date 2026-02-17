@@ -79,6 +79,7 @@ body {
     border: 1px solid #bbb;
     border-radius: 10px;
     padding: 15px 10px;
+    position: relative;
 }
 
 .migre-v1-main-diary-wrapper h1 {
@@ -94,6 +95,15 @@ body {
     margin: 0;
 }
 
+.migre-v1-main-bottom {
+    display: none;
+}
+@media only screen and (max-width: 780px) {
+    .migre-v1-main-bottom {
+        display: block;
+    }
+}
+
 .migre-v1-main-bottom-button-wrapper {
     padding: 15px;
     display: flex;
@@ -102,7 +112,7 @@ body {
 
 .migre-v1-main-bottom-button {
     width: 100%;
-    background-color: var(--migre-bg-color-black);
+    background-color: var(--migre-color-main);
     font-family: var(--migre-sans-font-family);
     color: var(--migre-color-font-white);
     padding: 12px 0px;
@@ -128,18 +138,18 @@ body {
 }
 @media (hover: hover) {
     .migre-v1-main-bottom-button:hover {
-        background-color: var(--migre-color-font-gray);
+        background-color: var(--migre-bg-color-dark-gray);
     }
     .migre-v1-main-bottom-button[data-square="true"]:hover {
-        background-color: #ddd;
+        background-color: var(--migre-bg-color-dark-gray);
     }
 }
 @media (hover: none) {
     .migre-v1-main-bottom-button:active {
-        background-color: var(--migre-color-font-gray);
+        background-color: var(--migre-bg-color-dark-gray);
     }
     .migre-v1-main-bottom-button[data-square="true"]:active {
-        background-color: #ddd;
+        background-color: var(--migre-bg-color-dark-gray);
     }
 }
 
@@ -148,7 +158,7 @@ body {
 }
 
 .migre-v1-main-header-inner {
-    padding: 6px 10px;
+    padding: 15px 25px;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -157,14 +167,14 @@ body {
 
 .migre-v1-main-header-login-button,
 .migre-v1-main-header-login-buttonlink {
-    border: none;
-    background-color: #BFA3FF;
-    font-size: 14px;
+    border: medium;
+    background-color: rgb(191, 163, 255);
+    font-size: var(--migre-font-size-m);
     font-family: var(--migre-sans-font-family);
-    border-radius: 4px;
-    padding: 4px 10px;
     cursor: pointer;
     color: white;
+    padding: 8px 2em;
+    border-radius: 10px;
 }
 @media (hover: hover) {
     .migre-v1-main-header-login-button:hover,
@@ -437,8 +447,8 @@ body {
 }
 
 .migre-v1-main-header-logo-wrapper {
-    width: 50px;
-    height: 50px;
+    width: 70px;
+    height: 70px;
     background-image: url(https://migrenoznik.ru/static/assets/images/icons/header-logo.png);
     background-position: center;
     background-size: cover;
@@ -466,4 +476,57 @@ body {
 .migre-v1-main-header-inner-left {
     display: flex;
     align-items: center;
+}
+
+.migre-v1-bar {
+    position: absolute;
+    top: 63px;
+}
+
+.migre-v1-bar-inner {
+    margin: 10px 10px;
+}
+
+.migre-v1-bar-button {
+    width: 100%;
+    background-color: var(--migre-color-main);
+    font-family: var(--migre-sans-font-family);
+    color: var(--migre-color-font-white);
+    padding: 7px 0px;
+    font-size: 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    border: none;
+    margin: 0 5px;
+}
+
+.migre-v1-bar-button {
+    width: 100%;
+    background-color: var(--migre-color-main);
+    font-family: var(--migre-sans-font-family);
+    color: var(--migre-color-font-white);
+    padding: 7px 0px;
+    font-size: 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    border: none;
+    margin: 0 5px;
+}
+@media (hover: hover) {
+    .migre-v1-bar-button:hover {
+        background-color: var(--migre-bg-color-dark-gray);
+    }
+}
+@media (hover: none) {
+    .migre-v1-bar-button:active {
+        background-color: var(--migre-bg-color-dark-gray);
+    }
+}
+@media only screen and (max-width: 780px) {
+    .migre-v1-bar-button {
+        display: none;
+    }
+.migre-v1-main-now-cancel {
+    position: absolute;
+    right: .5em;
 }

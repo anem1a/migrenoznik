@@ -12,7 +12,16 @@
             <header class="migre-v1-main-header">
                 <div class="migre-v1-main-header-container">
                     <div class="migre-v1-main-header-inner">
-                        <a class="migre-v1-main-header-login-buttonlink" href="/sign-up/">Создать аккаунт</a>
+                        <div class="migre-v1-main-header-inner-left">
+                            <div class="migre-v1-main-header-logo-wrapper"></div>
+                            <div class="migre-v1-main-header-hello">
+                                <h1>Мигренозник</h1>
+                                <h2>Держите вашу боль под контролем</h2>
+                            </div>
+                        </div>
+                        <div class="migre-v1-main-header-inner-right">
+                                <button class="migre-v1-main-header-login-button" onclick="window.location.href='/';">На главную</button>
+                        </div>
                     </div>
                 </div>
             </header>
@@ -22,32 +31,37 @@
                     <div class="migre-v1-main-login-header">
                         <h1>Войти</h1>
                     </div>
-                    <div class="migre-v1-main-login-fields">
-                        <div class="migre-v1-main-login-field-wrapper">
-                            <div>Логин</div>
-                            <div class="migre-v1-main-login-field-container">
-                                <input oninput="login_fields_Oninput()" name="login" type="text" placeholder="Логин">
+                    <form onsubmit="login_button_Clicked(); return false;">
+                        <div class="migre-v1-main-login-fields">
+                            <div class="migre-v1-main-login-field-wrapper">
+                                <div>Логин</div>
+                                <div class="migre-v1-main-login-field-container">
+                                    <input oninput="login_fields_Oninput()" name="login" type="text" placeholder="Логин">
+                                </div>
+                            </div>
+                            <div class="migre-v1-main-login-field-wrapper">
+                                <div>Пароль</div>
+                                <div class="migre-v1-main-login-field-container">
+                                    <input oninput="login_fields_Oninput()" name="password" type="password"
+                                        placeholder="Пароль">
+                                </div>
+                            </div>
+                            <div class="migre-v1-main-login-field-wrapper">
+                                <div id="migre-id-main-login-errorbox" class="migre-v1-main-login-field-error-container">
+                                    <p>Неверный логин или пароль.</p>
+                                </div>
+                            </div>
+                            <div class="migre-v1-main-login-field-wrapper">
+                                <div class="migre-v1-main-login-field-container">
+                                    <button type="submit">Войти</button>
+                                </div>
+                            </div>
+                            <div class="migre-v1-main-login-field-wrapper">
+                                Ещё не&nbsp;зарегистрированы? <a href="/sign-up/">Жми сюда</a>
                             </div>
                         </div>
                         <div class="migre-v1-main-login-field-wrapper">
-                            <div>Пароль</div>
-                            <div class="migre-v1-main-login-field-container">
-                                <input oninput="login_fields_Oninput()" name="password" type="password"
-                                    placeholder="Пароль">
-                            </div>
-                        </div>
-                        <div class="migre-v1-main-login-field-wrapper">
-                            <div id="migre-id-main-login-errorbox" class="migre-v1-main-login-field-error-container">
-                                <p>Неверный логин или пароль.</p>
-                            </div>
-                        </div>
-                        <div class="migre-v1-main-login-field-wrapper">
-                            <div class="migre-v1-main-login-field-container">
-                                <button onclick="login_button_Clicked()">Войти</button>
-                            </div>
-                        </div>
-                        <div class="migre-v1-main-login-field-wrapper">
-                            Ещё не&nbsp;зарегистрированы? <a href="/sign-up/">Жми сюда</a>
+                            Ещё не&nbsp;зарегистрированы? <a href="/sign-up/">Нажмите сюда</a>
                         </div>
                     </div>
                 </div>

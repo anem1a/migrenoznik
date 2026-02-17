@@ -3,12 +3,12 @@
 package handlers
 
 import (
-	"encoding/json"
-	"fmt"
 	"log"
 	"migrenoznik/cmd/server/global"
 	"net/http"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 // EntriesHandler обрабатывает GET-запрос для получения всех записей пользователя.
@@ -25,67 +25,67 @@ import (
 //   - собирает все данные в структуру Entry.
 //
 // 6. Возвращает JSON с массивом всех записей.
-func EntriesHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+func EntriesHandler(c *gin.Context) {
 
-	// Проверка сессии
-	cookie, err := r.Cookie("session_id")
+	cookie, err := c.Cookie("session_id")
 	if err != nil {
-		json.NewEncoder(w).Encode(map[string]interface{}{
+		c.JSON(http.StatusUnauthorized, gin.H{
 			"success": false,
 			"entries": nil,
 		})
-		log.Println("Ошибка сессии")
+		log.Println("Сессия не найдена в cookie")
 		return
 	}
 
-	login, ok := global.Sessions[cookie.Value]
+	login, ok := global.Sessions[cookie]
 	if !ok {
-		json.NewEncoder(w).Encode(map[string]interface{}{
+		c.JSON(http.StatusUnauthorized, gin.H{
 			"success": false,
 			"entries": nil,
 		})
-		log.Println("Ошибка логина")
+		log.Println("Сессия не найдена в хранилище")
 		return
 	}
 
-	// Получение логина из массива сессий
+	// 🆔 Получаем acc_id пользователя
 	var accID int
 	err = global.DB.QueryRow(`
-        SELECT acc_id
-        FROM "Accounts"
-        WHERE acc_login = $1
-    `, login).Scan(&accID)
+		SELECT acc_id
+		FROM "Accounts"
+		WHERE acc_login = $1
+	`, login).Scan(&accID)
 
 	if err != nil {
-		json.NewEncoder(w).Encode(map[string]interface{}{
+		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
 			"entries": nil,
 		})
-		log.Println("Аккаунт не найден")
+		log.Println("Аккаунт не найден в БД")
 		return
 	}
-	// Получение всех записей пользователя из таблицы "Attacks"
+
+	// 📥 Получение всех записей
 	rows, err := global.DB.Query(`
-        SELECT id_entry, date, duration, pain_level
-        FROM "Attacks"
-        WHERE acc_id = $1
-        ORDER BY date DESC
-    `, accID)
+		SELECT id_entry, date, duration, pain_level
+		FROM "Attacks"
+		WHERE acc_id = $1
+		ORDER BY date DESC
+	`, accID)
+
 	if err != nil {
-		json.NewEncoder(w).Encode(map[string]interface{}{
+		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
 			"entries": nil,
 		})
-		log.Println("Ошибка запроса в бд")
+		log.Println("Ошибка запроса записей с БД:", err)
 		return
 	}
 	defer rows.Close()
 
-	// Структура одной записи
+	// 📦 Структура ответа
 	type Entry struct {
 		DT_Start string   `json:"DT_Start"`
-		Duration float64  `json:"Duration"` // в часах
+		Duration float64  `json:"Duration"`
 		Strength int      `json:"Strength"`
 		Triggers []string `json:"Triggers"`
 		Symptoms []string `json:"Symptoms"`
@@ -95,90 +95,45 @@ func EntriesHandler(w http.ResponseWriter, r *http.Request) {
 
 	var entries []Entry
 
-	// Перебор всех записей пользователя
+	// 🔄 Перебор записей
 	for rows.Next() {
-		var id int
-		var date time.Time
-		var duration float64
-		var strength int
+		var (
+			id       int
+			date     time.Time
+			duration float64
+			strength int
+		)
 
 		if err := rows.Scan(&id, &date, &duration, &strength); err != nil {
 			continue
 		}
-		// Форматируем дату: 27.11.25
+
 		dtDisplay := date.Format("02.01.06")
 
-		// Получение триггеров
-		trigRows, err := global.DB.Query(`
-    		SELECT t.name
-    		FROM "Attack-Trigger" at
-    		JOIN "Triggers" t ON at.id_trigger = t.id_trigger
-    		WHERE at.id_entry = $1
+		// 🧠 Триггеры
+		triggers := fetchStringList(`
+			SELECT t.name
+			FROM "Attack-Trigger" at
+			JOIN "Triggers" t ON at.id_trigger = t.id_trigger
+			WHERE at.id_entry = $1
 		`, id)
-		if err != nil {
-			fmt.Println("Trigger error:", err)
-			continue
-		}
 
-		var triggers []string
-		for trigRows.Next() {
-			var name string
-			trigRows.Scan(&name)
-			triggers = append(triggers, name)
-		}
-
-		trigRows.Close()
-
-		if triggers == nil {
-			triggers = []string{}
-		}
-
-		// Получение симптомов
-		symptRows, err := global.DB.Query(`
+		// 🤕 Симптомы
+		symptoms := fetchStringList(`
 			SELECT s.name
-			FROM "Attack-Symptom" ast		
+			FROM "Attack-Symptom" ast
 			JOIN "Symptoms" s ON ast.id_sympt = s.id_sympt
 			WHERE ast.id_entry = $1
 		`, id)
-		if err != nil {
-			fmt.Println("Symptom error:", err)
-			continue
-		}
-		var symptoms []string
-		for symptRows.Next() {
-			var name string
-			symptRows.Scan(&name)
-			symptoms = append(symptoms, name)
-		}
-		symptRows.Close()
-		if symptoms == nil {
-			symptoms = []string{}
-		}
 
-		// Получение лекарств
-		drugsRows, err := global.DB.Query(`
-			SELECT ad.drug_name
-			FROM "Attack-Drug" add
-			JOIN "Drugs" ad ON add.atx_code = ad.atx_code
-			WHERE add.id_entry = $1
+		// 💊 Лекарства
+		drugs := fetchStringList(`
+			SELECT d.drug_name
+			FROM "Attack-Drug" ad
+			JOIN "Drugs" d ON ad.atx_code = d.atx_code
+			WHERE ad.id_entry = $1
 		`, id)
-		if err != nil {
-			fmt.Println("Drug error:", err)
-			continue
-		}
 
-		var drugs []string
-		for drugsRows.Next() {
-			var atxCode string
-			drugsRows.Scan(&atxCode)
-			drugs = append(drugs, atxCode)
-		}
-		drugsRows.Close()
-		if drugs == nil {
-			drugs = []string{}
-		}
-
-		// Добавляем запись в список
 		entries = append(entries, Entry{
 			DT_Start: dtDisplay,
 			Duration: duration,
@@ -188,12 +143,31 @@ func EntriesHandler(w http.ResponseWriter, r *http.Request) {
 			Drugs:    drugs,
 			ID:       id,
 		})
-
 	}
-
-	// Отправка ответа с записями
-	json.NewEncoder(w).Encode(map[string]interface{}{
+	
+	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"entries": entries,
 	})
+}
+
+func fetchStringList(query string, id int) []string {
+	rows, err := global.DB.Query(query, id)
+	if err != nil {
+		return []string{}
+	}
+	defer rows.Close()
+
+	var result []string
+	for rows.Next() {
+		var value string
+		if err := rows.Scan(&value); err == nil {
+			result = append(result, value)
+		}
+	}
+
+	if result == nil {
+		return []string{}
+	}
+	return result
 }

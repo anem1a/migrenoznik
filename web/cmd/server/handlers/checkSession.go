@@ -1,25 +1,26 @@
 package handlers
 
 import (
-	"encoding/json"
 	"migrenoznik/cmd/server/global"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
-func CheckSessionHandler(w http.ResponseWriter, r *http.Request) {
-	cookie, err := r.Cookie("session_id")
+func CheckSessionHandler(c *gin.Context) {
+	sessionID, err := c.Cookie("session_id")
 	if err != nil {
-		json.NewEncoder(w).Encode(map[string]bool{"logged_in": false})
+		c.JSON(http.StatusOK, gin.H{"logged_in": false})
 		return
 	}
 
-	login, ok := global.Sessions[cookie.Value]
+	login, ok := global.Sessions[sessionID]
 	if !ok {
-		json.NewEncoder(w).Encode(map[string]bool{"logged_in": false})
+		c.JSON(http.StatusOK, gin.H{"logged_in": false})
 		return
 	}
-
-	json.NewEncoder(w).Encode(map[string]interface{}{
+	
+	c.JSON(http.StatusOK, gin.H{
 		"logged_in": true,
 		"user":      login,
 	})
