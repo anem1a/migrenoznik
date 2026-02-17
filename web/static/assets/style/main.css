@@ -85,6 +85,15 @@ body {
     margin: 0;
 }
 
+.migre-v1-main-bottom {
+    display: none;
+}
+@media only screen and (max-width: 780px) {
+    .migre-v1-main-bottom {
+        display: block;
+    }
+}
+
 .migre-v1-main-bottom-button-wrapper {
     padding: 15px;
     display: flex;
@@ -93,7 +102,7 @@ body {
 
 .migre-v1-main-bottom-button {
     width: 100%;
-    background-color: var(--migre-bg-color-black);
+    background-color: var(--migre-color-main);
     font-family: var(--migre-sans-font-family);
     color: var(--migre-color-font-white);
     padding: 12px 0px;
@@ -119,18 +128,18 @@ body {
 }
 @media (hover: hover) {
     .migre-v1-main-bottom-button:hover {
-        background-color: #444;
+        background-color: var(--migre-bg-color-dark-gray);
     }
     .migre-v1-main-bottom-button[data-square="true"]:hover {
-        background-color: #ddd;
+        background-color: var(--migre-bg-color-dark-gray);
     }
 }
 @media (hover: none) {
     .migre-v1-main-bottom-button:active {
-        background-color: #444;
+        background-color: var(--migre-bg-color-dark-gray);
     }
     .migre-v1-main-bottom-button[data-square="true"]:active {
-        background-color: #ddd;
+        background-color: var(--migre-bg-color-dark-gray);
     }
 }
 
@@ -439,6 +448,54 @@ body {
     align-items: center;
 }
 
+.migre-v1-bar {
+    position: absolute;
+    top: 63px;
+}
+
+.migre-v1-bar-inner {
+    margin: 10px 10px;
+}
+
+.migre-v1-bar-button {
+    width: 100%;
+    background-color: var(--migre-color-main);
+    font-family: var(--migre-sans-font-family);
+    color: var(--migre-color-font-white);
+    padding: 7px 0px;
+    font-size: 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    border: none;
+    margin: 0 5px;
+}
+
+.migre-v1-bar-button {
+    width: 100%;
+    background-color: var(--migre-color-main);
+    font-family: var(--migre-sans-font-family);
+    color: var(--migre-color-font-white);
+    padding: 7px 0px;
+    font-size: 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    border: none;
+    margin: 0 5px;
+}
+@media (hover: hover) {
+    .migre-v1-bar-button:hover {
+        background-color: var(--migre-bg-color-dark-gray);
+    }
+}
+@media (hover: none) {
+    .migre-v1-bar-button:active {
+        background-color: var(--migre-bg-color-dark-gray);
+    }
+}
+@media only screen and (max-width: 780px) {
+    .migre-v1-bar-button {
+        display: none;
+    }
 .migre-v1-main-now-cancel {
     position: absolute;
     right: .5em;
