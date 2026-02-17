@@ -3,9 +3,15 @@
 
     --migre-sans-font-family: "Play", sans-serif;
     --migre-color-main: #bfa3ff;
-    --migre-color-font-black: #000;
-    --migre-color-font-white: #fff;
-    --migre-bg-color-black: #000;
+    --migre-color-font-black: #fff;
+    --migre-color-font-white: #000;
+    --migre-color-font-gray: #aaa;
+    --migre-bg-color-black: #fff;
+    --migre-bg-color-dark: #333;
+    --migre-bg-color-dark-gray: #666;
+
+    --migre-color-font-link-blue: rgb(131, 187, 254);
+    --migre-color-font-link-hover: rgb(255, 126, 18);
 
     --migre-diary-max-width: 420px;
 
@@ -13,6 +19,8 @@
     --migre-font-size-m: 16px;
     --migre-font-size-l: 18px;
     --migre-font-size-xl: 24px;
+
+    --migre-line-height-para: 1.2;
 }
 
 
@@ -21,12 +29,14 @@ body {
 	font-family: var(--migre-sans-font-family);
 
 	font-size: var(--migre-font-size-m);
-	line-height: 1.2;
+	line-height: var(--migre-line-height-para);
 	color: var(--migre-color-font-black);
 
 	display: flex;
 	flex-direction: column;
 	height: 100dvh;
+
+    background-color: var(--migre-bg-color-dark);
 }
 
 *,
@@ -81,7 +91,7 @@ body {
 .migre-v1-main-diary-wrapper h2 {
     font-size: var(--migre-font-size-m);
     font-weight: 400;
-    color: #666;
+    color: var(--migre-color-font-gray);
     margin: 0;
 }
 
@@ -114,9 +124,9 @@ body {
 }
 .migre-v1-main-bottom-button[data-square="true"] {
     width: 54px;
-    background-color: white;
+    background-color: var(--migre-bg-color-black);
     border: 1px solid black;
-    color: black;
+    color: var(--migre-color-font-white);
     font-size: 30px;
     line-height: 0;
 }
@@ -144,7 +154,7 @@ body {
 }
 
 .migre-v1-main-header {
-    border-bottom: 1px solid black;
+    border-bottom: 1px solid var(--migre-bg-color-dark-gray);
 }
 
 .migre-v1-main-header-inner {
@@ -187,12 +197,13 @@ body {
 
 .migre-v1-main-login-field-container input {
     border: none;
-    border-bottom: 1px solid black;
+    border-bottom: 1px solid var(--migre-bg-color-black);
     border-radius: 0;
     outline: none;
     width: 100%;
     font-size: 24px;
     font-family: var(--migre-sans-font-family);
+    background-color: var(--migre-bg-color-dark);
 }
 
 .migre-v1-main-login-field-container button {
@@ -225,6 +236,25 @@ body {
 
 .migre-v1-main-login-field-wrapper {
     margin-bottom: 15px;
+}
+
+.migre-v1-main-login-field-wrapper a {
+    text-decoration: none;
+    color: var(--migre-color-font-link-blue);
+    border-bottom: 1px solid var(--migre-color-font-link-blue);
+    cursor: pointer;
+}
+@media (hover: hover) {
+    .migre-v1-main-login-field-wrapper a:hover {
+        color: var(--migre-color-font-link-hover);
+        border-bottom: 1px solid var(--migre-color-font-link-hover);
+    }
+}
+@media (hover: none) {
+    .migre-v1-main-login-field-wrapper a:active {
+        color: var(--migre-color-font-link-hover);
+        border-bottom: 1px solid var(--migre-color-font-link-hover);
+    }
 }
 
 .migre-v1-main-diary-item {
@@ -307,7 +337,7 @@ body {
 }
 
 .migre-v1-main-now-item-value-tags-item {
-    background-color: #ddd;
+    background-color: var(--migre-bg-color-dark-gray);
     color: black;
     padding: .2em .75em;
     border-radius: 6px;
@@ -399,20 +429,20 @@ body {
 }
 
 .migre-v1-main-now-item a {
-    color: rgb(18, 126, 255);
-    border-bottom: 1px solid rgb(18, 126, 255);
+    color: var(--migre-color-font-link-blue);
+    border-bottom: 1px solid var(--migre-color-font-link-blue);
     cursor: pointer;
 }
 @media (hover: hover) {
     .migre-v1-main-now-item a:hover {
-        color: rgb(255, 126, 18);
-        border-bottom: 1px solid rgb(255, 126, 18);
+        color: var(--migre-color-font-link-hover);
+        border-bottom: 1px solid var(--migre-color-font-link-hover);
     }
 }
 @media (hover: none) {
     .migre-v1-main-now-item a:active {
-        color: rgb(255, 126, 18);
-        border-bottom: 1px solid rgb(255, 126, 18);
+        color: var(--migre-color-font-link-hover);
+        border-bottom: 1px solid var(--migre-color-font-link-hover);
     }
 }
 
