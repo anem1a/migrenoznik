@@ -480,7 +480,7 @@ body {
 
 .migre-v1-bar {
     position: absolute;
-    top: 63px;
+    top: 100px;
 }
 
 .migre-v1-bar-inner {
@@ -526,6 +526,8 @@ body {
     .migre-v1-bar-button {
         display: none;
     }
+}
+
 .migre-v1-main-now-cancel {
     position: absolute;
     right: .5em;
