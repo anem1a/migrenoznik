@@ -25,13 +25,25 @@ import (
 //   - собирает все данные в структуру Entry.
 //
 // 6. Возвращает JSON с массивом всех записей.
+
+// 📦 Структура ответа
+type Entry struct {
+	DT_Start string   `json:"DT_Start"`
+	Duration float64  `json:"Duration"`
+	Strength int      `json:"Strength"`
+	Triggers []string `json:"Triggers"`
+	Symptoms []string `json:"Symptoms"`
+	Drugs    []string `json:"Drugs"`
+	ID       int      `json:"ID"`
+}
+
 func EntriesHandler(c *gin.Context) {
 
 	cookie, err := c.Cookie("session_id")
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"success": false,
-			"entries": nil,
+			"entries": []Entry{},
 		})
 		log.Println("Сессия не найдена в cookie")
 		return
@@ -41,7 +53,7 @@ func EntriesHandler(c *gin.Context) {
 	if !ok {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"success": false,
-			"entries": nil,
+			"entries": []Entry{},
 		})
 		log.Println("Сессия не найдена в хранилище")
 		return
@@ -58,7 +70,7 @@ func EntriesHandler(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
-			"entries": nil,
+			"entries": []Entry{},
 		})
 		log.Println("Аккаунт не найден в БД")
 		return
@@ -75,23 +87,12 @@ func EntriesHandler(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
-			"entries": nil,
+			"entries": []Entry{},
 		})
 		log.Println("Ошибка запроса записей с БД:", err)
 		return
 	}
 	defer rows.Close()
-
-	// 📦 Структура ответа
-	type Entry struct {
-		DT_Start string   `json:"DT_Start"`
-		Duration float64  `json:"Duration"`
-		Strength int      `json:"Strength"`
-		Triggers []string `json:"Triggers"`
-		Symptoms []string `json:"Symptoms"`
-		Drugs    []string `json:"Drugs"`
-		ID       int      `json:"ID"`
-	}
 
 	var entries []Entry
 
@@ -144,11 +145,16 @@ func EntriesHandler(c *gin.Context) {
 			ID:       id,
 		})
 	}
+
+	if entries == nil {
+        entries = []Entry{} // ← ключевая строка
+    }
 	
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"entries": entries,
 	})
+	log.Printf("📦 Записи получены для пользователя: %s, количество: %d\n", login, len(entries))
 }
 
 func fetchStringList(query string, id int) []string {
