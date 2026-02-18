@@ -240,7 +240,7 @@ class MigrenoznikCore {
         /* Save to remote storage */
         let data = new FormData();
         data.append("dt_start", current.DT_Start.getTime());
-        data.append("duration", current.Duration);
+        data.append("duration", Math.floor(current.Duration));
         data.append("strength", current.Strength);
         data.append("triggers", JSON.stringify(current.Triggers.map(element => element.Code)));
         data.append("symptoms", JSON.stringify(current.Symptoms.map(element => element.Code)));
@@ -310,7 +310,7 @@ class MigrenoznikCore {
         /* Save to remote storage */
         let data = new FormData();
         data.append("dt_start", current.DT_Start.getTime());
-        data.append("duration", current.Duration);
+        data.append("duration", Math.floor(current.Duration));
         data.append("strength", current.Strength);
         data.append("triggers", JSON.stringify(current.Triggers.map(element => element.Code)));
         data.append("symptoms", JSON.stringify(current.Symptoms.map(element => element.Code)));
@@ -776,7 +776,7 @@ function compose_migraine_diary() {
             "div",
             "migre-v1-main-diary-item-basics",
             undefined,
-            `<div class="migre-v1-main-diary-item-left"><img src="/static/assets/images/icons/calendar.svg">${Calendar.date_to_quick_format(migraine_attack.DT_Start)}, длительность: ${Calendar.date_to_quick_format(migraine_attack.Duration)}</div>`
+            `<div class="migre-v1-main-diary-item-left"><img src="/static/assets/images/icons/calendar.svg">${Calendar.date_to_quick_format(migraine_attack.DT_Start)}, длительность: ${migraine_attack.Duration}</div>`
         ));
         diary_item.appendChild(create_element(
             "div",
