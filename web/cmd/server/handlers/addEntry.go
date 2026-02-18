@@ -73,18 +73,19 @@ func AddEntryHandler(c *gin.Context) {
 
 	// Получение полей из POST
 	dtStartStr := c.PostForm("dt_start")
-	dtEndStr := c.PostForm("dt_end")
 	strengthStr := c.PostForm("strength")
+	durationStr := c.PostForm("duration")
 	triggersJSON := c.PostForm("triggers")
 	symptomsJSON := c.PostForm("symptoms")
 	drugsJSON := c.PostForm("drugs")
 
-	if dtStartStr == "" || dtEndStr == "" || strengthStr == "" ||
+	if dtStartStr == "" || durationStr == "" || strengthStr == "" ||
 		triggersJSON == "" || symptomsJSON == "" || drugsJSON == "" {
 		c.JSON(http.StatusOK, gin.H{
 			"success":    false,
 			"id":         nil,
 			"error_code": 444})
+		log.Println("Ошибка полученных данных")
 		return
 	}
 
@@ -98,31 +99,30 @@ func AddEntryHandler(c *gin.Context) {
 		log.Println("Ошибка конвертации даты начала")
 		return
 	}
-	dtEndUnix, err := strconv.ParseInt(dtEndStr, 10, 64)
-	if err != nil || dtEndUnix < dtStartUnix {
-		c.JSON(http.StatusOK, gin.H{
-			"success":    false,
-			"id":         nil,
-			"error_code": 444})
-		log.Println("Ошибка конвертации даты окончания")
-		return
-	}
 
 	tStart := time.Unix(dtStartUnix/1000, 0)
-	tEnd := time.Unix(dtEndUnix/1000, 0)
 
 	date := tStart.Format("2006-01-02")
 	timeValue := tStart.Format("15:04:05")
 
-	durationHours := int(tEnd.Sub(tStart).Hours())
-	if durationHours < 0 {
-		durationHours = 0
+	// Конвертация продолжительности
+	durationHours, err := strconv.Atoi(durationStr)
+	if err != nil || durationHours < 0 {
+		c.JSON(http.StatusOK, gin.H{
+			"success":    false,
+			"id":         nil,
+			"error_code": 444})
+		log.Println("Ошибка конвертации длительности")
+		return
 	}
 
 	// Конвертация интенсивности боли
 	strength, err := strconv.Atoi(strengthStr)
 	if err != nil || strength < 0 || strength > 10 {
-		c.JSON(http.StatusOK, gin.H{"success": false, "id": nil, "error_code": 444})
+		c.JSON(http.StatusOK, gin.H{
+			"success":    false,
+			"id":         nil,
+			"error_code": 444})
 		log.Println("Ошибка конвертации интенсивности боли")
 		return
 	}
