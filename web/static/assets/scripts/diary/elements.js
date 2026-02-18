@@ -20,7 +20,7 @@ function configure_main_bottom_buttoms(migraine_now) {
         document.getElementById("migre-diary-main-bottom-button-add").style.display = 'none';
     } else {
         document.getElementById("migre-diary-main-bottom-button-now").innerText = "Отметить мигрень сейчас";
-        document.getElementById("migre-diary-main-bottom-button-add").style.display = 'block';
+        //document.getElementById("migre-diary-main-bottom-button-add").style.display = 'block';
     }
 }
 

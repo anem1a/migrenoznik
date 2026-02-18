@@ -10,14 +10,20 @@
             <header class="migre-v1-main-header">
                 <div class="migre-v1-main-header-container">
                     <div class="migre-v1-main-header-inner">
-                        {{ if .Username }}
-                        <div class="col-md-3 text-end">
-                            <span>Привет, {{ .Username }}</span>
-                            <button class="migre-v1-main-header-login-button" onclick="logout_Clicked()">Выйти</button>
+                        <div class="migre-v1-main-header-inner-left">
+                            <div class="migre-v1-main-header-logo-wrapper"></div>
+                            <div class="migre-v1-main-header-hello">
+                                <h1>Мигренозник</h1>
+                                <h2>Держи свою боль под контролем</h2>
+                            </div>
                         </div>
-                        {{ else }}
-                        <button class="migre-v1-main-header-login-button" onclick="login_Clicked()">Войти</button>
-                        {{ end }}
+                        <div class="migre-v1-main-header-inner-right">
+                            {{ if .Username }}
+                                <button class="migre-v1-main-header-login-button" onclick="logout_Clicked()">Выйти</button>
+                            {{ else }}
+                                <button class="migre-v1-main-header-login-button" onclick="login_Clicked()">Вход/регистрация</button>
+                            {{ end }}
+                        </div>
                     </div>
                 </div>
             </header>
@@ -137,6 +143,9 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="migre-v1-main-now-item">
+                                <a onclick="cancel_migraine_now()">Отменить</a>
+                            </div>
                         </div>
                     </div>
 
@@ -163,7 +172,7 @@
                             <button class="migre-v1-main-bottom-button" id="migre-diary-main-bottom-button-now"
                                 onclick="migraine_now_button_Clicked()">Отметить мигрень сейчас
                             </button>
-                            <button class="migre-v1-main-bottom-button" data-square="true" id="migre-diary-main-bottom-button-add"
+                            <button style="display: none;" class="migre-v1-main-bottom-button" data-square="true" id="migre-diary-main-bottom-button-add"
                                 onclick="migraine_now_button_Clicked()">+
                             </button>
                         </div>
