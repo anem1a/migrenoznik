@@ -17,9 +17,11 @@ function display_migraine_now_block(show) {
 function configure_main_bottom_buttoms(migraine_now) {
     if (migraine_now) {
         document.getElementById("migre-diary-main-bottom-button-now").innerText = "Отметить конец мигрени";
+        document.getElementById("migre-diary-main-bottom-button-now-2").innerText = "Отметить конец мигрени";
         document.getElementById("migre-diary-main-bottom-button-add").style.display = 'none';
     } else {
-        document.getElementById("migre-diary-main-bottom-button-now").innerText = "Отметить мигрень сейчас";
+        document.getElementById("migre-diary-main-bottom-button-now").innerText = "Записать мигрень";
+        document.getElementById("migre-diary-main-bottom-button-now-2").innerText = "Записать мигрень";
         //document.getElementById("migre-diary-main-bottom-button-add").style.display = 'block';
     }
 }
