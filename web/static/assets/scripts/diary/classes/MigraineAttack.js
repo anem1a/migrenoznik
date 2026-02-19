@@ -2,7 +2,7 @@ class MigraineAttack {
     constructor(local_id, dt_start, strength, duration = null, triggers = [], symptoms = [], drugs = [], id = null) {
         this.LocalID = local_id;
         this.DT_Start = dt_start;
-        this.Duration = (dt_end - dt_start) / 3600000;
+        this.Duration = duration;
         this.Strength = strength;
         this.Triggers = triggers;
         this.Symptoms = symptoms;
