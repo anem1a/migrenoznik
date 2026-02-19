@@ -121,9 +121,6 @@ func EntriesHandler(c *gin.Context) {
 			time.UTC,
 		)
 
-		// компенсировать смещение
-		dateTime = dateTime.Add(3 * time.Hour)
-
 		dtDisplay := dateTime.Format("2006-01-02T15:04Z")
 
 		// 🧠 Триггеры
