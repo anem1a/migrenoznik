@@ -74,39 +74,18 @@ class MigrenoznikCore {
         }
         let attacks = Core.get_migraine_attacks();
         let new_attacks = [];
-        // костыль, пока Аня не переделала
         if (data["entries"] === null) {
             return;
         }
         for (let i = 0; i < data["entries"].length; i++) {
-            for (let j = 0; j < data["entries"][i]["Triggers"].length; j++) {
-                const element = data["entries"][i]["Triggers"][j];
-                for (let k = 0; k < MigraineTrigger.total(); k++) {
-                    if (new MigraineTrigger(k).Name == element) {
-                        data["entries"][i]["Triggers"][j] = k;
-                    }
-                }
-            }
-            for (let j = 0; j < data["entries"][i]["Symptoms"].length; j++) {
-                const element = data["entries"][i]["Symptoms"][j];
-                for (let k = 0; k < MigraineSymptom.total(); k++) {
-                    if (new MigraineSymptom(k).Name == element) {
-                        data["entries"][i]["Symptoms"][j] = k;
-                    }
-                }
-            }
             for (let j = 0; j < data["entries"][i]["Drugs"].length; j++) {
                 const element = data["entries"][i]["Drugs"][j];
                 for (let k = 0; k < MigraineDrug.total(); k++) {
-                    if (new MigraineDrug(k).Name == element) {
+                    if (new MigraineDrug(k).ATX == element) {
                         data["entries"][i]["Drugs"][j] = new MigraineDrug(k).Code;
                     }
                 }
             }
-            
-            //data["entries"][i]["DT_Start"] = `20${data["entries"][i]["DT_Start"].substring(6,8)}-${data["entries"][i]["DT_Start"].substring(3,5)}-${data["entries"][i]["DT_Start"].substring(0,2)}T00:00Z`;
-
-            // Конец костыля
             let is_in_local_storage = false;
             for (const attack of attacks) {
                 if (attack.ID == data["entries"][i]["ID"]) {
