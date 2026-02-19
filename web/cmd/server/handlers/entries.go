@@ -31,8 +31,8 @@ type Entry struct {
 	DT_Start string   `json:"DT_Start"`
 	Duration float64  `json:"Duration"`
 	Strength int      `json:"Strength"`
-	Triggers []string `json:"Triggers"`
-	Symptoms []string `json:"Symptoms"`
+	Triggers []int    `json:"Triggers"`
+	Symptoms []int    `json:"Symptoms"`
 	Drugs    []string `json:"Drugs"`
 	ID       int      `json:"ID"`
 }
@@ -124,27 +124,24 @@ func EntriesHandler(c *gin.Context) {
 		dtDisplay := dateTime.Format("2006-01-02T15:04Z")
 
 		// 🧠 Триггеры
-		triggers := fetchStringList(`
-			SELECT t.name
-			FROM "Attack-Trigger" at
-			JOIN "Triggers" t ON at.id_trigger = t.id_trigger
-			WHERE at.id_entry = $1
+		triggers := fetchIntList(`
+			SELECT id_trigger
+			FROM "Attack-Trigger"
+			WHERE id_entry = $1
 		`, id)
 
 		// 🤕 Симптомы
-		symptoms := fetchStringList(`
-			SELECT s.name
-			FROM "Attack-Symptom" ast
-			JOIN "Symptoms" s ON ast.id_sympt = s.id_sympt
-			WHERE ast.id_entry = $1
+		symptoms := fetchIntList(`
+			SELECT id_sympt
+			FROM "Attack-Symptom"
+			WHERE id_entry = $1
 		`, id)
 
 		// 💊 Лекарства
 		drugs := fetchStringList(`
-			SELECT d.drug_name
-			FROM "Attack-Drug" ad
-			JOIN "Drugs" d ON ad.atx_code = d.atx_code
-			WHERE ad.id_entry = $1
+			SELECT atx_code
+			FROM "Attack-Drug"
+			WHERE id_entry = $1
 		`, id)
 
 		entries = append(entries, Entry{
@@ -167,6 +164,27 @@ func EntriesHandler(c *gin.Context) {
 		"entries": entries,
 	})
 	log.Printf("📦 Записи получены для пользователя: %s, количество: %d\n", login, len(entries))
+}
+
+func fetchIntList(query string, id int) []int {
+	rows, err := global.DB.Query(query, id)
+	if err != nil {
+		return []int{}
+	}
+	defer rows.Close()
+
+	var result []int
+	for rows.Next() {
+		var value int
+		if err := rows.Scan(&value); err == nil {
+			result = append(result, value)
+		}
+	}
+
+	if result == nil {
+		return []int{}
+	}
+	return result
 }
 
 func fetchStringList(query string, id int) []string {
