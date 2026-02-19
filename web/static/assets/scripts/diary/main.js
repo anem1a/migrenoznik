@@ -219,7 +219,7 @@ class MigrenoznikCore {
         /* Save to remote storage */
         let data = new FormData();
         data.append("dt_start", current.DT_Start.getTime());
-        data.append("duration", Math.floor(current.Duration));
+        data.append("duration", current.Duration);
         data.append("strength", current.Strength);
         data.append("triggers", JSON.stringify(current.Triggers.map(element => element.Code)));
         data.append("symptoms", JSON.stringify(current.Symptoms.map(element => element.Code)));
@@ -289,7 +289,7 @@ class MigrenoznikCore {
         /* Save to remote storage */
         let data = new FormData();
         data.append("dt_start", current.DT_Start.getTime());
-        data.append("duration", Math.floor(current.Duration));
+        data.append("duration", current.Duration);
         data.append("strength", current.Strength);
         data.append("triggers", JSON.stringify(current.Triggers.map(element => element.Code)));
         data.append("symptoms", JSON.stringify(current.Symptoms.map(element => element.Code)));
@@ -751,11 +751,18 @@ function compose_migraine_diary() {
             "div",
             "migre-v1-main-diary-item"
         );
+        let duration = `${migraine_attack.Duration} ${conjugate_word(migraine_attack.Duration, "час", "часа", "часов")}`;
+        if (migraine_attack.Duration == 0) {
+            duration = 'меньше получаса';
+        }
+        if (migraine_attack.Duration == 0.5) {
+            duration = 'полчаса';
+        }
         diary_item.appendChild(create_element(
             "div",
             "migre-v1-main-diary-item-basics",
             undefined,
-            `<div class="migre-v1-main-diary-item-left"><img src="/static/assets/images/icons/calendar.svg">${Calendar.date_to_quick_format(migraine_attack.DT_Start)} <img src="/static/assets/images/icons/time.svg" style="padding-left: 1em;"> ${migraine_attack.Duration} ${conjugate_word(migraine_attack.Duration, "час", "часа", "часов")}</div>`
+            `<div class="migre-v1-main-diary-item-left"><img src="/static/assets/images/icons/calendar.svg">${Calendar.date_to_quick_format(migraine_attack.DT_Start)} <img src="/static/assets/images/icons/time.svg" style="padding-left: 1em;"> ${duration}</div>`
         ));
         diary_item.appendChild(create_element(
             "div",

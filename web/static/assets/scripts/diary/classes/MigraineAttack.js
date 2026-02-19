@@ -2,7 +2,7 @@ class MigraineAttack {
     constructor(local_id, dt_start, strength, duration = null, triggers = [], symptoms = [], drugs = [], id = null) {
         this.LocalID = local_id;
         this.DT_Start = dt_start;
-        this.Duration = round_to_half(duration);
+        this._Duration = MigraineAttack.round_to_half(duration);
         this.Strength = strength;
         this.Triggers = triggers;
         this.Symptoms = symptoms;
@@ -29,7 +29,7 @@ class MigraineAttack {
             obj["LocalID"] == null ? Core.next_autoincrement() : Number(obj["LocalID"]),
             obj["DT_Start"] == null ? null : new Date(obj["DT_Start"]),
             obj["Strength"] == null ? null : Number(obj["Strength"]),
-            obj["Duration"] == null ? null : round_to_half(Number(obj["Duration"])),
+            obj["Duration"] == null ? null : MigraineAttack.round_to_half(Number(obj["Duration"])),
             obj["Triggers"] == null ? [] : obj["Triggers"].map(code => new MigraineTrigger(code)),
             obj["Symptoms"] == null ? [] : obj["Symptoms"].map(code => new MigraineSymptom(code)),
             obj["Drugs"] == null ? [] : obj["Drugs"].map(code => new MigraineDrug(code)),
@@ -117,7 +117,15 @@ class MigraineAttack {
         ].includes(status);
     }
 
-    round_to_half(num) {
+    static round_to_half(num) {
         return Math.round(num * 2) / 2;
+    }
+
+    set Duration(duration) {
+        this._Duration = MigraineAttack.round_to_half(duration);
+    }
+
+    get Duration() {
+        return this._Duration;
     }
 }
