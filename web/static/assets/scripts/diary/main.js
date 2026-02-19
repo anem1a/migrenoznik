@@ -776,7 +776,7 @@ function compose_migraine_diary() {
             "div",
             "migre-v1-main-diary-item-basics",
             undefined,
-            `<div class="migre-v1-main-diary-item-left"><img src="/static/assets/images/icons/calendar.svg">${Calendar.date_to_quick_format(migraine_attack.DT_Start)}, длительность: ${migraine_attack.Duration}</div>`
+            `<div class="migre-v1-main-diary-item-left"><img src="/static/assets/images/icons/calendar.svg">${Calendar.date_to_quick_format(migraine_attack.DT_Start)} <img src="/static/assets/images/icons/time.svg" style="padding-left: 1em;"> ${migraine_attack.Duration} ${conjugate_word(migraine_attack.Duration, "час", "часа", "часов")}</div>`
         ));
         diary_item.appendChild(create_element(
             "div",
