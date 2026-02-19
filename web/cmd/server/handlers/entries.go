@@ -78,7 +78,7 @@ func EntriesHandler(c *gin.Context) {
 
 	// 📥 Получение всех записей
 	rows, err := global.DB.Query(`
-		SELECT id_entry, date, duration, pain_level
+		SELECT id_entry, date, time, duration, pain_level
 		FROM "Attacks"
 		WHERE acc_id = $1
 		ORDER BY date DESC
@@ -100,16 +100,31 @@ func EntriesHandler(c *gin.Context) {
 	for rows.Next() {
 		var (
 			id       int
-			date     time.Time
+			dateVal  time.Time
+			timeVal  time.Time
 			duration float64
 			strength int
 		)
 
-		if err := rows.Scan(&id, &date, &duration, &strength); err != nil {
+		if err := rows.Scan(&id, &dateVal, &timeVal, &duration, &strength); err != nil {
 			continue
 		}
 
-		dtDisplay := date.Format("02.01.06")
+		dateTime := time.Date(
+			dateVal.Year(),
+			dateVal.Month(),
+			dateVal.Day(),
+			timeVal.Hour(),
+			timeVal.Minute(),
+			0,
+			0,
+			time.UTC,
+		)
+
+		// компенсировать смещение
+		dateTime = dateTime.Add(3 * time.Hour)
+
+		dtDisplay := dateTime.Format("2006-01-02T15:04Z")
 
 		// 🧠 Триггеры
 		triggers := fetchStringList(`
@@ -147,9 +162,9 @@ func EntriesHandler(c *gin.Context) {
 	}
 
 	if entries == nil {
-        entries = []Entry{} // ← ключевая строка
-    }
-	
+		entries = []Entry{}
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"entries": entries,
