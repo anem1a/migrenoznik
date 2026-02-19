@@ -104,7 +104,7 @@ class MigrenoznikCore {
                 }
             }
             
-            data["entries"][i]["DT_Start"] = `20${data["entries"][i]["DT_Start"].substring(6,8)}-${data["entries"][i]["DT_Start"].substring(3,5)}-${data["entries"][i]["DT_Start"].substring(0,2)}T00:00Z`;
+            //data["entries"][i]["DT_Start"] = `20${data["entries"][i]["DT_Start"].substring(6,8)}-${data["entries"][i]["DT_Start"].substring(3,5)}-${data["entries"][i]["DT_Start"].substring(0,2)}T00:00Z`;
 
             // Конец костыля
             let is_in_local_storage = false;
