@@ -547,3 +547,15 @@ body {
     font-weight: 300;
     margin: .5em 0;
 }
+
+.migre-v1-mobile {
+    display: none;
+}
+@media only screen and (max-width: 780px) {
+    .migre-v1-mobile {
+        display: inline;
+    }
+    .migre-v1-desktop {
+        display: none;
+    }
+}
