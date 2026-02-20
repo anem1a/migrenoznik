@@ -385,6 +385,17 @@ class MigrenoznikCore {
         localStorage.setItem("current_migraine_attack", JSON.stringify(current));
     }
 
+    retry_server() {
+        let attacks = Core.get_migraine_attacks();
+        for (const attack of attacks) {
+            if (attack.Status == "FAILED_SERVER_CREATING") {
+                Core.send_migraine_attack(attack);
+            } else if (attack.Status == "FAILED_SERVER_DELETING") {
+                delete_entry_Clicked(attack.LocalID);
+            }
+        }
+    }
+
     /**
      * This function returns next autoincrement value for migraine attacks and increments it in storage.
      * @returns 

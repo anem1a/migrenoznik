@@ -33,5 +33,8 @@ document.addEventListener('DOMContentLoaded',
         setInterval(() => {
             Core.fetch_remote_migraine_attacks();
         }, 1000);
+        setInterval(() => {
+            Core.retry_server();
+        }, 15000);
     }
 );
