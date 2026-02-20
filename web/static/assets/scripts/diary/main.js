@@ -739,6 +739,7 @@ function compose_migraine_diary() {
     document.getElementById("migre-diary-wrapper").innerHTML = "";
     document.getElementById("migre-unspecified-diary-wrapper").innerHTML = "";
     let migraine_attacks = Core.get_migraine_attacks();
+    let counter = 0;
     for (let i = 0; i < migraine_attacks.length; i++) {
         const migraine_attack = migraine_attacks[i];
         if (migraine_attack.Status == "LOCAL_DELETED" ||
@@ -747,6 +748,7 @@ function compose_migraine_diary() {
         ) {
             continue;
         }
+        counter += 1;
         let diary_item = create_element(
             "div",
             "migre-v1-main-diary-item"
@@ -792,6 +794,13 @@ function compose_migraine_diary() {
             document.getElementById("migre-unspecified-diary-wrapper").appendChild(diary_item);
             document.getElementById("migre-unspecified-entries-wrapper").style.display = "block";
         }
+    }
+    if (counter == 0) {
+        document.getElementById("migre-diary-wrapper").innerHTML = `
+        <div class="migre-v1-main-diary-message-box">
+            <h3 class="migre-v1-main-diary-message-box-title">Пока нет записей</h3>
+            <h4 class="migre-v1-main-diary-message-box-subtitle">Если хотите отметить мигрень, нажмите на кнопку <span>внизу экрана</span> <span>в левом верхнем углу</span></h4>
+        </div>`;
     }
 }
 
