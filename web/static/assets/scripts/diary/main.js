@@ -688,11 +688,6 @@ function cancel_migraine_now() {
     }
 }
 
-function login_Clicked() {
-    window.location.href = "/login/";
-    //window.history.pushState(null, null, "/login/");
-}
-
 /**
  * Onclick event of pressing the "Logout" button
  */
