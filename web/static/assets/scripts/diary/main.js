@@ -424,7 +424,7 @@ class MigrenoznikCore {
             if (attack.Status == "FAILED_SERVER_CREATING") {
                 Core.send_migraine_attack(attack);
             } else if (attack.Status == "FAILED_SERVER_DELETING") {
-                delete_entry_Clicked(attack.LocalID);
+                Core.delete_migraine_attack(attack);
             }
         }
     }
