@@ -635,14 +635,14 @@ function migraine_now_button_Clicked() {
         document.getElementById("migre-now-wrapper").style.display = 'none';
     } else {
         Core.toggle_migraine_status();
-        for (let i = 0; i < MigraineTrigger.total(); i++) {
-            document.getElementById(`migre-trigger-${i}`).setAttribute("data-selected", false);
+        for (const t of MigraineTrigger.total()) {   
+            document.getElementById(`migre-trigger-${t}`).setAttribute("data-selected", false);
         }
-        for (let i = 0; i < MigraineSymptom.total(); i++) {
-            document.getElementById(`migre-symptom-${i}`).setAttribute("data-selected", false);
+        for (const s of MigraineSymptom.total()) {   
+            document.getElementById(`migre-symptom-${s}`).setAttribute("data-selected", false);
         }
-        for (let i = 0; i < MigraineDrug.total(); i++) {
-            document.getElementById(`migre-drug-${i}`).setAttribute("data-selected", false);
+        for (const d of MigraineDrug.total()) {   
+            document.getElementById(`migre-drug-${d}`).setAttribute("data-selected", false);
         }
         let strength = document.getElementById("migre-current-strength-input").value;
         Core.add_new_migraine_attack(new MigraineAttack(Core.next_autoincrement(), new Date(), strength));

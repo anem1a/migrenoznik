@@ -4,7 +4,7 @@ class MigraineAttackEntity {
     }
     
     static total() {
-        return Object.keys(this.Config).length;
+        return Object.keys(this.Config);
     }
     
     constructor(code) {
