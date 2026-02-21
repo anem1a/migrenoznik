@@ -215,7 +215,7 @@ class MigrenoznikCore {
         data.append("strength", current.Strength);
         data.append("triggers", JSON.stringify(current.Triggers.map(element => element.Code)));
         data.append("symptoms", JSON.stringify(current.Symptoms.map(element => element.Code)));
-        data.append("drugs", JSON.stringify(current.Drugs.map(element => element.ATX)));
+        data.append("drugs", JSON.stringify(current.Drugs.map(element => element.Code)));
         
         const response = await fetch('/api/add_entry', {
             method: 'POST',
@@ -285,7 +285,7 @@ class MigrenoznikCore {
         data.append("strength", current.Strength);
         data.append("triggers", JSON.stringify(current.Triggers.map(element => element.Code)));
         data.append("symptoms", JSON.stringify(current.Symptoms.map(element => element.Code)));
-        data.append("drugs", JSON.stringify(current.Drugs.map(element => element.ATX)));
+        data.append("drugs", JSON.stringify(current.Drugs.map(element => element.Code)));
         
         const response = await fetch('/api/add_entry', {
             method: 'POST',
