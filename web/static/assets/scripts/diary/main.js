@@ -78,14 +78,6 @@ class MigrenoznikCore {
             return;
         }
         for (let i = 0; i < data["entries"].length; i++) {
-            for (let j = 0; j < data["entries"][i]["Drugs"].length; j++) {
-                const element = data["entries"][i]["Drugs"][j];
-                for (let k = 0; k < MigraineDrug.total(); k++) {
-                    if (new MigraineDrug(k).ATX == element) {
-                        data["entries"][i]["Drugs"][j] = new MigraineDrug(k).Code;
-                    }
-                }
-            }
             let is_in_local_storage = false;
             for (const attack of attacks) {
                 if (attack.ID == data["entries"][i]["ID"]) {
