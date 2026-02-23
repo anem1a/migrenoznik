@@ -9,4 +9,8 @@ class BrowserSystem {
         }
         return false;
     }
+
+    static get_meta(name) {
+        return document.querySelector(`meta[name="${name}"]`).getAttribute('content');
+    }
 }
