@@ -99,9 +99,11 @@ class MigrenoznikCore {
                 new_attacks.push(new_obj);
             }
         }
-        attacks.push(...new_attacks);
-        localStorage.setItem("migraine_attacks", JSON.stringify(attacks));
-        compose_migraine_diary();
+        if (new_attacks.length > 0) {
+            attacks.push(...new_attacks);
+            localStorage.setItem("migraine_attacks", JSON.stringify(attacks));
+            compose_migraine_diary();
+        }
     }
 
     /**
