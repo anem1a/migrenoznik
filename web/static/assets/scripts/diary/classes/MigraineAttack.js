@@ -1,5 +1,5 @@
 class MigraineAttack {
-    constructor(local_id, dt_start, strength, duration = null, triggers = [], symptoms = [], drugs = [], id = null) {
+    constructor(local_id, dt_start, strength, login = null, duration = null, triggers = [], symptoms = [], drugs = [], id = null) {
         this.LocalID = local_id;
         this.DT_Start = dt_start;
         this.Duration = (dt_end - dt_start) / 3600000;
@@ -7,6 +7,7 @@ class MigraineAttack {
         this.Triggers = triggers;
         this.Symptoms = symptoms;
         this.Drugs = drugs;
+        this.Login = login;
         this.ID = id;
 
         /**
@@ -29,6 +30,7 @@ class MigraineAttack {
             obj["LocalID"] == null ? Core.next_autoincrement() : Number(obj["LocalID"]),
             obj["DT_Start"] == null ? null : new Date(obj["DT_Start"]),
             obj["Strength"] == null ? null : Number(obj["Strength"]),
+            obj["Login"] == null ? null : obj["Login"],
             obj["Duration"] == null ? null : Number(obj["Duration"]),
             obj["Triggers"] == null ? [] : obj["Triggers"].map(code => new MigraineTrigger(code)),
             obj["Symptoms"] == null ? [] : obj["Symptoms"].map(code => new MigraineSymptom(code)),
@@ -44,6 +46,7 @@ class MigraineAttack {
             "LocalID": this.LocalID,
             "DT_Start": this.DT_Start,
             "Duration": this.Duration,
+            "Login": this.Login,
             "Strength": this.Strength,
             "Status": MigraineAttack.is_valid_status(this.Status) ? this.Status : "LOCAL_ONLY",
             "Triggers": this.Triggers.map(obj => obj.Code),
