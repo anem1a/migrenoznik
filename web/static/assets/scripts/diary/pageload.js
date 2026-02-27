@@ -31,7 +31,9 @@ document.addEventListener('DOMContentLoaded',
 
         Core.fetch_remote_migraine_attacks();
         setInterval(() => {
-            Core.fetch_remote_migraine_attacks();
+            if (Core.LoggedIn) {
+                Core.fetch_remote_migraine_attacks();
+            }
         }, 1000);
     }
 );
