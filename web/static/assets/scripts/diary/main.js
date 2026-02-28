@@ -670,7 +670,7 @@ function migraine_now_button_Clicked() {
             document.getElementById(`migre-drug-${i}`).setAttribute("data-selected", false);
         }
         let strength = document.getElementById("migre-current-strength-input").value;
-        Core.add_new_migraine_attack(new MigraineAttack(Core.next_autoincrement(), new Date(), strength));
+        Core.add_new_migraine_attack(new MigraineAttack(Core.next_autoincrement(), new Date(), strength, BrowserSystem.get_meta("login")));
         configure_main_bottom_buttoms(true);
         let now = new Date();
         document.getElementById("migre-current-dt-start-value").innerHTML = `${now.getDate()} ${Calendar.month_number_to_name(now.getMonth())} ${now.getFullYear()} ${now.getHours() < 10 ? "0" : ""}${now.getHours()}:${now.getMinutes() < 10 ? "0" : ""}${now.getMinutes()}`;
