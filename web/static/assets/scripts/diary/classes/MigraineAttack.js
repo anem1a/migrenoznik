@@ -42,18 +42,26 @@ class MigraineAttack {
     }
 
     toJSON() {
-        return {
+        var result = {
             "LocalID": this.LocalID,
             "DT_Start": this.DT_Start,
             "Duration": this.Duration,
-            "Login": this.Login,
             "Strength": this.Strength,
             "Status": MigraineAttack.is_valid_status(this.Status) ? this.Status : "LOCAL_ONLY",
             "Triggers": this.Triggers.map(obj => obj.Code),
             "Symptoms": this.Symptoms.map(obj => obj.Code),
             "Drugs": this.Drugs.map(obj => obj.Code),
             "ID": this.ID
+        };
+        
+        if (this.Status === "FAILED_SERVER_CREATING" || 
+            this.Status === "FAILED_SERVER_DELETING" ||
+            this.Status === "PENDING_SERVER_CREATING" ||
+            this.Status === "PENDING_SERVER_DELETING") {
+            result["Login"] = this.Login;
         }
+        
+        return result;
     }
 
     backed_up() {
