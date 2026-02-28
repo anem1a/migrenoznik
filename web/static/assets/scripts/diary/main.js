@@ -740,6 +740,7 @@ function compose_migraine_diary() {
     document.getElementById("migre-unspecified-diary-wrapper").innerHTML = "";
     let migraine_attacks = Core.get_migraine_attacks();
     let counter = 0;
+    let unspecified = false;
     for (let i = 0; i < migraine_attacks.length; i++) {
         const migraine_attack = migraine_attacks[i];
         if (migraine_attack.Status == "LOCAL_DELETED" ||
@@ -791,9 +792,13 @@ function compose_migraine_diary() {
         if (migraine_attack.Status != "LOCAL_ONLY" || Core.LoggedIn == false) {
             document.getElementById("migre-diary-wrapper").appendChild(diary_item);
         } else {
+            unspecified = true;
             document.getElementById("migre-unspecified-diary-wrapper").appendChild(diary_item);
             document.getElementById("migre-unspecified-entries-wrapper").style.display = "block";
         }
+    }
+    if (!unspecified) {
+        document.getElementById("migre-unspecified-entries-wrapper").style.display = "none";
     }
     if (counter == 0) {
         document.getElementById("migre-diary-wrapper").innerHTML = `
