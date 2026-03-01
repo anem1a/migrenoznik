@@ -783,6 +783,7 @@ function compose_migraine_diary() {
                 undefined, undefined,
                 "Сохранить"
             );
+            save_button.style.marginLeft = '1em';
             save_button.addEventListener("click", () => {
                 Core.send_migraine_attack(migraine_attack);
             })
