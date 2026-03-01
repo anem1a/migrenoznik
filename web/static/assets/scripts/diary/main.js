@@ -78,14 +78,6 @@ class MigrenoznikCore {
             return;
         }
         for (let i = 0; i < data["entries"].length; i++) {
-            for (let j = 0; j < data["entries"][i]["Drugs"].length; j++) {
-                const element = data["entries"][i]["Drugs"][j];
-                for (let k = 0; k < MigraineDrug.total(); k++) {
-                    if (new MigraineDrug(k).ATX == element) {
-                        data["entries"][i]["Drugs"][j] = new MigraineDrug(k).Code;
-                    }
-                }
-            }
             let is_in_local_storage = false;
             for (const attack of attacks) {
                 if (attack.ID == data["entries"][i]["ID"]) {
@@ -223,7 +215,7 @@ class MigrenoznikCore {
         data.append("strength", current.Strength);
         data.append("triggers", JSON.stringify(current.Triggers.map(element => element.Code)));
         data.append("symptoms", JSON.stringify(current.Symptoms.map(element => element.Code)));
-        data.append("drugs", JSON.stringify(current.Drugs.map(element => element.ATX)));
+        data.append("drugs", JSON.stringify(current.Drugs.map(element => element.Code)));
         
         const response = await fetch('/api/add_entry', {
             method: 'POST',
@@ -293,7 +285,7 @@ class MigrenoznikCore {
         data.append("strength", current.Strength);
         data.append("triggers", JSON.stringify(current.Triggers.map(element => element.Code)));
         data.append("symptoms", JSON.stringify(current.Symptoms.map(element => element.Code)));
-        data.append("drugs", JSON.stringify(current.Drugs.map(element => element.ATX)));
+        data.append("drugs", JSON.stringify(current.Drugs.map(element => element.Code)));
         
         const response = await fetch('/api/add_entry', {
             method: 'POST',
@@ -545,105 +537,80 @@ class MigrenoznikCore {
             },
         };
         this.Drugs = {
-            "0": {
-                "name": 'Ацетилсалициловая кислота',
-                "atx": 'N02BA01'
+            "N02BA01": {
+                "name": 'Ацетилсалициловая кислота'
             },
-            "1": {
-                "name": 'Ибупрофен',
-                "atx": 'M01AE01'
+            "M01AE01": {
+                "name": 'Ибупрофен'
             },
-            "2": {
-                "name": 'Напроксен',
-                "atx": 'M01AE02'
+            "M01AE02": {
+                "name": 'Напроксен'
             },
-            "3": {
-                "name": 'Диклофенак',
-                "atx": 'M01AB05'
+            "M01AB05": {
+                "name": 'Диклофенак'
             },
-            "4": {
-                "name": 'Парацетамол',
-                "atx": 'N02BE01'
+            "N02BE01": {
+                "name": 'Парацетамол'
             },
-            "5": {
-                "name": 'Суматриптан',
-                "atx": 'N02CC01'
+            "N02CC01": {
+                "name": 'Суматриптан'
             },
-            "6": {
-                "name": 'Декскетопрофен',
-                "atx": 'M01AE17'
+            "M01AE17": {
+                "name": 'Декскетопрофен'
             },
-            "7": {
-                "name": 'Кеторолак',
-                "atx": 'M01AB15'
+            "M01AB15": {
+                "name": 'Кеторолак'
             },
-            "8": {
-                "name": 'Магния сульфат',
-                "atx": 'A12CC02'
+            "A12CC02": {
+                "name": 'Магния сульфат'
             },
-            "9": {
-                "name": 'Дексаметазон',
-                "atx": 'H02AB02'
+            "H02AB02": {
+                "name": 'Дексаметазон'
             },
-            "10": {
-                "name": 'Метопролол',
-                "atx": 'C07AB02'
+            "C07AB02": {
+                "name": 'Метопролол'
             },
-            "11": {
-                "name": 'Пропранолол',
-                "atx": 'C07AA05'
+            "C07AA05": {
+                "name": 'Пропранолол'
             },
-            "12": {
-                "name": 'Атенолол',
-                "atx": 'C07AB03'
+            "C07AB03": {
+                "name": 'Атенолол'
             },
-            "13": {
-                "name": 'Амитриптилин',
-                "atx": 'N06AA09'
+            "N06AA09": {
+                "name": 'Амитриптилин'
             },
-            "14": {
-                "name": 'Кандесартан',
-                "atx": 'C09CA06'
+            "C09CA06": {
+                "name": 'Кандесартан'
             },
-            "15": {
-                "name": 'Метоклопрамид',
-                "atx": 'A03FA01'
+            "A03FA01": {
+                "name": 'Метоклопрамид'
             },
-            "16": {
-                "name": 'Домперидон',
-                "atx": 'A03FA03'
+            "A03FA03": {
+                "name": 'Домперидон'
             },
-            "17": {
-                "name": 'Элетриптан',
-                "atx": 'N02CC06'
+            "N02CC06": {
+                "name": 'Элетриптан'
             },
-            "18": {
-                "name": 'Золмитриптан',
-                "atx": 'N02CC03'
+            "N02CC03": {
+                "name": 'Золмитриптан'
             },
-            "19": {
-                "name": 'Хлорпромазин',
-                "atx": 'N05AA01'
+            "N05AA01": {
+                "name": 'Хлорпромазин'
             },
-            "20": {
-                "name": 'Вальпроевая кислота',
-                "atx": 'N03AG01'
+            "N03AG01": {
+                "name": 'Вальпроевая кислота'
             },
-            "21": {
-                "name": 'Топирамат',
-                "atx": 'N03AX11'
+            "N03AX11": {
+                "name": 'Топирамат'
             },
-            "22": {
-                "name": 'Фреманезумаб',
-                "atx": 'N02CD03'
+            "N02CD03": {
+                "name": 'Фреманезумаб'
             },
-            "23": {
-                "name": 'Эренумаб',
-                "atx": 'N02CD01'
+            "N02CD01": {
+                "name": 'Эренумаб'
             },
-            "24": {
-                "name": 'Венлафаксин',
-                "atx": 'N06AX16'
+            "N06AX16": {
+                "name": 'Венлафаксин'
             },
         };
     }
@@ -660,14 +627,14 @@ function migraine_now_button_Clicked() {
         document.getElementById("migre-now-wrapper").style.display = 'none';
     } else {
         Core.toggle_migraine_status();
-        for (let i = 0; i < MigraineTrigger.total(); i++) {
-            document.getElementById(`migre-trigger-${i}`).setAttribute("data-selected", false);
+        for (const t of MigraineTrigger.total()) {   
+            document.getElementById(`migre-trigger-${t}`).setAttribute("data-selected", false);
         }
-        for (let i = 0; i < MigraineSymptom.total(); i++) {
-            document.getElementById(`migre-symptom-${i}`).setAttribute("data-selected", false);
+        for (const s of MigraineSymptom.total()) {   
+            document.getElementById(`migre-symptom-${s}`).setAttribute("data-selected", false);
         }
-        for (let i = 0; i < MigraineDrug.total(); i++) {
-            document.getElementById(`migre-drug-${i}`).setAttribute("data-selected", false);
+        for (const d of MigraineDrug.total()) {   
+            document.getElementById(`migre-drug-${d}`).setAttribute("data-selected", false);
         }
         let strength = document.getElementById("migre-current-strength-input").value;
         Core.add_new_migraine_attack(new MigraineAttack(Core.next_autoincrement(), new Date(), strength));

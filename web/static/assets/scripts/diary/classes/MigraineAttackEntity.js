@@ -4,7 +4,7 @@ class MigraineAttackEntity {
     }
     
     static total() {
-        return Object.keys(this.Config).length;
+        return Object.keys(this.Config);
     }
     
     constructor(code) {
@@ -31,9 +31,5 @@ class MigraineSymptom extends MigraineAttackEntity {
 class MigraineDrug extends MigraineAttackEntity {
     static get Config() {
         return Core.Drugs;
-    }
-
-    get ATX() {
-        return this.constructor.Config[String(this.Code)]?.atx || '';
     }
 }
