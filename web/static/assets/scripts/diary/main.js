@@ -211,6 +211,39 @@ class MigrenoznikCore {
         }
     }
 
+    async delete_migraine_attack(attack) {
+        if (attack.Status == "LOCAL_ONLY") {
+            Core.remove_migraine_attack(local_id);
+            compose_migraine_diary();
+            return;
+        } else {
+            this.updateAttack(attack.LocalID, { Status: "LOCAL_DELETED" });
+        }
+
+        let attacks = Core.get_migraine_attacks();
+        if (attack.ID == null) {
+            return;
+        }
+
+        this.updateAttack(attack.LocalID, { Status: "PENDING_SERVER_DELETING" });
+        let response = await fetch(`https://migrenoznik.ru/api/delete_entry?id=${attack.ID}`);
+        if (!response.ok) {
+            throw new Error(`Ошибка HTTP: ${response.status}`);
+        }
+        
+        const data = await response.json();
+
+        attacks = Core.get_migraine_attacks();
+        if (data["success"]) {
+            Core.remove_migraine_attack(attack.LocalID);
+            compose_migraine_diary();
+        } else {
+            this.updateAttack(attack.LocalID, { Status: "FAILED_SERVER_DELETING" });
+            // Здесь надо будет добавить обработку ошибки сервера (почему именно запись не удалилась) MIG-165
+            compose_migraine_diary();
+        }
+    }
+
     /**
      * Sends migraine attack to remote server.
      * @param {*} current - migraine attack to send
@@ -383,6 +416,17 @@ class MigrenoznikCore {
         let current = this.get_current_migraine_attack();
         current.remove_drug(drug);
         localStorage.setItem("current_migraine_attack", JSON.stringify(current));
+    }
+
+    retry_server() {
+        let attacks = Core.get_migraine_attacks();
+        for (const attack of attacks) {
+            if (attack.Status == "FAILED_SERVER_CREATING") {
+                Core.send_migraine_attack(attack);
+            } else if (attack.Status == "FAILED_SERVER_DELETING") {
+                Core.delete_migraine_attack(attack);
+            }
+        }
     }
 
     /**
