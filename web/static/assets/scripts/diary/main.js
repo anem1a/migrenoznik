@@ -65,6 +65,7 @@ class MigrenoznikCore {
             if (this.LoggedIn == true) {
                 this.LoggedIn = false;
                 Core.clear_local_storage_from_remote_entries();
+                compose_migraine_diary();
             }
             return;
         }
