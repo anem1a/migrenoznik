@@ -405,6 +405,7 @@ class MigrenoznikCore {
         }
         this.LoggedIn = false;
         this.DM = new DownloadManager(3);
+        this.Diary = new MigraineDiary();
         this.Triggers = {
             "0": {
                 "name": 'Менструальный цикл'
