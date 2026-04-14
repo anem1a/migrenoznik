@@ -13,16 +13,29 @@ class MigraineDiary {
         }
     }
 
+    /* Текущий приступ */
+
+
+    /* Получить текущий приступ мигрени - может быть null, если приступа нет. */
     get CurrentAttack() {
         return this._CurrentAttack;
     }
 
+    /* Установить текущий приступ мигрени. */
     set CurrentAttack(value) {
         this._CurrentAttack = value;
         localStorage.setItem("current_migraine_attack", JSON.stringify(this._CurrentAttack));
     }
 
+    /* Есть ли сейчас приступ мигрени? */
     is_migraine_now() {
         return this._CurrentAttack !== null;
     }
+
+    /* Очистить текущий приступ мигрени. */
+    clear_current_attack() {
+        this._CurrentAttack = null;
+        localStorage.removeItem("current_migraine_attack");
+    }
+
 }
