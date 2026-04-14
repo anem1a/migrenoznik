@@ -11,6 +11,18 @@ class MigraineDiary {
         } catch (error) {
             this._CurrentAttack = null;
         }
+
+        let migraine_attacks = localStorage.getItem("migraine_attacks");
+        this._Attacks = [];
+        try {
+            migraine_attacks = JSON.parse(migraine_attacks);
+            for (const attack of migraine_attacks) {
+                let _attack = MigraineAttack.from_json(attack);
+                this._Attacks = _attack;
+            }
+        } catch (error) {
+            this._Attacks = [];
+        }
     }
 
     /* Текущий приступ */
@@ -36,6 +48,26 @@ class MigraineDiary {
     clear_current_attack() {
         this._CurrentAttack = null;
         localStorage.removeItem("current_migraine_attack");
+    }
+
+
+    /* Все приступы */
+
+    /* Быстрый способ получить список приступов. Не гарантирует актуальность */
+    get Attacks() {
+        return this._Attacks;
+    }
+
+    set Attacks(value) {
+        this._Attacks = value;
+        localStorage.setItem("migraine_attacks", JSON.stringify(this._Attacks));
+    }
+
+    /* Добавить новый приступ в локальное хранилище */
+    async add_attack(attack) {
+        let attacks = this.Attacks;
+        attacks.push(attack);
+        this.Attacks = attacks;
     }
 
 }

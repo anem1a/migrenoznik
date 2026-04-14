@@ -1,38 +1,6 @@
 class MigrenoznikCore {
 
     /**
-     * Does user have migraine now.
-     * @returns True if yes, False if no
-     */
-    is_migraine_now() {
-        let migraine_now = localStorage.getItem("migraine_now");
-        if (migraine_now == undefined) {
-            let current_migraine_attack = localStorage.getItem("current_migraine_attack");
-            try {
-                current_migraine_attack = JSON.parse(current_migraine_attack);
-                MigraineAttack.from_json(current_migraine_attack);
-                localStorage.setItem("migraine_now", "true");
-                return true;
-            } catch (error) {
-                localStorage.setItem("migraine_now", "false");
-                return false;
-            }
-        }
-        return migraine_now == "true";
-    }
-
-    /**
-     * Toggles user's migraine status, i.e. if user has migraine, stops it, otherwise starts it.
-     */
-    toggle_migraine_status() {
-        if (this.is_migraine_now()) {
-            localStorage.setItem("migraine_now", "false");
-        } else {
-            localStorage.setItem("migraine_now", "true");
-        }
-    }
-
-    /**
      * Returns the entire diary of migraine attacks.
      */
     get_migraine_attacks() {
@@ -266,12 +234,13 @@ class MigrenoznikCore {
     }
 
     /**
-     * Closes (saves as ended) current migraine attack.
+     * Закрывает и сохраняет текущий приступ
      */
     async close_current_migraine_attack() {
         let attacks = this.get_migraine_attacks();
-        let current = this.get_current_migraine_attack();
-        current.Duration = (new Date() - current.DT_Start) / 3600000;
+        let current = Core.Diary.CurrentAttack;
+        MILLISECONDS_IN_HOUR = 60 * 60 * 1000;
+        current.Duration = (new Date() - current.DT_Start) / MILLISECONDS_IN_HOUR;
         if (this.LoggedIn) {
             current.Status = "PENDING_SERVER_CREATING";
         } else {
@@ -654,8 +623,7 @@ class MigrenoznikCore {
  * Onclick event of pressing the "Migraine now" button
  */
 function migraine_now_button_Clicked() {
-    if (Core.is_migraine_now()) {
-        Core.toggle_migraine_status();
+    if (Core.Diary.is_migraine_now()) {
         Core.close_current_migraine_attack();
         configure_main_bottom_buttoms(false);
         document.getElementById("migre-now-wrapper").style.display = 'none';
