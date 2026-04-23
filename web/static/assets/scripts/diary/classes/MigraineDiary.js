@@ -58,11 +58,6 @@ class MigraineDiary {
         return this._Attacks;
     }
 
-    set Attacks(value) {
-        this._Attacks = value;
-        localStorage.setItem("migraine_attacks", JSON.stringify(this._Attacks));
-    }
-
     /* Добавить новый приступ в локальное хранилище */
     async add_attack(attack) {
         let attacks = this.Attacks;
